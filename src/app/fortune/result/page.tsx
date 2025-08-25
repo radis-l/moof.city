@@ -195,27 +195,27 @@ function FortuneResultPageContent() {
         {/* Fortune Predictions */}
         <div className="w-full max-w-md space-y-4 mb-8">
           {/* Relationship */}
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4 fortune-container">
             <h3 className="font-bold mb-2 text-pink-300 flex items-center">
               💝 เรื่องรัก
             </h3>
-            <p className="text-sm text-gray-200">{fortune.relationship}</p>
+            <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-line thai-text fortune-text">{fortune.relationship}</p>
           </div>
 
           {/* Work */}
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4 fortune-container">
             <h3 className="font-bold mb-2 text-blue-300 flex items-center">
               💼 การงาน
             </h3>
-            <p className="text-sm text-gray-200">{fortune.work}</p>
+            <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-line thai-text fortune-text">{fortune.work}</p>
           </div>
 
           {/* Health */}
-          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4 fortune-container">
             <h3 className="font-bold mb-2 text-green-300 flex items-center">
               🏥 สุขภาพ
             </h3>
-            <p className="text-sm text-gray-200">{fortune.health}</p>
+            <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-line thai-text fortune-text">{fortune.health}</p>
           </div>
         </div>
 
