@@ -2,23 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
-
-interface FortuneDataEntry {
-  id: string
-  timestamp: string
-  userData: {
-    email: string
-    ageRange: string
-    birthDay: string
-    bloodGroup: string
-  }
-  fortuneResult: {
-    luckyNumber: number
-    relationship: string
-    work: string
-    health: string
-  }
-}
+import type { FortuneDataEntry } from '@/types'
 
 export default function AdminPage() {
   const [data, setData] = useState<FortuneDataEntry[]>([])

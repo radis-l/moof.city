@@ -1,16 +1,9 @@
 import { kv } from '@vercel/kv'
-import type { UserData, FortuneResult } from '@/types'
+import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
 // @vercel/kv automatically detects environment variables in this order:
 // KV_REST_API_URL, STORAGE_REST_API_URL, UPSTASH_REDIS_REST_URL
 // KV_REST_API_TOKEN, STORAGE_REST_API_TOKEN, UPSTASH_REDIS_REST_TOKEN
-
-export interface FortuneDataEntry {
-  id: string
-  timestamp: string
-  userData: UserData
-  fortuneResult: FortuneResult
-}
 
 const KV_KEY = 'fortune-data'
 

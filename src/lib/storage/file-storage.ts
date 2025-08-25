@@ -1,14 +1,6 @@
 import fs from 'fs'
 import path from 'path'
-import type { UserData, FortuneResult } from '@/types'
-
-// Define data structure for storing fortune data
-export interface FortuneDataEntry {
-  id: string
-  timestamp: string
-  userData: UserData
-  fortuneResult: FortuneResult
-}
+import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
 // File paths
 const DATA_DIR = path.join(process.cwd(), 'data')
@@ -140,36 +132,6 @@ export const getAllFortuneData = async (): Promise<{
   }
 }
 
-// Get fortune data by ID
-export const getFortuneDataById = async (id: string): Promise<{
-  success: boolean
-  data?: FortuneDataEntry
-  message: string
-}> => {
-  try {
-    const data = readFortuneData()
-    const entry = data.find(item => item.id === id)
-    
-    if (entry) {
-      return {
-        success: true,
-        data: entry,
-        message: 'Fortune data found'
-      }
-    } else {
-      return {
-        success: false,
-        message: 'Fortune data not found'
-      }
-    }
-  } catch (error: unknown) {
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : 'Error retrieving fortune data'
-    }
-  }
-}
-
 
 // Delete fortune data by ID
 export const deleteFortuneData = async (id: string): Promise<{
@@ -255,7 +217,7 @@ export const exportToCSV = async (): Promise<{
     // Combine headers and rows
     const csvData = [headers, ...rows]
       .map(row => row.join(','))
-      .join('\\n')
+      .join('\n')
     
     return {
       success: true,

@@ -1,4 +1,4 @@
-import type { UserData, FortuneResult } from '@/types'
+import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
 // Import both storage methods
 import {
@@ -16,13 +16,6 @@ import {
   checkEmailExistsKV,
   exportToCSVKV
 } from './kv-storage'
-
-export interface FortuneDataEntry {
-  id: string
-  timestamp: string
-  userData: UserData
-  fortuneResult: FortuneResult
-}
 
 // Detect if we're in production (Vercel) or development
 const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
