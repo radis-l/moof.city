@@ -182,11 +182,11 @@ function FortuneResultPageContent() {
 
         {/* Lucky Number */}
         <div className="bg-black/40 backdrop-blur rounded-lg p-6 mb-6 w-full max-w-md">
-          <h2 className="text-xl font-bold text-center mb-4 text-yellow-300">
+          <h2 className="text-xl font-bold text-center mb-4 text-white">
             🍀 เลขนำโชค
           </h2>
           <div className="flex justify-center">
-            <div className="bg-black/60 border-2 border-yellow-400/50 text-yellow-300 font-bold text-3xl w-20 h-20 rounded-full flex items-center justify-center">
+            <div className="text-white font-bold text-3xl flex items-center justify-center">
               {fortune.luckyNumber}
             </div>
           </div>
