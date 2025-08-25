@@ -1,26 +1,125 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Force MuseoModerno font loading */
+.font-museo-moderno {
+  font-family: var(--font-museo-moderno), "MuseoModerno", sans-serif !important;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Particle Effects - Hero Style */
+#particles-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Small bright particles */
+.particle-small {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(168, 85, 247, 0.9) 25%, rgba(147, 51, 234, 0.8) 60%, rgba(126, 34, 206, 0.4) 100%);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.9), 0 0 20px rgba(147, 51, 234, 0.6);
+  filter: blur(0.3px);
+}
+
+/* Medium glowing particles */
+.particle-medium {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.85) 0%, rgba(168, 85, 247, 0.7) 40%, rgba(126, 34, 206, 0.5) 80%, transparent 100%);
+  box-shadow: 0 0 16px rgba(236, 72, 153, 0.8), 0 0 32px rgba(168, 85, 247, 0.5);
+  filter: blur(0.8px);
+}
+
+/* Large soft particles */
+.particle-large {
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.6) 0%, rgba(88, 28, 135, 0.4) 50%, rgba(59, 7, 100, 0.2) 80%, transparent 100%);
+  box-shadow: 0 0 25px rgba(147, 51, 234, 0.5), 0 0 40px rgba(88, 28, 135, 0.3);
+  filter: blur(1.5px);
+}
+
+/* Gradient Spheres - Hero Style with better contrast */
+.gradient-sphere {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: float 25s infinite ease-in-out;
+}
+
+.gradient-sphere-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.25) 0%, rgba(168, 85, 247, 0.18) 30%, rgba(147, 51, 234, 0.12) 60%, transparent 100%);
+  filter: blur(60px);
+  top: 10%;
+  left: -5%;
+  animation-delay: 0s;
+}
+
+.gradient-sphere-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(147, 51, 234, 0.22) 30%, rgba(126, 34, 206, 0.15) 60%, transparent 100%);
+  filter: blur(80px);
+  top: 40%;
+  right: -10%;
+  animation-delay: -8s;
+}
+
+.gradient-sphere-3 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.28) 0%, rgba(88, 28, 135, 0.20) 40%, rgba(59, 7, 100, 0.12) 70%, transparent 100%);
+  filter: blur(70px);
+  bottom: 15%;
+  left: 20%;
+  animation-delay: -15s;
+}
+
+.gradient-sphere-4 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.20) 0%, rgba(168, 85, 247, 0.15) 50%, rgba(147, 51, 234, 0.08) 80%, transparent 100%);
+  filter: blur(50px);
+  top: 70%;
+  left: 70%;
+  animation-delay: -20s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0px, 0px) scale(1); }
+  25% { transform: translate(20px, -30px) scale(1.1); }
+  50% { transform: translate(-15px, -20px) scale(0.9); }
+  75% { transform: translate(25px, -10px) scale(1.05); }
+}
+
+/* Enhanced mystical glow effects */
+.mystical-glow {
+  position: relative;
+}
+
+.mystical-glow::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, rgba(168, 85, 247, 0.3), rgba(147, 51, 234, 0.3), rgba(126, 34, 206, 0.3));
+  border-radius: inherit;
+  z-index: -1;
+  filter: blur(8px);
+  opacity: 0;
+  animation: mysticalPulse 3s infinite ease-in-out;
+}
+
+@keyframes mysticalPulse {
+  0%, 100% { opacity: 0; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
