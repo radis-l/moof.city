@@ -1,11 +1,9 @@
-import { createClient } from '@vercel/kv'
+import { kv } from '@vercel/kv'
 import type { UserData, FortuneResult } from '@/types'
 
-// Create KV client using Upstash environment variables (STORAGE_ prefix)
-const kv = createClient({
-  url: process.env.STORAGE_REST_API_URL!,
-  token: process.env.STORAGE_REST_API_TOKEN!,
-})
+// @vercel/kv automatically detects environment variables in this order:
+// KV_REST_API_URL, STORAGE_REST_API_URL, UPSTASH_REDIS_REST_URL
+// KV_REST_API_TOKEN, STORAGE_REST_API_TOKEN, UPSTASH_REDIS_REST_TOKEN
 
 export interface FortuneDataEntry {
   id: string
@@ -22,8 +20,10 @@ export const saveFortuneDataKV = async (
   fortuneResult: FortuneResult
 ): Promise<{ success: boolean; message: string; id?: string }> => {
   try {
+    console.log('KV Storage: Attempting to save data')
     // Get existing data
     const existingData: FortuneDataEntry[] = await kv.get(KV_KEY) || []
+    console.log('KV Storage: Retrieved existing data:', existingData.length, 'entries')
     
     // Find existing entry with same email
     const existingEntryIndex = existingData.findIndex(entry => 
@@ -60,7 +60,9 @@ export const saveFortuneDataKV = async (
     }
     
     // Save to KV
+    console.log('KV Storage: Saving', updatedData.length, 'entries to KV')
     await kv.set(KV_KEY, updatedData)
+    console.log('KV Storage: Successfully saved data')
     
     return {
       success: true,
@@ -68,6 +70,7 @@ export const saveFortuneDataKV = async (
       id: entryData.id
     }
   } catch (error: unknown) {
+    console.error('KV Storage Error:', error)
     return {
       success: false,
       message: error instanceof Error ? error.message : 'Error saving fortune data'
@@ -83,7 +86,9 @@ export const getAllFortuneDataKV = async (): Promise<{
   message: string
 }> => {
   try {
+    console.log('KV Storage: Getting all data from key:', KV_KEY)
     const data: FortuneDataEntry[] = await kv.get(KV_KEY) || []
+    console.log('KV Storage: Retrieved', data.length, 'fortune records')
     
     return {
       success: true,
@@ -92,6 +97,7 @@ export const getAllFortuneDataKV = async (): Promise<{
       message: `Retrieved ${data.length} fortune records`
     }
   } catch (error: unknown) {
+    console.error('KV Storage Get Error:', error)
     return {
       success: false,
       data: [],
