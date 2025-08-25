@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "id": "1756145749071",
+    "timestamp": "26/08/2568 01:15:49",
+    "userData": {
+      "email": "test@example.com",
+      "ageRange": "26-35",
+      "birthDay": "Monday",
+      "bloodGroup": "A"
+    },
+    "fortuneResult": {
+      "luckyNumber": 42,
+      "relationship": "Sample relationship fortune",
+      "work": "Sample work fortune",
+      "health": "Sample health fortune",
+      "generatedAt": "2025-08-25T18:15:00.000Z"
+    }
+  }
+]
