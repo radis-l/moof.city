@@ -181,7 +181,7 @@ function FortuneResultPageContent() {
         </div>
 
         {/* Lucky Number */}
-        <div className="bg-black/40 backdrop-blur rounded-lg p-6 mb-6 w-full max-w-md">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-6 mb-6 w-full max-w-md">
           <h2 className="text-xl font-bold text-center mb-4 text-white">
             🍀 เลขนำโชค
           </h2>
@@ -195,7 +195,7 @@ function FortuneResultPageContent() {
         {/* Fortune Predictions */}
         <div className="w-full max-w-md space-y-4 mb-8">
           {/* Relationship */}
-          <div className="bg-black/40 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
             <h3 className="font-bold mb-2 text-pink-300 flex items-center">
               💝 เรื่องรัก
             </h3>
@@ -203,7 +203,7 @@ function FortuneResultPageContent() {
           </div>
 
           {/* Work */}
-          <div className="bg-black/40 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
             <h3 className="font-bold mb-2 text-blue-300 flex items-center">
               💼 การงาน
             </h3>
@@ -211,7 +211,7 @@ function FortuneResultPageContent() {
           </div>
 
           {/* Health */}
-          <div className="bg-black/40 backdrop-blur rounded-lg p-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-4">
             <h3 className="font-bold mb-2 text-green-300 flex items-center">
               🏥 สุขภาพ
             </h3>
