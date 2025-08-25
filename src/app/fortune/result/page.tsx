@@ -117,9 +117,6 @@ function FortuneResultPageContent() {
     router.push('/')
   }
 
-  const handleNewFortune = () => {
-    router.push(`/fortune?email=${encodeURIComponent(userData?.email || '')}`)
-  }
 
   if (loading) {
     return (
@@ -220,20 +217,13 @@ function FortuneResultPageContent() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 w-full max-w-md">
+        <div className="flex justify-center w-full max-w-md">
           <Button 
             variant="outline" 
             onClick={handleStartOver}
-            className="flex-1"
+            className="px-8"
           >
             หน้าแรก
-          </Button>
-          <Button 
-            variant="primary" 
-            onClick={handleNewFortune}
-            className="flex-1"
-          >
-            ดูดวงใหม่
           </Button>
         </div>
 

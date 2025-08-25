@@ -47,16 +47,15 @@ export default function Home() {
       const result = await response.json()
       
       if (result.success && result.exists) {
-        // Email exists, go directly to result page
+        // Email exists, show existing fortune result
         router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
       } else {
-        // Email doesn't exist, go to questionnaire
+        // Email doesn't exist, start new questionnaire
         router.push(`/fortune?email=${encodeURIComponent(email)}`)
       }
     } catch (error) {
       console.error('Error checking email:', error)
-      // Fallback to questionnaire on error
-      router.push(`/fortune?email=${encodeURIComponent(email)}`)
+      setEmailError('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     } finally {
       setLoading(false)
     }

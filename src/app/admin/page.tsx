@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
+import { BarChart } from '@/components/ui/bar-chart'
 import type { FortuneDataEntry } from '@/types'
 
 export default function AdminPage() {
@@ -10,6 +11,7 @@ export default function AdminPage() {
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState<string>('')
   const [clearingAll, setClearingAll] = useState(false)
+  const [chartPeriod, setChartPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily')
 
   const fetchData = async () => {
     setLoading(true)
@@ -106,6 +108,106 @@ export default function AdminPage() {
     }
   }
 
+  // Chart data calculation
+  const chartData = useMemo(() => {
+    if (data.length === 0) return []
+
+    const now = new Date()
+    const counts: Record<string, number> = {}
+
+    if (chartPeriod === 'daily') {
+      // Last 7 days
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(now)
+        date.setDate(date.getDate() - i)
+        const key = date.toISOString().split('T')[0]
+        counts[key] = 0
+      }
+
+      data.forEach(item => {
+        try {
+          // Parse timestamp format "25/08/2567 01:45:23"
+          const [datePart] = item.timestamp.split(' ')
+          const [day, month, year] = datePart.split('/')
+          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year) // Convert Buddhist year to Gregorian
+          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
+          const key = date.toISOString().split('T')[0]
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++
+          }
+        } catch (e) {
+          console.warn('Failed to parse timestamp:', item.timestamp)
+        }
+      })
+
+      return Object.entries(counts).map(([date, count]) => ({
+        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        value: count,
+        date
+      }))
+    } else if (chartPeriod === 'weekly') {
+      // Last 8 weeks
+      for (let i = 7; i >= 0; i--) {
+        const date = new Date(now)
+        date.setDate(date.getDate() - (i * 7))
+        const weekStart = new Date(date)
+        weekStart.setDate(date.getDate() - date.getDay())
+        const key = weekStart.toISOString().split('T')[0]
+        counts[key] = 0
+      }
+
+      data.forEach(item => {
+        try {
+          const [datePart] = item.timestamp.split(' ')
+          const [day, month, year] = datePart.split('/')
+          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
+          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
+          const weekStart = new Date(date)
+          weekStart.setDate(date.getDate() - date.getDay())
+          const key = weekStart.toISOString().split('T')[0]
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++
+          }
+        } catch (e) {
+          console.warn('Failed to parse timestamp:', item.timestamp)
+        }
+      })
+
+      return Object.entries(counts).map(([date, count]) => ({
+        label: `W${Math.ceil((new Date(date).getTime() - new Date(new Date(date).getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000))}`,
+        value: count,
+        date
+      }))
+    } else {
+      // Last 6 months
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        const key = date.toISOString().split('T')[0].substring(0, 7) // YYYY-MM
+        counts[key] = 0
+      }
+
+      data.forEach(item => {
+        try {
+          const [datePart] = item.timestamp.split(' ')
+          const [, month, year] = datePart.split('/')
+          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
+          const key = `${actualYear}-${month.padStart(2, '0')}`
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++
+          }
+        } catch (e) {
+          console.warn('Failed to parse timestamp:', item.timestamp)
+        }
+      })
+
+      return Object.entries(counts).map(([date, count]) => ({
+        label: new Date(date + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+        value: count,
+        date
+      }))
+    }
+  }, [data, chartPeriod])
+
   useEffect(() => {
     fetchData()
   }, [])
@@ -171,6 +273,48 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Email Count Chart */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold">Email Count Trends</h2>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setChartPeriod('daily')}
+                className={`px-3 py-1 text-sm rounded ${
+                  chartPeriod === 'daily'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Daily
+              </button>
+              <button
+                onClick={() => setChartPeriod('weekly')}
+                className={`px-3 py-1 text-sm rounded ${
+                  chartPeriod === 'weekly'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Weekly
+              </button>
+              <button
+                onClick={() => setChartPeriod('monthly')}
+                className={`px-3 py-1 text-sm rounded ${
+                  chartPeriod === 'monthly'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Monthly
+              </button>
+            </div>
+          </div>
+          <div className="h-64">
+            <BarChart data={chartData} maxHeight={200} />
+          </div>
+        </div>
+
         {/* Error Display */}
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
@@ -229,8 +373,22 @@ export default function AdminPage() {
                         {item.userData.bloodGroup}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(item.timestamp.split(' ').reverse().join('-')).toLocaleDateString('en-GB')} <br/>
-                        <span className="text-xs">{item.timestamp.split(' ')[1]}</span>
+                        {(() => {
+                          try {
+                            const [datePart, timePart] = item.timestamp.split(' ')
+                            const [day, month, year] = datePart.split('/')
+                            const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
+                            const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
+                            return (
+                              <>
+                                {date.toLocaleDateString('en-GB')}<br/>
+                                <span className="text-xs">{timePart}</span>
+                              </>
+                            )
+                          } catch {
+                            return item.timestamp
+                          }
+                        })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button

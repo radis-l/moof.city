@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress-bar'
@@ -44,6 +44,7 @@ function FortunePageContent() {
   const [ageRange, setAgeRange] = useState<AgeRange | ''>('')
   const [birthDay, setBirthDay] = useState<BirthDay | ''>('')
   const [bloodGroup, setBloodGroup] = useState<BloodGroup | ''>('')
+  const [loading, setLoading] = useState(true)
 
   const totalSteps = 3
   const isStepValid = () => {
@@ -134,9 +135,44 @@ function FortunePageContent() {
     }
   }
 
-  if (!email) {
-    router.push('/')
-    return null
+  useEffect(() => {
+    const checkEmailExists = async () => {
+      if (!email) {
+        router.push('/')
+        return
+      }
+
+      try {
+        const response = await fetch(`/api/storage/check-email?email=${encodeURIComponent(email)}`)
+        const result = await response.json()
+        
+        if (result.success && result.exists) {
+          // Email already exists, redirect to results
+          router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
+          return
+        }
+        
+        // Email doesn't exist, allow questionnaire
+        setLoading(false)
+      } catch (error) {
+        console.error('Error checking email:', error)
+        // On error, allow questionnaire
+        setLoading(false)
+      }
+    }
+
+    checkEmailExists()
+  }, [email, router])
+
+  if (!email || loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
+        <div className="text-center">
+          <MoofLogo />
+          <p className="mt-4 text-gray-300">กำลังตรวจสอบ...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
