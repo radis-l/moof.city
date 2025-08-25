@@ -152,7 +152,7 @@ const generateWorkFortune = (
   const baseMessage = ageTemplates[randomIndex]
   const bloodMessage = bloodModifiers[bloodGroup as keyof typeof bloodModifiers] || bloodModifiers['A']
   
-  return Math.random() > 0.5 ? baseMessage : bloodMessage
+  return `${baseMessage} ${bloodMessage}`
 }
 
 // Generate health fortune
