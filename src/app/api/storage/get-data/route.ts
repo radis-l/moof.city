@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllFortuneData } from '@/lib/storage/file-storage'
+import { getAllFortuneData } from '@/lib/storage/hybrid-storage'
 
 // Get all fortune data from local file storage
 export async function GET() {

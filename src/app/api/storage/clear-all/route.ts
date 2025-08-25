@@ -1,25 +1,15 @@
 import { NextResponse } from 'next/server'
-import fs from 'fs'
-import path from 'path'
-
-const DATA_DIR = path.join(process.cwd(), 'data')
-const FORTUNE_FILE = path.join(DATA_DIR, 'fortune-data.json')
+import { clearAllFortuneData } from '@/lib/storage/hybrid-storage'
 
 // Clear all fortune data
 export async function DELETE() {
   try {
-    // Ensure data directory exists
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true })
-    }
-    
-    // Write empty array to file
-    fs.writeFileSync(FORTUNE_FILE, '[]')
+    const result = await clearAllFortuneData()
     
     return NextResponse.json({
-      success: true,
-      message: 'All fortune data cleared successfully'
-    }, { status: 200 })
+      success: result.success,
+      message: result.message
+    }, { status: result.success ? 200 : 500 })
     
   } catch (error: unknown) {
     console.error('Error clearing all data:', error)

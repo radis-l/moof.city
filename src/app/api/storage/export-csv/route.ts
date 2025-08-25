@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { exportToCSV } from '@/lib/storage/file-storage'
+import { exportToCSV } from '@/lib/storage/hybrid-storage'
 
 // Export fortune data as CSV
 export async function GET() {

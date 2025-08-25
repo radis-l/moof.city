@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveFortuneData } from '@/lib/storage/file-storage'
+import { saveFortuneData } from '@/lib/storage/hybrid-storage'
 import { validateFortuneForm } from '@/lib/validation'
 import type { FortuneResult } from '@/types'
 

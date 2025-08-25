@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllFortuneData } from '@/lib/storage/file-storage'
+import { checkEmailExists } from '@/lib/storage/hybrid-storage'
 
 // Check if email exists and return latest fortune
 export async function GET(request: NextRequest) {
@@ -14,29 +14,20 @@ export async function GET(request: NextRequest) {
       }, { status: 400 })
     }
     
-    const result = await getAllFortuneData()
+    const result = await checkEmailExists(email)
     
-    if (!result.success) {
-      return NextResponse.json({
-        success: false,
-        error: 'Failed to fetch data'
-      }, { status: 500 })
-    }
-    
-    // Find entry with matching email
-    const userEntry = result.data.find(entry => entry.userData.email === email)
-    
-    if (userEntry) {
+    if (result.success) {
       return NextResponse.json({
         success: true,
-        exists: true,
-        fortune: userEntry
+        exists: result.exists,
+        fortune: result.fortune
       }, { status: 200 })
     } else {
       return NextResponse.json({
-        success: true,
-        exists: false
-      }, { status: 200 })
+        success: false,
+        error: 'Failed to check email',
+        message: result.message
+      }, { status: 500 })
     }
     
   } catch (error: unknown) {

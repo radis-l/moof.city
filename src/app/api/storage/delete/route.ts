@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { deleteFortuneData } from '@/lib/storage/file-storage'
+import { deleteFortuneData } from '@/lib/storage/hybrid-storage'
 
 // Delete fortune data by ID
 export async function DELETE(request: NextRequest) {
