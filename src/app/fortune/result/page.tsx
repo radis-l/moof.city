@@ -186,7 +186,7 @@ function FortuneResultPageContent() {
             🍀 เลขนำโชค
           </h2>
           <div className="flex justify-center">
-            <div className="text-white font-bold text-3xl flex items-center justify-center">
+            <div className="text-white font-bold text-6xl flex items-center justify-center">
               {fortune.luckyNumber}
             </div>
           </div>
