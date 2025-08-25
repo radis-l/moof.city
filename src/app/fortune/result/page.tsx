@@ -178,7 +178,7 @@ function FortuneResultPageContent() {
         </div>
 
         {/* Lucky Number */}
-        <div className="bg-white/10 backdrop-blur rounded-lg p-6 mb-6 w-full max-w-md">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-6 mb-4 w-full max-w-md">
           <h2 className="text-xl font-bold text-center mb-4 text-white">
             🍀 เลขนำโชค
           </h2>
@@ -190,7 +190,7 @@ function FortuneResultPageContent() {
         </div>
 
         {/* Fortune Predictions */}
-        <div className="w-full max-w-md space-y-4 mb-8">
+        <div className="w-full max-w-md space-y-4 mb-3">
           {/* Relationship */}
           <div className="bg-white/10 backdrop-blur rounded-lg p-4 fortune-container">
             <h3 className="font-bold mb-2 text-pink-300 flex items-center">
@@ -216,29 +216,31 @@ function FortuneResultPageContent() {
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex justify-center w-full max-w-md">
-          <Button 
-            variant="outline" 
-            onClick={handleStartOver}
-            className="px-8"
-          >
-            หน้าแรก
-          </Button>
+        {/* Footer */}
+        <div className="text-center mb-20">
+          <div className="text-xs text-gray-500">
+            Powered by <span className="font-bold text-white font-museo-moderno">MOOF</span>
+          </div>
         </div>
+
 
         {/* Saving Status */}
         {saving && (
-          <p className="text-xs text-gray-400 mt-4">กำลังบันทึกข้อมูล...</p>
+          <p className="text-xs text-gray-400 mt-4">กำลังบันทึกข้อมูল...</p>
         )}
       </div>
 
-      {/* Footer */}
-      <div className="text-center pb-6 relative z-10">
-        <div className="text-xs text-gray-500">
-          Powered by <span className="font-bold text-white font-museo-moderno">MOOF</span>
-        </div>
+      {/* Fixed Bottom Button */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+        <Button 
+          variant="outline" 
+          onClick={handleStartOver}
+          className="px-8 py-3 bg-white/10 backdrop-blur border-white/20 hover:bg-white/20 text-white font-medium shadow-lg"
+        >
+          หน้าแรก
+        </Button>
       </div>
+
     </div>
   )
 }

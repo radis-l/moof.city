@@ -59,6 +59,8 @@ src/
 - ✅ Added hourly filter to bar chart (H/D/W/M)
 - ✅ Implemented secure admin authentication system
 - ✅ Added password change interface via admin panel
+- ✅ Improved mobile UX with floating back button
+- ✅ Optimized spacing and layout for better visual balance
 
 ## 🔐 Authentication System
 - **Login**: `/admin` requires password authentication
