@@ -67,7 +67,6 @@ src/
 - **Password Management**: Change password via admin UI
 - **Session**: 24-hour expiry, secure logout functionality
 - **APIs**: `/api/auth/login`, `/api/auth/verify`, `/api/auth/logout`, `/api/auth/change-password`
-
 ## 🚀 Commands
 ```bash
 npm run dev    # Development server
