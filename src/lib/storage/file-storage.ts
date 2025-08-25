@@ -170,32 +170,6 @@ export const getFortuneDataById = async (id: string): Promise<{
   }
 }
 
-// Get recent fortune data (last N entries)
-export const getRecentFortuneData = async (limit: number = 10): Promise<{
-  success: boolean
-  data: FortuneDataEntry[]
-  message: string
-}> => {
-  try {
-    const allData = readFortuneData()
-    // Sort by timestamp (newest first) and limit results
-    const recentData = allData
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, limit)
-    
-    return {
-      success: true,
-      data: recentData,
-      message: `Retrieved ${recentData.length} recent fortune records`
-    }
-  } catch (error: unknown) {
-    return {
-      success: false,
-      data: [],
-      message: error instanceof Error ? error.message : 'Error retrieving recent fortune data'
-    }
-  }
-}
 
 // Delete fortune data by ID
 export const deleteFortuneData = async (id: string): Promise<{

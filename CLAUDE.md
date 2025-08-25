@@ -19,10 +19,10 @@ After collecting user data, provide personalized fortune telling including:
 - **Health Fortune**: Wellness and health predictions (100-120 characters)
 
 ### Data Storage
-All collected user information stored in local JSON file:
-- Store: email, age range, birth day, blood group, timestamp, generated fortune
-- Format: `/data/fortune-data.json`
-- Features: Auto-save, duplicate prevention, CSV export capability
+**Hybrid Storage System** (automatically switches based on environment):
+- **Development**: Local JSON files (`/data/fortune-data.json`)
+- **Production**: Upstash Redis (Vercel KV integration)
+- **Features**: Auto-save, duplicate prevention, CSV export, admin dashboard
 
 ## Technical Requirements
 
@@ -34,21 +34,23 @@ All collected user information stored in local JSON file:
 - Thai language interface with authentic conversational tone
 
 ### Backend
-- Next.js API routes
+- Next.js API routes with hybrid storage
 - Data validation and sanitization with Zod
-- Fortune generation algorithm
-- Local file storage system
-- Error handling and logging
+- Fortune generation algorithm (96+ variations)
+- Hybrid storage (files + Redis)
+- Upstash Redis integration via @vercel/kv
+- Error handling and comprehensive logging
 - Duplicate prevention logic
 
 ### Authentication
 - Simple email collection (no OAuth required)
 - Email validation with Zod schemas
 
-### Data Storage
-- Local JSON file storage (`/data/fortune-data.json`)
-- No external APIs or setup required
-- Automatic backup through file system
+### Production Database
+- **Upstash Redis** (free tier: 500K commands/month)
+- **Zero configuration** (auto-detected environment variables)
+- **Production-ready** data persistence and scalability
+- **Admin dashboard** fully functional in production
 
 ## Project Structure
 
@@ -182,14 +184,16 @@ No environment variables required! The application works completely offline with
 ## 🎉 FINAL IMPLEMENTATION STATUS: 100% COMPLETE
 
 ### Tech Stack Summary:
-- ✅ **Data Storage**: Local File Storage (JSON) - Zero setup required
+- ✅ **Data Storage**: Hybrid System (Files + Redis) - Production ready
+- ✅ **Database**: Upstash Redis via Vercel KV integration
 - ✅ **Authentication**: Simple email validation - No OAuth complexity
-- ✅ **Approach**: Production-ready MVP with all features
+- ✅ **Approach**: Production-ready MVP with scalable database
 
 ### Dependencies:
 ```json
 {
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "next": "15.5.0",
     "react": "19.1.0", 
     "react-dom": "19.1.0",
@@ -246,37 +250,45 @@ No environment variables required! The application works completely offline with
 ### 🏗️ FINAL PROJECT STRUCTURE:
 ```
 📁 booking-platform/
-├── 📄 package.json              # Dependencies (4 total)
+├── 📄 package.json                    # Dependencies (5 total)
+├── 📄 CLAUDE.md                       # Project documentation
+├── 📄 VERCEL_KV_SETUP.md             # Database setup guide
 ├── 📁 data/
-│   └── 📄 fortune-data.json     # User fortune storage
+│   └── 📄 fortune-data.json           # Local development storage
 ├── 📁 src/
 │   ├── 📁 app/
-│   │   ├── 📄 page.tsx          # Thai landing page
-│   │   ├── 📄 layout.tsx        # App layout + fonts
+│   │   ├── 📄 page.tsx                # Thai landing page
+│   │   ├── 📄 layout.tsx              # App layout + fonts
 │   │   ├── 📁 admin/
-│   │   │   └── 📄 page.tsx      # Data management dashboard
-│   │   ├── 📁 api/storage/      # 7 API endpoints
-│   │   │   ├── check-email/     # Check if email exists
-│   │   │   ├── clear-all/       # Delete all entries
-│   │   │   ├── delete/          # Delete single entry
-│   │   │   ├── export-csv/      # Export to CSV
-│   │   │   ├── get-data/        # Read all entries
-│   │   │   ├── recent/          # Get recent entries  
-│   │   │   └── save-fortune/    # Create fortune entry
+│   │   │   └── 📄 page.tsx            # Data management dashboard
+│   │   ├── 📁 api/storage/            # 6 API endpoints
+│   │   │   ├── check-email/           # Check if email exists
+│   │   │   ├── clear-all/             # Delete all entries
+│   │   │   ├── delete/                # Delete single entry
+│   │   │   ├── export-csv/            # Export to CSV
+│   │   │   ├── get-data/              # Read all entries
+│   │   │   └── save-fortune/          # Create fortune entry
 │   │   └── 📁 fortune/
-│   │       ├── 📄 page.tsx      # Multi-step form
+│   │       ├── 📄 page.tsx            # Multi-step form
 │   │       └── 📁 result/
-│   │           └── 📄 page.tsx  # Fortune display
-│   ├── 📁 components/ui/        # 6 reusable components
+│   │           └── 📄 page.tsx        # Fortune display (6xl lucky number)
+│   ├── 📁 components/ui/              # 5 reusable components
+│   │   ├── button.tsx                 # Button component
+│   │   ├── input.tsx                  # Input component  
+│   │   ├── particle-background.tsx    # Animated background
+│   │   ├── progress-bar.tsx           # Progress indicator
+│   │   └── radio-group.tsx            # Radio group component
 │   ├── 📁 lib/
-│   │   ├── 📄 fortune-generator.ts  # 96+ fortune variations
-│   │   ├── 📄 validation.ts     # Zod schemas
-│   │   └── 📁 storage/
-│   │       └── 📄 file-storage.ts   # File operations
+│   │   ├── 📄 fortune-generator.ts    # 96+ fortune variations
+│   │   ├── 📄 validation.ts           # Zod schemas
+│   │   └── 📁 storage/                # Hybrid storage system
+│   │       ├── file-storage.ts        # Local file operations
+│   │       ├── kv-storage.ts          # Redis/KV operations
+│   │       └── hybrid-storage.ts      # Auto-switching storage
 │   ├── 📁 assets/
-│   │   └── 📄 logo.tsx          # MOOF logo component
+│   │   └── 📄 logo.tsx                # MOOF logo component
 │   └── 📁 types/
-       └── 📄 index.ts          # TypeScript definitions
+       └── 📄 index.ts                # TypeScript definitions
 ```
 
 ### 🎯 LIVE FEATURES:

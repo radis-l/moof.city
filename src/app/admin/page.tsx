@@ -77,23 +77,18 @@ export default function AdminPage() {
     setClearingAll(true)
     setError('')
     try {
-      console.log('Clearing all data...')
       const response = await fetch('/api/storage/clear-all', {
         method: 'DELETE'
       })
       
-      console.log('Clear all response status:', response.status)
       const result = await response.json()
-      console.log('Clear all result:', result)
       
       if (result.success) {
         setData([])
-        console.log('Data cleared successfully')
       } else {
         setError(result.message || 'Failed to clear all data')
       }
     } catch (err: unknown) {
-      console.error('Clear all error:', err)
       setError(err instanceof Error ? err.message : 'Error clearing all data')
     } finally {
       setClearingAll(false)
@@ -108,24 +103,19 @@ export default function AdminPage() {
     setDeleting(id)
     setError('')
     try {
-      console.log('Deleting entry with id:', id)
       const response = await fetch(`/api/storage/delete?id=${id}`, {
         method: 'DELETE'
       })
       
-      console.log('Delete response status:', response.status)
       const result = await response.json()
-      console.log('Delete result:', result)
       
       if (result.success) {
         // Remove from local state
         setData(data.filter(item => item.id !== id))
-        console.log('Entry deleted successfully')
       } else {
         setError(result.message || 'Failed to delete entry')
       }
     } catch (err: unknown) {
-      console.error('Delete error:', err)
       setError(err instanceof Error ? err.message : 'Error deleting entry')
     } finally {
       setDeleting('')
