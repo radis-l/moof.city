@@ -6,6 +6,7 @@ Thai fortune telling website with one-time fortune per email. Users submit age/b
 ## 🏗️ Architecture
 - **Framework**: Next.js 15.5.0 App Router + TypeScript
 - **Storage**: Hybrid (JSON files dev, Redis production)
+- **Authentication**: bcrypt + HTTP-only cookies + environment variables
 - **UI**: Tailwind CSS 4.0, mobile-first
 - **Languages**: Thai interface, no external APIs
 
@@ -16,10 +17,13 @@ src/
 │   ├── page.tsx                    # Landing (email input)
 │   ├── fortune/page.tsx            # 3-step form
 │   ├── fortune/result/page.tsx     # Results display
-│   ├── admin/page.tsx              # Dashboard + analytics
-│   └── api/storage/                # 6 API endpoints
+│   ├── admin/page.tsx              # Protected dashboard + analytics
+│   ├── api/storage/                # 6 API endpoints
+│   └── api/auth/                   # 3 authentication endpoints
 ├── components/ui/
-│   ├── bar-chart.tsx              # Admin chart (NEW)
+│   ├── bar-chart.tsx              # Admin chart with H/D/W/M filters
+│   ├── admin-login.tsx            # Secure login form
+│   ├── change-password-modal.tsx  # Password management UI
 │   └── [4 other UI components]
 ├── lib/
 │   ├── fortune-generator.ts        # Algorithm (96+ variations)
@@ -38,7 +42,8 @@ src/
 - **Fortune Generation**: Deterministic (same input = same output)
 - **Components**: Functional with hooks, full TypeScript
 - **Error Handling**: Thai messages, graceful fallbacks
-- **Admin Analytics**: Bar chart with D/M/W filters
+- **Admin Analytics**: Bar chart with H/D/W/M filters (Hourly/Daily/Weekly/Monthly)
+- **Admin Security**: Password-protected with bcrypt hashing and session management
 
 ## ⚠️ Critical Constraints
 - **One Fortune Per Email**: No questionnaire retaking
@@ -51,6 +56,17 @@ src/
 - ✅ Added email existence check in questionnaire
 - ✅ Enhanced admin with interactive charts
 - ✅ Fixed Buddhist year timestamp parsing
+- ✅ Added hourly filter to bar chart (H/D/W/M)
+- ✅ Implemented secure admin authentication system
+- ✅ Added password change interface via admin panel
+
+## 🔐 Authentication System
+- **Login**: `/admin` requires password authentication
+- **Security**: bcrypt hashing (salt rounds: 12) + HTTP-only session cookies
+- **Password Storage**: `.env.local` file (protected from Git)
+- **Password Management**: Change password via admin UI
+- **Session**: 24-hour expiry, secure logout functionality
+- **APIs**: `/api/auth/login`, `/api/auth/verify`, `/api/auth/logout`, `/api/auth/change-password`
 
 ## 🚀 Commands
 ```bash
@@ -60,4 +76,4 @@ npm run lint   # Code linting
 ```
 
 ---
-**Status**: Production Ready | **Features**: 18/18 ✅ | **Files**: 24 TypeScript
+**Status**: Production Ready | **Features**: 22/22 ✅ | **Files**: 27 TypeScript

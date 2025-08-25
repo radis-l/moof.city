@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { BarChart } from '@/components/ui/bar-chart'
+import { AdminLogin } from '@/components/ui/admin-login'
+import { ChangePasswordModal } from '@/components/ui/change-password-modal'
 import type { FortuneDataEntry } from '@/types'
 
 export default function AdminPage() {
@@ -11,7 +13,28 @@ export default function AdminPage() {
   const [error, setError] = useState('')
   const [deleting, setDeleting] = useState<string>('')
   const [clearingAll, setClearingAll] = useState(false)
-  const [chartPeriod, setChartPeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily')
+  const [chartPeriod, setChartPeriod] = useState<'hourly' | 'daily' | 'weekly' | 'monthly'>('daily')
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+  const [showPasswordModal, setShowPasswordModal] = useState(false)
+
+  const checkAuthentication = async () => {
+    try {
+      const response = await fetch('/api/auth/verify')
+      const result = await response.json()
+      setIsAuthenticated(result.authenticated)
+    } catch {
+      setIsAuthenticated(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      setIsAuthenticated(false)
+    } catch {
+      setIsAuthenticated(false)
+    }
+  }
 
   const fetchData = async () => {
     setLoading(true)
@@ -115,7 +138,38 @@ export default function AdminPage() {
     const now = new Date()
     const counts: Record<string, number> = {}
 
-    if (chartPeriod === 'daily') {
+    if (chartPeriod === 'hourly') {
+      // Last 24 hours
+      for (let i = 23; i >= 0; i--) {
+        const date = new Date(now)
+        date.setHours(date.getHours() - i, 0, 0, 0)
+        const key = date.toISOString().substring(0, 13) // YYYY-MM-DDTHH
+        counts[key] = 0
+      }
+
+      data.forEach(item => {
+        try {
+          // Parse timestamp format "25/08/2567 01:45:23"
+          const [datePart, timePart] = item.timestamp.split(' ')
+          const [day, month, year] = datePart.split('/')
+          const [hour] = timePart.split(':')
+          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
+          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day), parseInt(hour))
+          const key = date.toISOString().substring(0, 13) // YYYY-MM-DDTHH
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++
+          }
+        } catch (e) {
+          console.warn('Failed to parse timestamp:', item.timestamp)
+        }
+      })
+
+      return Object.entries(counts).map(([dateHour, count]) => ({
+        label: new Date(dateHour + ':00:00').getHours().toString().padStart(2, '0') + ':00',
+        value: count,
+        date: dateHour
+      }))
+    } else if (chartPeriod === 'daily') {
       // Last 7 days
       for (let i = 6; i >= 0; i--) {
         const date = new Date(now)
@@ -209,9 +263,30 @@ export default function AdminPage() {
   }, [data, chartPeriod])
 
   useEffect(() => {
-    fetchData()
+    checkAuthentication()
   }, [])
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchData()
+    }
+  }, [isAuthenticated])
+
+  // Show loading while checking authentication
+  if (isAuthenticated === null) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-600">Loading...</div>
+      </div>
+    )
+  }
+
+  // Show login form if not authenticated
+  if (!isAuthenticated) {
+    return <AdminLogin onAuthenticated={() => setIsAuthenticated(true)} />
+  }
+
+  // Show admin dashboard if authenticated
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-7xl mx-auto">
@@ -236,6 +311,20 @@ export default function AdminPage() {
                 className="border-red-300 text-red-600 hover:bg-red-50 hover:border-red-400"
               >
                 {clearingAll ? 'Clearing...' : 'Clear All Data'}
+              </Button>
+              <Button 
+                onClick={() => setShowPasswordModal(true)} 
+                variant="outline"
+                className="border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400"
+              >
+                Change Password
+              </Button>
+              <Button 
+                onClick={handleLogout} 
+                variant="outline"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50 hover:border-gray-400"
+              >
+                Logout
               </Button>
             </div>
           </div>
@@ -278,6 +367,16 @@ export default function AdminPage() {
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold">Email Count Trends</h2>
             <div className="flex space-x-2">
+              <button
+                onClick={() => setChartPeriod('hourly')}
+                className={`px-3 py-1 text-sm rounded ${
+                  chartPeriod === 'hourly'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                Hourly
+              </button>
               <button
                 onClick={() => setChartPeriod('daily')}
                 className={`px-3 py-1 text-sm rounded ${
@@ -406,6 +505,13 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+
+        {/* Password Change Modal */}
+        <ChangePasswordModal
+          isOpen={showPasswordModal}
+          onClose={() => setShowPasswordModal(false)}
+          onSuccess={() => setShowPasswordModal(false)}
+        />
       </div>
     </div>
   )
