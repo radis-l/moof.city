@@ -1,5 +1,11 @@
-import { kv } from '@vercel/kv'
+import { createClient } from '@vercel/kv'
 import type { UserData, FortuneResult } from '@/types'
+
+// Create KV client using Upstash environment variables (STORAGE_ prefix)
+const kv = createClient({
+  url: process.env.STORAGE_REST_API_URL!,
+  token: process.env.STORAGE_REST_API_TOKEN!,
+})
 
 export interface FortuneDataEntry {
   id: string
