@@ -1,8 +1,79 @@
 @import "tailwindcss";
 
-/* Force MuseoModerno font loading */
+/* MOOF Fortune Telling - Foundation Styles */
+
+/* Typography System - Major Third Scale (1.250) */
+:root {
+  /* Font Families */
+  --font-heading: var(--font-maitree), "Maitree", serif;
+  --font-body: var(--font-kanit), "Kanit", sans-serif;
+  --font-logo: var(--font-museo-moderno), "MuseoModerno", sans-serif;
+  
+  /* Typography Scale - Major Third (1.250) - Base 18px */
+  --text-xs: 0.75rem;     /* 12px */
+  --text-sm: 0.875rem;    /* 14px */
+  --text-base: 1.125rem;  /* 18px */
+  --text-lg: 1.375rem;    /* 22px */
+  --text-xl: 1.75rem;     /* 28px */
+  --text-2xl: 2.1875rem;  /* 35px */
+  --text-3xl: 2.75rem;    /* 44px */
+  --text-4xl: 3.4375rem;  /* 55px */
+  --text-5xl: 4.25rem;    /* 68px */
+  
+  /* 8-Point Spacing System */
+  --space-1: 0.5rem;   /* 8px */
+  --space-2: 1rem;     /* 16px */
+  --space-3: 1.5rem;   /* 24px */
+  --space-4: 2rem;     /* 32px */
+  --space-5: 2.5rem;   /* 40px */
+  --space-6: 3rem;     /* 48px */
+  --space-8: 4rem;     /* 64px */
+  --space-10: 5rem;    /* 80px */
+  
+  /* Color Palette */
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+  --color-purple-400: #A78BFA;
+  --color-purple-500: #8B5CF6;
+  --color-purple-600: #7C3AED;
+  --color-purple-700: #6D28D9;
+  --color-gray-100: #F3F4F6;
+  --color-gray-200: #E5E7EB;
+  --color-gray-400: #9CA3AF;
+  --color-gray-500: #6B7280;
+  --color-gray-700: #374151;
+  --color-gray-800: #1F2937;
+  --color-gray-900: #111827;
+}
+
+/* Typography Classes */
+.font-heading {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.font-body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.font-logo {
+  font-family: var(--font-logo);
+}
+
+/* Force MuseoModerno font loading for logo */
 .font-museo-moderno {
   font-family: var(--font-museo-moderno), "MuseoModerno", sans-serif !important;
+}
+
+/* Ensure MuseoModerno loads with higher specificity */
+.font-logo,
+.font-museo-moderno {
+  font-family: var(--font-museo-moderno), "MuseoModerno", Helvetica, Arial, sans-serif !important;
+  font-display: swap;
 }
 
 /* Particle Effects - Hero Style */
@@ -23,105 +94,130 @@
   pointer-events: none;
 }
 
-/* Small bright particles */
+/* Enhanced Mystical Particles - Brighter & More Visible */
 .particle-small {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.95) 0%, rgba(168, 85, 247, 0.9) 25%, rgba(147, 51, 234, 0.8) 60%, rgba(126, 34, 206, 0.4) 100%);
-  box-shadow: 0 0 10px rgba(168, 85, 247, 0.9), 0 0 20px rgba(147, 51, 234, 0.6);
-  filter: blur(0.3px);
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(139, 92, 246, 0.95) 30%, rgba(124, 58, 237, 0.8) 70%, rgba(109, 40, 217, 0.4) 100%);
+  box-shadow: 
+    0 0 8px rgba(139, 92, 246, 1),
+    0 0 16px rgba(124, 58, 237, 0.8),
+    0 0 24px rgba(109, 40, 217, 0.4);
+  filter: blur(0.2px);
 }
 
-/* Medium glowing particles */
 .particle-medium {
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.85) 0%, rgba(168, 85, 247, 0.7) 40%, rgba(126, 34, 206, 0.5) 80%, transparent 100%);
-  box-shadow: 0 0 16px rgba(236, 72, 153, 0.8), 0 0 32px rgba(168, 85, 247, 0.5);
-  filter: blur(0.8px);
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.9) 0%, rgba(139, 92, 246, 0.8) 40%, rgba(124, 58, 237, 0.6) 80%, transparent 100%);
+  box-shadow: 
+    0 0 12px rgba(167, 139, 250, 0.9),
+    0 0 24px rgba(139, 92, 246, 0.7),
+    0 0 36px rgba(124, 58, 237, 0.4);
+  filter: blur(0.5px);
 }
 
-/* Large soft particles */
 .particle-large {
-  background: radial-gradient(circle, rgba(147, 51, 234, 0.6) 0%, rgba(88, 28, 135, 0.4) 50%, rgba(59, 7, 100, 0.2) 80%, transparent 100%);
-  box-shadow: 0 0 25px rgba(147, 51, 234, 0.5), 0 0 40px rgba(88, 28, 135, 0.3);
-  filter: blur(1.5px);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.7) 0%, rgba(124, 58, 237, 0.5) 50%, rgba(109, 40, 217, 0.3) 80%, transparent 100%);
+  box-shadow: 
+    0 0 20px rgba(139, 92, 246, 0.6),
+    0 0 40px rgba(124, 58, 237, 0.4),
+    0 0 60px rgba(109, 40, 217, 0.2);
+  filter: blur(1px);
 }
 
-/* Gradient Spheres - Hero Style with better contrast */
+/* Enhanced Gradient Spheres - More Visible Purple Mystical Effect */
 .gradient-sphere {
   position: absolute;
   border-radius: 50%;
   pointer-events: none;
-  animation: float 25s infinite ease-in-out;
+  animation: float 30s infinite ease-in-out;
 }
 
 .gradient-sphere-1 {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.25) 0%, rgba(168, 85, 247, 0.18) 30%, rgba(147, 51, 234, 0.12) 60%, transparent 100%);
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, rgba(139, 92, 246, 0.25) 40%, rgba(124, 58, 237, 0.15) 70%, transparent 100%);
   filter: blur(60px);
   top: 10%;
-  left: -5%;
+  left: -10%;
   animation-delay: 0s;
 }
 
 .gradient-sphere-2 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.3) 0%, rgba(147, 51, 234, 0.22) 30%, rgba(126, 34, 206, 0.15) 60%, transparent 100%);
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, rgba(124, 58, 237, 0.3) 40%, rgba(109, 40, 217, 0.18) 70%, transparent 100%);
   filter: blur(80px);
   top: 40%;
-  right: -10%;
-  animation-delay: -8s;
+  right: -15%;
+  animation-delay: -10s;
 }
 
 .gradient-sphere-3 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(147, 51, 234, 0.28) 0%, rgba(88, 28, 135, 0.20) 40%, rgba(59, 7, 100, 0.12) 70%, transparent 100%);
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(124, 58, 237, 0.35) 0%, rgba(109, 40, 217, 0.22) 50%, rgba(88, 28, 135, 0.12) 80%, transparent 100%);
   filter: blur(70px);
   bottom: 15%;
-  left: 20%;
-  animation-delay: -15s;
-}
-
-.gradient-sphere-4 {
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.20) 0%, rgba(168, 85, 247, 0.15) 50%, rgba(147, 51, 234, 0.08) 80%, transparent 100%);
-  filter: blur(50px);
-  top: 70%;
-  left: 70%;
+  left: 15%;
   animation-delay: -20s;
 }
 
-@keyframes float {
-  0%, 100% { transform: translate(0px, 0px) scale(1); }
-  25% { transform: translate(20px, -30px) scale(1.1); }
-  50% { transform: translate(-15px, -20px) scale(0.9); }
-  75% { transform: translate(25px, -10px) scale(1.05); }
+.gradient-sphere-4 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.3) 0%, rgba(139, 92, 246, 0.18) 60%, rgba(124, 58, 237, 0.08) 90%, transparent 100%);
+  filter: blur(50px);
+  top: 70%;
+  right: 20%;
+  animation-delay: -25s;
 }
 
-/* Enhanced mystical glow effects */
+@keyframes float {
+  0%, 100% { transform: translate(0px, 0px) scale(1) rotate(0deg); }
+  25% { transform: translate(15px, -20px) scale(1.05) rotate(90deg); }
+  50% { transform: translate(-10px, -15px) scale(0.95) rotate(180deg); }
+  75% { transform: translate(20px, -8px) scale(1.02) rotate(270deg); }
+}
+
+/* Enhanced Mystical Glow Effects */
 .mystical-glow {
   position: relative;
+  transition: all 0.3s ease;
 }
 
 .mystical-glow::before {
   content: '';
   position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  background: linear-gradient(45deg, rgba(168, 85, 247, 0.3), rgba(147, 51, 234, 0.3), rgba(126, 34, 206, 0.3));
+  top: -3px;
+  left: -3px;
+  right: -3px;
+  bottom: -3px;
+  background: linear-gradient(45deg, 
+    rgba(167, 139, 250, 0.4), 
+    rgba(139, 92, 246, 0.4), 
+    rgba(124, 58, 237, 0.4), 
+    rgba(109, 40, 217, 0.4)
+  );
   border-radius: inherit;
   z-index: -1;
-  filter: blur(8px);
+  filter: blur(12px);
   opacity: 0;
-  animation: mysticalPulse 3s infinite ease-in-out;
+  animation: mysticalPulse 4s infinite ease-in-out;
+}
+
+.mystical-glow:hover::before {
+  opacity: 0.8;
+  filter: blur(16px);
+  animation: mysticalPulse 2s infinite ease-in-out;
 }
 
 @keyframes mysticalPulse {
-  0%, 100% { opacity: 0; transform: scale(0.95); }
-  50% { opacity: 1; transform: scale(1.05); }
+  0%, 100% { 
+    opacity: 0; 
+    transform: scale(0.9); 
+  }
+  50% { 
+    opacity: 0.6; 
+    transform: scale(1.1); 
+  }
 }
 
 /* Thai text optimization for mobile */
@@ -131,16 +227,76 @@
   letter-spacing: 0.3px;
 }
 
+/* Layout System */
+.container-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-3);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.grid-full { grid-column: 1 / -1; }
+.grid-half { grid-column: span 6; }
+.grid-third { grid-column: span 4; }
+.grid-quarter { grid-column: span 3; }
+
+/* Main Layout Classes */
+.mystical-background {
+  background: linear-gradient(135deg, #000000 0%, #111827 50%, #000000 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+
+.content-section {
+  position: relative;
+  z-index: 10;
+  padding: var(--space-6) 0;
+}
+
+.card-mystical {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 16px;
+  padding: var(--space-4);
+  transition: all 0.3s ease;
+}
+
+.card-mystical:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(139, 92, 246, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+}
+
 /* Enhanced mobile text readability */
 @media (max-width: 640px) {
+  .container-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+    padding: 0 var(--space-2);
+  }
+  
+  .grid-full { grid-column: 1 / -1; }
+  .grid-half { grid-column: span 2; }
+  .grid-third { grid-column: span 2; }
+  .grid-quarter { grid-column: span 1; }
+  
   .fortune-text {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     line-height: 1.7;
-    padding: 0.25rem;
+    padding: var(--space-1);
   }
   
   .fortune-container {
-    padding: 1rem;
-    margin: 0.75rem 0;
+    padding: var(--space-2);
+    margin: var(--space-2) 0;
+  }
+  
+  .content-section {
+    padding: var(--space-4) 0;
   }
 }

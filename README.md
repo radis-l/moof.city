@@ -14,7 +14,7 @@ A beautiful, personalized fortune telling experience that reveals your lucky num
 
 ### 🎨 **Beautiful Experience**
 - **Modern Thai Design** - Elegant dark gradient theme with authentic typography
-- **Mobile Optimized** - Perfect experience on all devices
+- **Mobile-Only Focus** - Exclusively designed for smartphone experience
 - **Instant Results** - Get your fortune immediately after answering 3 simple questions
 - **One-Time Reading** - Each email gets a unique, permanent fortune
 
@@ -28,7 +28,9 @@ A beautiful, personalized fortune telling experience that reveals your lucky num
 ## 🚀 Getting Started
 
 ### For Users
-Simply visit the website and begin your fortune telling journey! The process takes less than 2 minutes and provides you with lifetime access to your personal reading.
+Simply visit the website **on your mobile device** and begin your fortune telling journey! The process takes less than 2 minutes and provides you with lifetime access to your personal reading.
+
+> **Note:** This application is designed exclusively for mobile devices. Desktop and tablet users will see a message directing them to access the site via mobile.
 
 ### For Developers
 ```bash
@@ -58,7 +60,7 @@ Our algorithm combines traditional Thai fortune telling wisdom with modern perso
 - 💖 **Love Compatibility** - Relationship insights and guidance
 - 💼 **Career Forecasting** - Professional success predictions
 - 🌿 **Health Guidance** - Wellness and lifestyle advice
-- 📱 **Mobile First** - Optimized for smartphone use
+- 📱 **Mobile Exclusive** - Designed exclusively for mobile devices
 - 🔒 **Privacy Protected** - Your data stays secure
 - ♻️ **One Fortune Policy** - Authentic, permanent readings
 
@@ -69,7 +71,7 @@ Built with modern web technologies for optimal performance:
 - **Next.js 15.5.0** - React framework for production
 - **TypeScript** - Type-safe development
 - **Tailwind CSS 4.0** - Modern styling framework
-- **Mobile-First Design** - Responsive across all devices
+- **Mobile-Exclusive Design** - Optimized specifically for smartphones
 - **Kanit Font** - Authentic Thai typography
 
 ## 🎨 Design Philosophy
@@ -84,9 +86,10 @@ MOOF combines traditional Thai fortune telling wisdom with contemporary user exp
 
 ### User Experience  
 - **3-Step Process** - Simple questionnaire flow
-- **Floating Navigation** - Always-accessible back button
+- **Floating Navigation** - Always-accessible blur-effect buttons
 - **Instant Results** - No waiting, immediate fortune delivery
 - **Permanent Storage** - One reading per email, saved forever
+- **Mobile-Only Access** - Desktop users redirected to mobile prompt
 
 ## 📊 Analytics & Insights
 
@@ -104,7 +107,8 @@ MOOF is optimized for production deployment:
 - **Static Generation** - Fast loading times
 - **SEO Optimized** - Meta tags and structured data
 - **Mobile Performance** - Lighthouse score optimized
-- **Cross-Browser** - Compatible with all modern browsers
+- **Admin Dashboard** - Secure analytics and data management
+- **Hybrid Storage** - JSON files (dev) + Redis (production)
 
 ## 🎯 Perfect For
 

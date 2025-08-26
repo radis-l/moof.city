@@ -61,82 +61,172 @@ export default function Home() {
     }
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-      <ParticleBackground />
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 relative z-10">
-        <div className="text-sm text-gray-400">
-          ดูดวงฟรีกับ <span className="font-bold text-white font-museo-moderno">MOOF</span>
-        </div>
-        <div className="text-sm text-gray-400">
-          &lt;/&gt;
-        </div>
+    <>
+      {/* Mobile Only - Main Content */}
+      <div className="block md:hidden mystical-background text-white relative overflow-hidden">
+        <ParticleBackground />
+        
+        {/* Header */}
+        <header className="content-section" style={{ paddingTop: 'var(--space-3)' }}>
+          <div className="container-grid">
+            <div className="grid-full flex justify-between items-center">
+              <button 
+                className="font-body cursor-pointer hover:opacity-80 transition-opacity" 
+                style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}
+                onClick={() => router.push('/')}
+              >
+                ดูดวงฟรีกับ <span className="font-logo font-bold text-white">MOOF</span>
+              </button>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}>
+                &lt;/&gt;
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Unified Hero Section */}
+        <main className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10">
+          <div className="w-full max-w-md text-center space-y-4">
+            
+            {/* Main Heading - Integrated */}
+            <h1 
+              className="font-heading text-white font-bold" 
+              style={{ 
+                fontSize: 'var(--text-4xl)', 
+                textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
+                paddingBottom: 'var(--space-2)'
+              }}
+            >
+              ดวงประจำวัน
+            </h1>
+
+            {/* Email Input */}
+            <div>
+              <Input 
+                type="email"
+                placeholder="อีเมล"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                error={emailError}
+                className="text-center"
+              />
+            </div>
+
+            {/* Terms Checkbox */}
+            <div className="flex items-start text-left">
+              <input 
+                type="checkbox" 
+                id="terms" 
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 mr-3 w-4 h-4 accent-purple-500"
+              />
+              <label 
+                htmlFor="terms" 
+                className="font-body text-gray-300 leading-relaxed"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                ยินยอมให้ใช้อีเมลเพื่อวัดประสิทธิภาพโฆษณา
+              </label>
+            </div>
+
+            {/* CTA Button */}
+            <div>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                className="w-full mystical-glow"
+                onClick={handleStartFortune}
+                disabled={loading}
+              >
+                <span className="font-heading font-medium">
+                  {loading ? 'กำลังตรวจสอบ...' : 'ดูดวงของวัน'}
+                </span>
+              </Button>
+            </div>
+
+            {/* Email Policy - Integrated */}
+            <div className="text-left">
+              <div 
+                className="font-body font-medium text-gray-400 mb-2"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                นโยบายการใช้อีเมล:
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span 
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    ไม่มีการนำอีเมลไปใช้ในเชิงพาณิชย์
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span 
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    ไม่มีการแชร์อีเมลกับบุคคลที่สาม
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span 
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    อีเมลจะถูกลบออกภายใน <span className="text-white font-medium">30 วัน</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </main>
+
+        {/* Footer */}
+        <footer className="content-section">
+          <div className="container-grid">
+            <div className="grid-full text-center">
+              <div 
+                className="font-body text-gray-500"
+                style={{ fontSize: 'var(--text-xs)' }}
+              >
+                Powered by <span className="font-logo font-bold text-white">MOOF</span>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10">
-        {/* Logo */}
-        <div className="mb-8">
-          <MoofLogo />
-        </div>
-
-        {/* Main Heading */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">
-          ดวงประจำวัน
-        </h1>
-
-        {/* Email Input */}
-        <div className="w-full max-w-md mb-4">
-          <Input 
-            type="email"
-            placeholder="อีเมล"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            error={emailError}
-            className="text-center"
-          />
-        </div>
-
-        {/* Checkbox */}
-        <div className="flex items-center mb-6">
-          <input 
-            type="checkbox" 
-            id="terms" 
-            checked={agreed}
-            onChange={(e) => setAgreed(e.target.checked)}
-            className="mr-2 w-4 h-4"
-          />
-          <label htmlFor="terms" className="text-sm text-gray-400">
-            ยินยอมให้ใช้อีเมลเพื่อวัดประสิทธิภาพโฆษณา
-          </label>
-        </div>
-
-        {/* Get Fortune Button */}
-        <Button 
-          variant="outline" 
-          size="lg" 
-          className="w-full max-w-md mb-8 mystical-glow"
-          onClick={handleStartFortune}
-          disabled={loading}
-        >
-          {loading ? 'กำลังตรวจสอบ...' : 'ดูดวงของวัน'}
-        </Button>
-
-        {/* Benefits List */}
-        <div className="text-left text-sm text-gray-400 space-y-1">
-          <p>นโยบายการใช้อีเมล:</p>
-          <p>• ไม่มีการนำอีเมลไปใช้ในเชิงพาณิชย์</p>
-          <p>• ไม่มีการแชร์อีเมลกับบุคคลที่สาม</p>
-          <p>• อีเมลจะถูกลบออกภายใน <span className="text-white">30 วัน</span></p>
+      {/* Desktop/Tablet - Mobile Only Message */}
+      <div className="hidden md:flex mystical-background text-white min-h-screen items-center justify-center relative overflow-hidden">
+        <ParticleBackground />
+        <div className="text-center relative z-10 px-6">
+          <div className="mb-8">
+            <MoofLogo />
+          </div>
+          <h1 
+            className="font-heading text-white font-bold mb-6"
+            style={{ 
+              fontSize: 'var(--text-3xl)', 
+              textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+            }}
+          >
+            เว็บไซต์นี้รองรับเฉพาะมือถือ
+          </h1>
+          <p 
+            className="font-body text-gray-300 mb-8 max-w-md mx-auto leading-relaxed"
+            style={{ fontSize: 'var(--text-lg)' }}
+          >
+            กรุณาเปิดเว็บไซต์ผ่านมือถือของคุณ<br />
+            เพื่อประสบการณ์การใช้งานที่ดีที่สุด
+          </p>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="text-center pb-6 relative z-10">
-        <div className="text-xs text-gray-500">
-          Powered by <span className="font-bold text-white font-museo-moderno">MOOF</span>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }

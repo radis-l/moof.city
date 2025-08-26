@@ -90,9 +90,25 @@ function FortunePageContent() {
     switch (currentStep) {
       case 1:
         return (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">คุณอายุเท่าไหร่?</h2>
-            <p className="text-gray-400 mb-8">เลือกช่วงอายุของคุณ</p>
+          <div className="text-center space-y-3">
+            <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
+              <h2 
+                className="font-heading text-white font-bold"
+                style={{ 
+                  fontSize: 'var(--text-2xl)',
+                  marginBottom: 'var(--space-1)',
+                  textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
+                }}
+              >
+                คุณอายุเท่าไหร่?
+              </h2>
+              <p 
+                className="font-body text-gray-400"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                เลือกช่วงอายุของคุณ
+              </p>
+            </div>
             <RadioGroup
               name="ageRange"
               options={AGE_OPTIONS}
@@ -104,9 +120,25 @@ function FortunePageContent() {
 
       case 2:
         return (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">คุณเกิดวันไหน?</h2>
-            <p className="text-gray-400 mb-8">วันในสัปดาห์ที่คุณเกิด</p>
+          <div className="text-center space-y-3">
+            <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
+              <h2 
+                className="font-heading text-white font-bold"
+                style={{ 
+                  fontSize: 'var(--text-2xl)',
+                  marginBottom: 'var(--space-1)',
+                  textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
+                }}
+              >
+                คุณเกิดวันไหน?
+              </h2>
+              <p 
+                className="font-body text-gray-400"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                วันในสัปดาห์ที่คุณเกิด
+              </p>
+            </div>
             <RadioGroup
               name="birthDay"
               options={DAY_OPTIONS}
@@ -118,15 +150,41 @@ function FortunePageContent() {
 
       case 3:
         return (
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-2">กรุ๊ปเลือดคุณคืออะไร?</h2>
-            <p className="text-gray-400 mb-8">เลือกกรุ๊ปเลือดของคุณ</p>
+          <div className="text-center space-y-3">
+            <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
+              <h2 
+                className="font-heading text-white font-bold"
+                style={{ 
+                  fontSize: 'var(--text-2xl)',
+                  marginBottom: 'var(--space-1)',
+                  textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
+                }}
+              >
+                กรุ๊ปเลือดคุณคืออะไร?
+              </h2>
+              <p 
+                className="font-body text-gray-400"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                เลือกกรุ๊ปเลือดของคุณ
+              </p>
+            </div>
             <RadioGroup
               name="bloodGroup"
               options={BLOOD_OPTIONS}
               value={bloodGroup}
               onChange={(value) => setBloodGroup(value as BloodGroup)}
             />
+            
+            {/* Powered by MOOF - positioned after last choice */}
+            <div className="mt-8 mb-4 text-center">
+              <div 
+                className="font-body text-gray-500"
+                style={{ fontSize: 'var(--text-xs)' }}
+              >
+                Powered by <span className="font-logo font-bold text-white">MOOF</span>
+              </div>
+            </div>
           </div>
         )
 
@@ -176,70 +234,117 @@ function FortunePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white relative overflow-hidden">
-      <ParticleBackground />
-      {/* Header */}
-      <div className="flex justify-between items-center p-4 relative z-10">
-        <div className="text-sm text-gray-400">
-          ดูดวงฟรีกับ <span className="font-bold text-white font-museo-moderno">MOOF</span>
-        </div>
-        <div className="text-sm text-gray-400">
-          &lt;/&gt;
+    <>
+      {/* Mobile Only - Main Content */}
+      <div className="block md:hidden mystical-background text-white relative overflow-hidden">
+        <ParticleBackground />
+        
+        {/* Header */}
+        <header className="content-section" style={{ paddingTop: 'var(--space-3)' }}>
+          <div className="container-grid">
+            <div className="grid-full flex justify-between items-center">
+              <button 
+                className="font-body cursor-pointer hover:opacity-80 transition-opacity" 
+                style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}
+                onClick={() => router.push('/')}
+              >
+                ดูดวงฟรีกับ <span className="font-logo font-bold text-white">MOOF</span>
+              </button>
+              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}>
+                &lt;/&gt;
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Unified Hero Section - Questionnaire */}
+        <main className="flex flex-col items-center justify-center min-h-[75vh] px-6 relative z-10">
+          <div className="w-full max-w-md text-center space-y-4">
+
+            {/* Progress Bar */}
+            <div>
+              <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+            </div>
+
+            {/* Step Content - Minimal */}
+            <div>
+              {renderStepContent()}
+            </div>
+
+            {/* Powered by MOOF - positioned after choices for non-final steps */}
+            {currentStep !== 3 && (
+              <div className="mt-8 mb-4 text-center">
+                <div 
+                  className="font-body text-gray-500"
+                  style={{ fontSize: 'var(--text-xs)' }}
+                >
+                  Powered by <span className="font-logo font-bold text-white">MOOF</span>
+                </div>
+              </div>
+            )}
+
+            {/* Bottom padding for floating buttons */}
+            <div style={{ paddingBottom: '120px' }}></div>
+
+          </div>
+        </main>
+
+
+        {/* Fixed Floating Buttons */}
+        <div className="fixed bottom-0 left-0 right-0 z-50">
+          <div className="flex gap-4 p-4 max-w-md mx-auto">
+            <Button
+              variant="secondary"
+              onClick={handleBack}
+              className="flex-1 bg-gray-900/40 backdrop-blur-sm border-2 border-gray-300/70 hover:border-gray-200/90 hover:bg-gray-900/50 text-gray-100 hover:text-white shadow-xl"
+              size="lg"
+            >
+              <span className="font-body font-medium">
+                {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
+              </span>
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={handleNext}
+              disabled={!isStepValid()}
+              className="flex-1 mystical-glow bg-purple-900/40 backdrop-blur-sm border-2 border-purple-400/80 hover:border-purple-300/90 hover:bg-purple-900/50 text-purple-200 hover:text-white shadow-xl"
+              size="lg"
+            >
+              <span className="font-heading font-medium">
+                {currentStep === totalSteps ? 'ดูดวงเลย!' : 'ต่อไป'}
+              </span>
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10">
-        {/* Logo */}
-        <div className="mb-8">
-          <MoofLogo />
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full max-w-md mb-8">
-          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
-        </div>
-
-        {/* Step Content */}
-        <div className="w-full max-w-md mb-8">
-          {renderStepContent()}
-        </div>
-
-        {/* Navigation Buttons */}
-        <div className="flex gap-4 w-full max-w-md">
-          <Button
-            variant="outline"
-            onClick={handleBack}
-            className="flex-1"
+      {/* Desktop/Tablet - Mobile Only Message */}
+      <div className="hidden md:flex mystical-background text-white min-h-screen items-center justify-center relative overflow-hidden">
+        <ParticleBackground />
+        <div className="text-center relative z-10 px-6">
+          <div className="mb-8">
+            <MoofLogo />
+          </div>
+          <h1 
+            className="font-heading text-white font-bold mb-6"
+            style={{ 
+              fontSize: 'var(--text-3xl)', 
+              textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+            }}
           >
-            {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
-          </Button>
-          
-          <Button
-            variant="primary"
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className="flex-1"
+            เว็บไซต์นี้รองรับเฉพาะมือถือ
+          </h1>
+          <p 
+            className="font-body text-gray-300 mb-8 max-w-md mx-auto leading-relaxed"
+            style={{ fontSize: 'var(--text-lg)' }}
           >
-            {currentStep === totalSteps ? 'ดูดวงเลย!' : 'ต่อไป'}
-          </Button>
-        </div>
-
-        {/* User Email Display */}
-        <div className="mt-6 text-center">
-          <p className="text-xs text-gray-400">
-            อีเมล: <span className="text-white">{email}</span>
+            กรุณาเปิดเว็บไซต์ผ่านมือถือของคุณ<br />
+            เพื่อประสบการณ์การใช้งานที่ดีที่สุด
           </p>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className="text-center pb-6 relative z-10">
-        <div className="text-xs text-gray-500">
-          Powered by <span className="font-bold text-white font-museo-moderno">MOOF</span>
-        </div>
-      </div>
-    </div>
+    </>
   )
 }
 

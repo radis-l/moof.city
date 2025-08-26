@@ -1,8 +1,5 @@
 export const MoofLogo = () => (
-  <div 
-    className="text-white font-bold text-2xl tracking-wide"
-    style={{ fontFamily: 'var(--font-museo-moderno), "MuseoModerno", sans-serif' }}
-  >
+  <div className="text-white font-bold text-2xl tracking-wide font-museo-moderno">
     MOOF
   </div>
 )

@@ -9,18 +9,27 @@ export const ProgressBar = ({ currentStep, totalSteps, className = '' }: Progres
 
   return (
     <div className={`w-full ${className}`}>
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-sm text-gray-400">
+      <div className="flex justify-between items-center mb-3">
+        <span 
+          className="font-body text-gray-300 font-medium"
+          style={{ fontSize: 'var(--text-sm)' }}
+        >
           ขั้นตอนที่ {currentStep} จาก {totalSteps}
         </span>
-        <span className="text-sm text-gray-400">
+        <span 
+          className="font-body text-purple-300 font-medium"
+          style={{ fontSize: 'var(--text-sm)' }}
+        >
           {Math.round(progress)}%
         </span>
       </div>
-      <div className="w-full bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-gray-700/50 rounded-full h-3 backdrop-blur-sm">
         <div 
-          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
+          className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
+          style={{ 
+            width: `${progress}%`,
+            boxShadow: '0 0 12px rgba(139, 92, 246, 0.4)'
+          }}
         />
       </div>
     </div>

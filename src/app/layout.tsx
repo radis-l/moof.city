@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Kanit, MuseoModerno } from "next/font/google";
+import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
 
 const kanit = Kanit({
@@ -12,6 +12,12 @@ const museoModerno = MuseoModerno({
   variable: "--font-museo-moderno",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800", "900"],
+});
+
+const maitree = Maitree({
+  variable: "--font-maitree",
+  subsets: ["latin", "thai"],
+  weight: ["200", "300", "400", "500", "600", "700"],
 });
 
 
@@ -28,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body
-        className={`${kanit.variable} ${museoModerno.variable} font-kanit antialiased`}
+        className={`${kanit.variable} ${museoModerno.variable} ${maitree.variable} font-kanit antialiased`}
       >
         {children}
       </body>

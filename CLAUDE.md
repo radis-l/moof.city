@@ -49,18 +49,26 @@ src/
 - **One Fortune Per Email**: No questionnaire retaking
 - **No External Dependencies**: Completely offline
 - **Thai Language Only**: Native text, no translations
-- **Mobile First**: Responsive design priority
+- **Mobile Only**: Strict mobile-only design (768px breakpoint)
+- **No Desktop/Tablet Access**: Shows redirect message on larger screens
 
-## 🔧 Recent Changes
-- ❌ Removed "ดูดวงใหม่" button from results
-- ✅ Added email existence check in questionnaire
-- ✅ Enhanced admin with interactive charts
-- ✅ Fixed Buddhist year timestamp parsing
-- ✅ Added hourly filter to bar chart (H/D/W/M)
-- ✅ Implemented secure admin authentication system
-- ✅ Added password change interface via admin panel
-- ✅ Improved mobile UX with floating back button
-- ✅ Optimized spacing and layout for better visual balance
+## 🎨 UI/UX Patterns
+- **Floating Buttons**: Individual backdrop-blur backgrounds on buttons
+- **Card System**: `card-mystical` class for containers with blur effects
+- **Typography**: CSS variables for consistent sizing (`var(--text-*)`)
+- **Header Navigation**: Clickable "ดูดวงฟรีกับ MOOF" returns to home
+- **Minimal Icons**: Removed decorative emojis (stars, clovers) from main content
+- **Spacing Consistency**: Standardized `mt-8 mb-4` for "Powered by MOOF"
+
+## 🔧 Recent Changes (Latest Session)
+- ✅ **Result Page Redesign**: New 3-card layout (Header, Lucky Number, Combined Fortune)
+- ✅ **Mobile-Only Enforcement**: Added desktop/tablet redirect to all pages
+- ✅ **UI Consistency**: Removed container backgrounds, standardized spacing
+- ✅ **Button Optimization**: Individual blur backgrounds for floating effect
+- ✅ **Icon Cleanup**: Removed ✨ and 🍀 emojis from titles
+- ✅ **Header Enhancement**: Made "ดูดวงฟรีกับ MOOF" clickable across all pages
+- ✅ **Email Removal**: Removed email display from result page header
+- ✅ **Fortune Card Consolidation**: Combined 3 fortune categories in single card with dividers
 
 ## 🔐 Authentication System
 - **Login**: `/admin` requires password authentication
