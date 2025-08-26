@@ -98,7 +98,7 @@ export default function Home() {
           <div>
             <Input 
               type="email"
-              placeholder="อีเมล"
+              placeholder="ใส่อีเมล"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               error={emailError}
@@ -128,13 +128,13 @@ export default function Home() {
           <div>
             <Button 
               variant="outline" 
-              size="lg" 
-              className="w-full mystical-glow"
+              size="md" 
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
               onClick={handleStartFortune}
               disabled={loading}
             >
               <span className="font-heading font-medium">
-                {loading ? 'กำลังตรวจสอบ...' : 'ดูดวงของวัน'}
+                {loading ? 'กำลังตรวจสอบ...' : 'ดูดวง'}
               </span>
             </Button>
           </div>
