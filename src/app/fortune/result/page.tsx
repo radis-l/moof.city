@@ -162,17 +162,17 @@ function FortuneResultPageContent() {
 
             {/* Sub-header - User Info Only */}
             <div className="text-center mb-6">
-              <div className="flex justify-center gap-6 text-center">
-                <div>
-                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>อายุ</div>
+              <div className="flex justify-center gap-8 text-center">
+                <div className="min-w-[60px]">
+                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>อายุ</div>
                   <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.ageRange}</div>
                 </div>
-                <div>
-                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</div>
+                <div className="min-w-[60px]">
+                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</div>
                   <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.birthDay}</div>
                 </div>
-                <div>
-                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</div>
+                <div className="min-w-[60px]">
+                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</div>
                   <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.bloodGroup}</div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ function FortuneResultPageContent() {
               </div>
 
               {/* Divider */}
-              <div className="border-t border-gray-600/30 my-6"></div>
+              <div className="border-t border-gray-500/50 my-6"></div>
 
               {/* Work */}
               <div className="mb-6">
@@ -232,7 +232,7 @@ function FortuneResultPageContent() {
               </div>
 
               {/* Divider */}
-              <div className="border-t border-gray-600/30 my-6"></div>
+              <div className="border-t border-gray-500/50 my-6"></div>
 
               {/* Health */}
               <div>
