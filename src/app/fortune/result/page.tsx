@@ -251,8 +251,8 @@ function FortuneResultPageContent() {
                 </div>
             </div>
 
-            {/* Enhanced bottom padding for floating button - ensures content never gets hidden */}
-            <div style={{ paddingBottom: '140px' }}></div>
+            {/* Bottom padding for floating button */}
+            <div style={{ paddingBottom: '100px' }}></div>
 
             {/* Saving Status */}
             {saving && (

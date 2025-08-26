@@ -240,8 +240,8 @@ function FortunePageContent() {
               {renderStepContent()}
             </div>
 
-            {/* Enhanced bottom padding for floating buttons - ensures content never gets hidden */}
-            <div style={{ paddingBottom: '140px' }}></div>
+            {/* Bottom padding for floating buttons */}
+            <div style={{ paddingBottom: '100px' }}></div>
 
           </div>
         </main>
