@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
 import { PerformanceMonitor } from "@/components/ui/performance-monitor";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const kanit = Kanit({
   variable: "--font-kanit",
@@ -44,6 +45,7 @@ export default function RootLayout({
       >
         <PerformanceMonitor />
         {children}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!} />
       </body>
     </html>
   );

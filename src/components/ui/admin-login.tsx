@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { trackAdminLogin, trackError } from '@/lib/analytics'
 
 interface AdminLoginProps {
   onAuthenticated: () => void
@@ -29,11 +30,14 @@ export function AdminLogin({ onAuthenticated }: AdminLoginProps) {
       const result = await response.json()
 
       if (result.success) {
+        trackAdminLogin()
         onAuthenticated()
       } else {
+        trackError('admin_login_failed', 'Invalid password')
         setError('รหัสผ่านไม่ถูกต้อง')
       }
-    } catch {
+    } catch (error) {
+      trackError('admin_login_error', error instanceof Error ? error.message : 'Network error')
       setError('เกิดข้อผิดพลาด กรุณาลองใหม่')
     } finally {
       setLoading(false)

@@ -8,6 +8,7 @@ import { RadioGroup } from '@/components/ui/radio-group'
 import { MoofLogo } from '@/assets/logo'
 import { MobileLayout } from '@/components/layout'
 import type { AgeRange, BirthDay, BloodGroup } from '@/types'
+import { trackQuestionnaireStart, trackQuestionnaireComplete, trackPageView, trackError } from '@/lib/analytics'
 
 const AGE_OPTIONS = [
   { value: '<18', label: 'ต่ำกว่า 18 ปี' },
@@ -80,6 +81,8 @@ function FortunePageContent() {
       birthDay,
       bloodGroup
     }
+    
+    trackQuestionnaireComplete()
     
     // Store in URL params for now (later we'll use Google Sheets)
     const params = new URLSearchParams(formData as Record<string, string>)
@@ -201,10 +204,15 @@ function FortunePageContent() {
         }
         
         // Email doesn't exist, allow questionnaire
+        trackPageView('Fortune Questionnaire')
+        trackQuestionnaireStart()
         setLoading(false)
       } catch (error) {
         console.error('Error checking email:', error)
+        trackError('questionnaire_email_check_failed', error instanceof Error ? error.message : 'Unknown error')
         // On error, allow questionnaire
+        trackPageView('Fortune Questionnaire')
+        trackQuestionnaireStart()
         setLoading(false)
       }
     }

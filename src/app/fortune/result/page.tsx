@@ -7,6 +7,7 @@ import { MoofLogo } from '@/assets/logo'
 import { MobileLayout } from '@/components/layout'
 import { generateFortune } from '@/lib/fortune-generator'
 import type { UserData, FortuneResult } from '@/types'
+import { trackResultView, trackFortuneGeneration, trackError, trackPageView } from '@/lib/analytics'
 
 function FortuneResultPageContent() {
   const searchParams = useSearchParams()
@@ -25,6 +26,8 @@ function FortuneResultPageContent() {
       if (result.success && result.exists && result.fortune) {
         setUserData(result.fortune.userData)
         setFortune(result.fortune.fortuneResult)
+        trackPageView('Fortune Result - Existing User')
+        trackResultView()
       } else {
         // Email not found, redirect to home
         router.push('/')
@@ -32,6 +35,7 @@ function FortuneResultPageContent() {
       }
     } catch (error) {
       console.error('Error loading existing fortune:', error)
+      trackError('existing_fortune_load_failed', error instanceof Error ? error.message : 'Unknown error')
       router.push('/')
       return
     } finally {
@@ -74,6 +78,10 @@ function FortuneResultPageContent() {
       const generatedFortune = generateFortune(user)
       setFortune(generatedFortune)
       
+      trackPageView('Fortune Result - New User')
+      trackResultView()
+      trackFortuneGeneration()
+      
       // Save to storage only once
       if (!saveAttempted.current) {
         saveAttempted.current = true
@@ -102,10 +110,12 @@ function FortuneResultPageContent() {
       
       if (!result.success) {
         console.warn('Failed to save fortune:', result.error)
+        trackError('fortune_save_failed', result.error)
         // Don't show error to user, just log it
       }
     } catch (error) {
       console.error('Error saving fortune:', error)
+      trackError('fortune_save_error', error instanceof Error ? error.message : 'Unknown error')
       // Don't show error to user, just log it
     } finally {
       setSaving(false)

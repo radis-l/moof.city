@@ -1,9 +1,10 @@
 'use client'
 
-import { ReactNode, memo } from 'react'
+import { ReactNode, memo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoofLogo } from '@/assets/logo'
 import { LazyParticleBackground } from '@/components/ui/lazy-particle-background'
+import { trackMobileWarningShown } from '@/lib/analytics'
 
 interface MobileLayoutProps {
   children: ReactNode
@@ -12,6 +13,25 @@ interface MobileLayoutProps {
 
 export const MobileLayout = memo(function MobileLayout({ children, showHeader = true }: MobileLayoutProps) {
   const router = useRouter()
+
+  useEffect(() => {
+    // Track when desktop/tablet users see mobile warning
+    const checkScreenSize = () => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+        trackMobileWarningShown()
+      }
+    }
+    
+    // Check immediately
+    checkScreenSize()
+    
+    // Check on resize
+    window.addEventListener('resize', checkScreenSize)
+    
+    return () => {
+      window.removeEventListener('resize', checkScreenSize)
+    }
+  }, [])
 
   return (
     <>

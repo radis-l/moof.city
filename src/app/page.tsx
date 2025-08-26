@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MobileLayout } from '@/components/layout'
+import { trackEmailSubmission, trackError, trackPageView } from '@/lib/analytics'
 
 export default function Home() {
   const router = useRouter()
@@ -48,13 +49,16 @@ export default function Home() {
       
       if (result.success && result.exists) {
         // Email exists, show existing fortune result
+        trackEmailSubmission(false)
         router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
       } else {
         // Email doesn't exist, start new questionnaire
+        trackEmailSubmission(true)
         router.push(`/fortune?email=${encodeURIComponent(email)}`)
       }
     } catch (error) {
       console.error('Error checking email:', error)
+      trackError('email_check_failed', error instanceof Error ? error.message : 'Unknown error')
       setEmailError('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     } finally {
       setLoading(false)
@@ -63,6 +67,7 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
+    trackPageView('Landing Page')
   }, [])
   return (
     <MobileLayout>

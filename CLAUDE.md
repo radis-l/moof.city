@@ -88,3 +88,34 @@ npm run lint   # ESLint code linting
 - Analytics with H/D/W/M filters (Hourly/Daily/Weekly/Monthly)
 - User management and data export (CSV)
 - Password change functionality with UI modal
+
+## Analytics & Tracking
+
+### Google Analytics 4 Integration
+- **Package**: `@next/third-parties/google` for optimized Next.js integration
+- **Measurement ID**: Set via `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
+- **Implementation**: `src/lib/analytics.ts` - Comprehensive tracking utilities
+
+### Tracked Events
+- **User Journey**: Email submissions, questionnaire start/completion, result views
+- **Engagement**: Fortune generation completions, page views
+- **Errors**: API failures, storage errors, form validation issues
+- **UI Interactions**: Mobile warning displays (desktop users)
+- **Admin Actions**: Login attempts and authentication events
+
+### Event Categories
+- `form_interaction` - Email submissions and form events
+- `user_journey` - Questionnaire and navigation flow
+- `engagement` - Content consumption and fortune interactions  
+- `ui_interaction` - Interface and responsive design events
+- `error` - System errors and debugging information
+- `admin` - Administrative operations and authentication
+
+### Analytics Functions (`src/lib/analytics.ts`)
+- `trackEvent()` - Generic event tracking with categories
+- `trackEmailSubmission()` - New vs returning user differentiation
+- `trackQuestionnaireStart/Complete()` - Conversion funnel tracking
+- `trackResultView()` - Fortune result engagement
+- `trackFortuneGeneration()` - New fortune creation events
+- `trackError()` - Error logging with context
+- `trackPageView()` - Custom page view naming
