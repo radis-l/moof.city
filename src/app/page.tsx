@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
+import { StarBorder } from '@/components/ui/star-border'
 import { MobileLayout } from '@/components/layout'
 
 export default function Home() {
@@ -126,17 +126,17 @@ export default function Home() {
 
           {/* CTA Button */}
           <div>
-            <Button 
-              variant="outline" 
-              size="md" 
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+            <StarBorder 
+              className="w-full"
+              color="rgba(139, 92, 246, 0.8)"
+              speed="4s"
               onClick={handleStartFortune}
               disabled={loading}
             >
               <span className="font-heading font-medium">
                 {loading ? 'กำลังตรวจสอบ...' : 'ดูดวง'}
               </span>
-            </Button>
+            </StarBorder>
           </div>
 
           {/* Email Policy - Integrated */}
