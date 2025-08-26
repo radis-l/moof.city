@@ -88,6 +88,8 @@ MOOF combines traditional Thai fortune telling wisdom with contemporary user exp
 
 ### User Experience  
 - **3-Step Process** - Simple questionnaire flow
+- **Enhanced Input UX** - Placeholder disappears on focus for better typing experience
+- **Gradient Button Design** - Eye-catching purple-to-blue gradient with hover effects
 - **Floating Navigation** - Always-accessible blur-effect buttons
 - **Instant Results** - No waiting, immediate fortune delivery
 - **Permanent Storage** - One reading per email, saved forever
