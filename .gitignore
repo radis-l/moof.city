@@ -45,3 +45,6 @@ next-env.d.ts
 *.temp
 .idea/
 .vscode/
+
+# Admin config (contains password hash)
+/data/admin-config.json

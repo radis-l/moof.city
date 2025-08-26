@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
-import fs from 'fs'
-import path from 'path'
+import { getAdminPasswordHash, setAdminPasswordHash } from '@/lib/storage/admin-config-storage'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,9 +29,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const currentHash = process.env.ADMIN_PASSWORD_HASH || 
-      // Fallback hash for testing (should match login)
-      '$2b$12$EF2GHQN6FRmUQ8KbpdJ3oOv9s0CMgjMmDK54cDL650Ku2ifK7bGdq'
+    // Get current password hash from database
+    const currentHash = await getAdminPasswordHash()
     
     console.log('Change password attempt - hash exists:', !!currentHash)
     
@@ -53,33 +51,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate new hash
-    const newHash = await bcrypt.hash(newPassword, 12)
-
-    // Update .env.local file
-    const envPath = path.join(process.cwd(), '.env.local')
-    let envContent = ''
+    // Save new password to database
+    const success = await setAdminPasswordHash(newPassword)
     
-    try {
-      envContent = fs.readFileSync(envPath, 'utf8')
-    } catch {
+    if (!success) {
       return NextResponse.json(
-        { success: false, message: 'Could not read environment file' },
-        { status: 500 }
-      )
-    }
-
-    // Replace the password hash line
-    const updatedContent = envContent.replace(
-      /ADMIN_PASSWORD_HASH=.*/,
-      `ADMIN_PASSWORD_HASH=${newHash}`
-    )
-
-    try {
-      fs.writeFileSync(envPath, updatedContent, 'utf8')
-    } catch {
-      return NextResponse.json(
-        { success: false, message: 'Could not update environment file' },
+        { success: false, message: 'Could not update password' },
         { status: 500 }
       )
     }
@@ -87,7 +64,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: true, 
-        message: 'Password changed successfully. Please restart the server for changes to take effect.' 
+        message: 'Password changed successfully!' 
       },
       { status: 200 }
     )

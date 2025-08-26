@@ -1,21 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
+import { getAdminPasswordHash, initializeAdminPassword } from '@/lib/storage/admin-config-storage'
 
 export async function POST(request: NextRequest) {
   try {
     const { password } = await request.json()
-
-    // Get password hash at runtime to ensure environment variables are loaded
-    const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || 
-      // Fallback hash for testing (remove in production)
-      '$2b$12$EF2GHQN6FRmUQ8KbpdJ3oOv9s0CMgjMmDK54cDL650Ku2ifK7bGdq'
-
-    // Debug logging
-    console.log('Login attempt:', { passwordLength: password?.length })
-    console.log('Environment hash exists:', !!ADMIN_PASSWORD_HASH)
-    console.log('Environment hash preview:', ADMIN_PASSWORD_HASH?.substring(0, 10) + '...')
-    console.log('All env vars:', Object.keys(process.env).filter(k => k.includes('ADMIN')))
 
     if (!password) {
       return NextResponse.json(
@@ -24,9 +14,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Initialize default password if none exists
+    await initializeAdminPassword('Punpun12')
+
+    // Get current password hash from database
+    const ADMIN_PASSWORD_HASH = await getAdminPasswordHash()
+
+    // Debug logging
+    console.log('Login attempt:', { passwordLength: password?.length })
+    console.log('Password hash exists:', !!ADMIN_PASSWORD_HASH)
+
     if (!ADMIN_PASSWORD_HASH) {
-      console.log('Missing ADMIN_PASSWORD_HASH environment variable')
-      console.log('Available env vars:', Object.keys(process.env).slice(0, 10))
+      console.log('No password hash available')
       return NextResponse.json(
         { success: false, message: 'Server configuration error' },
         { status: 500 }
