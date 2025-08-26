@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
 import { PerformanceMonitor } from "@/components/ui/performance-monitor";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import Script from "next/script";
 
 const kanit = Kanit({
   variable: "--font-kanit",
@@ -45,7 +45,52 @@ export default function RootLayout({
       >
         <PerformanceMonitor />
         {children}
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID!} />
+        
+        {/* Google Analytics */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
+          <>
+            <Script
+              strategy="afterInteractive"
+              src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}`}
+            />
+            <Script
+              id="gtag-init"
+              strategy="afterInteractive"
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}', {
+                    page_title: document.title,
+                    page_location: window.location.href,
+                  });
+                  console.log('GA4 initialized with ID:', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+                  
+                  // Verify installation after initialization
+                  setTimeout(() => {
+                    import('/src/lib/analytics').then(({ verifyGAInstallation }) => {
+                      verifyGAInstallation();
+                    });
+                  }, 1000);
+                `,
+              }}
+            />
+          </>
+        )}
+        
+        {process.env.NODE_ENV === 'development' && (
+          <Script
+            id="ga-debug"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                console.log('GA Measurement ID from env:', '${process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}');
+                console.log('Current URL:', window.location.href);
+              `
+            }}
+          />
+        )}
       </body>
     </html>
   );
