@@ -106,6 +106,8 @@
   border-radius: 50%;
   pointer-events: none;
   animation: float 30s infinite ease-in-out;
+  will-change: transform; /* Optimize for transforms */
+  contain: layout style paint; /* Performance containment */
 }
 
 .gradient-sphere-1 {
@@ -226,6 +228,9 @@
   min-height: 100vh;
   position: relative;
   overflow: hidden;
+  /* Performance optimizations */
+  transform: translateZ(0); /* Force hardware acceleration */
+  backface-visibility: hidden; /* Prevent flickering */
 }
 
 .content-section {

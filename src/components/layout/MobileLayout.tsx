@@ -3,7 +3,7 @@
 import { ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoofLogo } from '@/assets/logo'
-import { ParticleBackground } from '@/components/ui/particle-background'
+import { LazyParticleBackground } from '@/components/ui/lazy-particle-background'
 
 interface MobileLayoutProps {
   children: ReactNode
@@ -17,7 +17,7 @@ export function MobileLayout({ children, showHeader = true }: MobileLayoutProps)
     <>
       {/* Mobile Only - Main Content */}
       <div className="block md:hidden mystical-background text-white relative overflow-hidden">
-        <ParticleBackground />
+        <LazyParticleBackground />
         
         {/* Header */}
         {showHeader && (
@@ -45,7 +45,7 @@ export function MobileLayout({ children, showHeader = true }: MobileLayoutProps)
 
       {/* Desktop/Tablet - Mobile Only Message */}
       <div className="hidden md:flex mystical-background text-white min-h-screen items-center justify-center relative overflow-hidden">
-        <ParticleBackground />
+        <LazyParticleBackground />
         <div className="text-center relative z-10 px-6">
           <div className="mb-8">
             <MoofLogo />

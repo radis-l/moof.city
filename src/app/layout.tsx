@@ -1,23 +1,29 @@
 import type { Metadata } from "next";
 import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
+import { PerformanceMonitor } from "@/components/ui/performance-monitor";
 
 const kanit = Kanit({
   variable: "--font-kanit",
   subsets: ["latin", "thai"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"], // Reduced weight variants
+  display: 'swap', // Add font-display swap
+  preload: true, // Preload primary font
 });
 
 const museoModerno = MuseoModerno({
   variable: "--font-museo-moderno",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "600", "700"], // Reduced weight variants
+  display: 'swap',
+  fallback: ['Helvetica', 'Arial', 'sans-serif'], // Add fallbacks
 });
 
 const maitree = Maitree({
   variable: "--font-maitree",
   subsets: ["latin", "thai"],
-  weight: ["200", "300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600"], // Reduced weight variants
+  display: 'swap',
 });
 
 
@@ -36,6 +42,7 @@ export default function RootLayout({
       <body
         className={`${kanit.variable} ${museoModerno.variable} ${maitree.variable} font-kanit antialiased`}
       >
+        <PerformanceMonitor />
         {children}
       </body>
     </html>
