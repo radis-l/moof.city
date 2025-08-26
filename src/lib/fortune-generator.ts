@@ -1,16 +1,55 @@
 import type { UserData, FortuneResult, AgeRange, BirthDay, BloodGroup } from '@/types'
 
+// Helper functions for number generation
+const getAgeMultiplier = (ageRange: AgeRange): number => {
+  const multipliers = { '<18': 5, '18-25': 7, '26-35': 11, '36-45': 13, '46-55': 17, '55+': 19 }
+  return multipliers[ageRange] || 11
+}
+
+const getDayMultiplier = (birthDay: BirthDay): number => {
+  const multipliers = {
+    'Monday': 2, 'Tuesday': 3, 'Wednesday': 5, 'Thursday': 7,
+    'Friday': 11, 'Saturday': 13, 'Sunday': 17
+  }
+  return multipliers[birthDay] || 7
+}
+
+const getBloodMultiplier = (bloodGroup: BloodGroup): number => {
+  const multipliers = { 'A': 3, 'B': 5, 'AB': 7, 'O': 11 }
+  return multipliers[bloodGroup] || 7
+}
+
+// Create deterministic selection based on user data seed
+const createSeededSelector = (userData: UserData) => {
+  const { ageRange, birthDay, bloodGroup } = userData
+  
+  // Create a consistent seed from user data
+  const ageMultiplier = getAgeMultiplier(ageRange as AgeRange)
+  const dayMultiplier = getDayMultiplier(birthDay as BirthDay)
+  const bloodMultiplier = getBloodMultiplier(bloodGroup as BloodGroup)
+  const baseSeed = (ageMultiplier * 31 + dayMultiplier * 17 + bloodMultiplier * 13) % 1000
+  
+  // Return a function that generates deterministic "random" numbers
+  return (index: number, arrayLength: number): number => {
+    const seed = (baseSeed + index * 23) % 997 // Use prime numbers for better distribution
+    return seed % arrayLength
+  }
+}
+
 // Fortune generation based on user data
 export const generateFortune = (userData: UserData): FortuneResult => {
   const { ageRange, birthDay, bloodGroup } = userData
+
+  // Create deterministic selector for this user
+  const selectIndex = createSeededSelector(userData)
 
   // Generate lucky number based on user data
   const luckyNumber = generateLuckyNumber(ageRange, birthDay, bloodGroup)
 
   // Generate personalized predictions
-  const relationship = generateRelationshipFortune(birthDay, bloodGroup)
-  const work = generateWorkFortune(ageRange, birthDay)
-  const health = generateHealthFortune(bloodGroup, ageRange)
+  const relationship = generateRelationshipFortune(birthDay, bloodGroup, selectIndex)
+  const work = generateWorkFortune(ageRange, birthDay, selectIndex)
+  const health = generateHealthFortune(bloodGroup, ageRange, selectIndex)
 
   return {
     luckyNumber,
@@ -42,7 +81,8 @@ const generateLuckyNumber = (
 // Generate relationship fortune using birthDay + bloodGroup combination
 const generateRelationshipFortune = (
   birthDay: string,
-  bloodGroup: string
+  bloodGroup: string,
+  selectIndex: (index: number, arrayLength: number) => number
 ): string => {
   // Base fortunes focused on life events and introspection
   const dayRelationshipMessages = {
@@ -110,9 +150,9 @@ const generateRelationshipFortune = (
   const dayMessages = dayRelationshipMessages[birthDay as keyof typeof dayRelationshipMessages] || dayRelationshipMessages['Monday']
   const bloodModifierMessages = bloodModifiers[bloodGroup as keyof typeof bloodModifiers] || bloodModifiers['A']
 
-  // Combine a random birth day message + a random blood group modifier
-  const baseMessage = dayMessages[Math.floor(Math.random() * dayMessages.length)]
-  const bloodModifier = bloodModifierMessages[Math.floor(Math.random() * bloodModifierMessages.length)]
+  // Combine deterministic birth day message + blood group modifier
+  const baseMessage = dayMessages[selectIndex(0, dayMessages.length)]
+  const bloodModifier = bloodModifierMessages[selectIndex(1, bloodModifierMessages.length)]
 
   return baseMessage + bloodModifier
 }
@@ -120,7 +160,8 @@ const generateRelationshipFortune = (
 // Generate work fortune
 const generateWorkFortune = (
   ageRange: string,
-  birthDay: string
+  birthDay: string,
+  selectIndex: (index: number, arrayLength: number) => number
 ): string => {
   const workTemplates = {
     '<18': [
@@ -196,8 +237,8 @@ const generateWorkFortune = (
   const ageTemplates = workTemplates[ageRange as keyof typeof workTemplates] || workTemplates['26-35']
   const dayModifierMessages = dayModifiers[birthDay as keyof typeof dayModifiers] || dayModifiers['Monday']
 
-  const baseMessage = ageTemplates[Math.floor(Math.random() * ageTemplates.length)]
-  const dayMessage = dayModifierMessages[Math.floor(Math.random() * dayModifierMessages.length)]
+  const baseMessage = ageTemplates[selectIndex(2, ageTemplates.length)]
+  const dayMessage = dayModifierMessages[selectIndex(3, dayModifierMessages.length)]
 
   return `${baseMessage} ${dayMessage}`
 }
@@ -205,7 +246,8 @@ const generateWorkFortune = (
 // Generate health fortune
 const generateHealthFortune = (
   bloodGroup: string,
-  ageRange: string
+  ageRange: string,
+  selectIndex: (index: number, arrayLength: number) => number
 ): string => {
   const healthTemplates = {
     A: [
@@ -266,27 +308,8 @@ const generateHealthFortune = (
   const bloodTemplates = healthTemplates[bloodGroup as keyof typeof healthTemplates] || healthTemplates['O']
   const ageAdviceMessages = ageAdvice[ageRange as keyof typeof ageAdvice] || ageAdvice['26-35']
 
-  const baseMessage = bloodTemplates[Math.floor(Math.random() * bloodTemplates.length)]
-  const ageMessage = ageAdviceMessages[Math.floor(Math.random() * ageAdviceMessages.length)]
+  const baseMessage = bloodTemplates[selectIndex(4, bloodTemplates.length)]
+  const ageMessage = ageAdviceMessages[selectIndex(5, ageAdviceMessages.length)]
 
   return `${baseMessage} ${ageMessage}`
-}
-
-// Helper functions for number generation
-const getAgeMultiplier = (ageRange: AgeRange): number => {
-  const multipliers = { '<18': 5, '18-25': 7, '26-35': 11, '36-45': 13, '46-55': 17, '55+': 19 }
-  return multipliers[ageRange] || 11
-}
-
-const getDayMultiplier = (birthDay: BirthDay): number => {
-  const multipliers = {
-    'Monday': 2, 'Tuesday': 3, 'Wednesday': 5, 'Thursday': 7,
-    'Friday': 11, 'Saturday': 13, 'Sunday': 17
-  }
-  return multipliers[birthDay] || 7
-}
-
-const getBloodMultiplier = (bloodGroup: BloodGroup): number => {
-  const multipliers = { 'A': 3, 'B': 5, 'AB': 7, 'O': 11 }
-  return multipliers[bloodGroup] || 7
 }

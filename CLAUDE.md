@@ -40,7 +40,8 @@ src/
 
 ## 💻 Development Patterns
 - **Email Validation**: Always check existence before questionnaire
-- **Fortune Generation**: Deterministic (same input = same output)
+- **Fortune Generation**: Fully deterministic with seeded selection (no Math.random())
+- **Refresh Consistency**: Same user data always generates identical fortune content
 - **Components**: Functional with hooks, full TypeScript
 - **Error Handling**: Thai messages, graceful fallbacks
 - **Admin Analytics**: Bar chart with H/D/W/M filters (Hourly/Daily/Weekly/Monthly)
@@ -63,10 +64,11 @@ src/
 
 ## 🔧 Recent Changes (Latest Session)
 - ✅ **Enhanced Fortune Generator**: Completely revamped fortune algorithm with detailed Thai messages
+- ✅ **Deterministic Fortune Selection**: Replaced Math.random() with seeded selection for refresh consistency
 - ✅ **Improved Fortune Content**: More personalized predictions combining birth day + blood group traits
-- ✅ **Better Randomization**: Enhanced message selection logic for relationship, work, and health fortunes
+- ✅ **Prime Number Distribution**: Uses prime multipliers (31, 17, 13, 23) for better variety while maintaining consistency
 - ✅ **Age-Specific Advice**: Tailored health and work guidance based on user's age range
-- ✅ **Consistent Lucky Numbers**: Maintained deterministic number generation with prime multipliers
+- ✅ **Refresh-Proof Results**: Same user data always generates identical fortune content across sessions
 
 ## 🔐 Authentication System  
 - **Login**: `/admin` with password `Punpun12` (auto-initialized)
@@ -84,4 +86,4 @@ npm run lint   # Code linting
 
 ---
 **Status**: Production Ready | **Features**: 25/25 ✅ | **Files**: 36 TypeScript  
-**Latest Update**: Enhanced fortune generator with detailed Thai content and improved personalization
+**Latest Update**: Implemented deterministic fortune generation ensuring consistent results across refreshes
