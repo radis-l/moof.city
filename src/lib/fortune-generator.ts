@@ -8,7 +8,7 @@ export const generateFortune = (userData: UserData): FortuneResult => {
   const luckyNumber = generateLuckyNumber(ageRange, birthDay, bloodGroup)
   
   // Generate personalized predictions
-  const relationship = generateRelationshipFortune(birthDay, bloodGroup, ageRange)
+  const relationship = generateRelationshipFortune(birthDay, bloodGroup)
   const work = generateWorkFortune(ageRange, birthDay, bloodGroup)
   const health = generateHealthFortune(bloodGroup, ageRange)
   
@@ -42,8 +42,7 @@ const generateLuckyNumber = (
 // Generate relationship fortune using birthDay + bloodGroup combination
 const generateRelationshipFortune = (
   birthDay: string,
-  bloodGroup: string,
-  _ageRange: string
+  bloodGroup: string
 ): string => {
   // Birth day based relationship patterns (longer base texts to match health)
   const dayRelationshipMessages = {

@@ -175,16 +175,6 @@ function FortunePageContent() {
               value={bloodGroup}
               onChange={(value) => setBloodGroup(value as BloodGroup)}
             />
-            
-            {/* Powered by MOOF - positioned after last choice */}
-            <div className="mt-8 mb-4 text-center">
-              <div 
-                className="font-body text-gray-500"
-                style={{ fontSize: 'var(--text-xs)' }}
-              >
-                Powered by <span className="font-logo font-bold text-white">MOOF</span>
-              </div>
-            </div>
           </div>
         )
 
@@ -234,67 +224,55 @@ function FortunePageContent() {
   }
 
   return (
-    <MobileLayout>
-      {/* Unified Hero Section - Questionnaire */}
-      <main className="flex flex-col items-center justify-center min-h-[75vh] px-6 relative z-10">
-        <div className="w-full max-w-md text-center space-y-4">
+    <>
+      <MobileLayout>
+        {/* Unified Hero Section - Questionnaire */}
+        <main className="flex flex-col items-center justify-center min-h-[75vh] px-6 relative z-10">
+          <div className="w-full max-w-md text-center space-y-4">
 
-          {/* Progress Bar */}
-          <div>
-            <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
-          </div>
-
-          {/* Step Content - Minimal */}
-          <div>
-            {renderStepContent()}
-          </div>
-
-          {/* Powered by MOOF - positioned after choices for non-final steps */}
-          {currentStep !== 3 && (
-            <div className="mt-8 mb-4 text-center">
-              <div 
-                className="font-body text-gray-500"
-                style={{ fontSize: 'var(--text-xs)' }}
-              >
-                Powered by <span className="font-logo font-bold text-white">MOOF</span>
-              </div>
+            {/* Progress Bar */}
+            <div>
+              <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
             </div>
-          )}
 
-          {/* Bottom padding for floating buttons */}
-          <div style={{ paddingBottom: '120px' }}></div>
+            {/* Step Content - Minimal */}
+            <div>
+              {renderStepContent()}
+            </div>
 
-        </div>
-      </main>
+            {/* Enhanced bottom padding for floating buttons - ensures content never gets hidden */}
+            <div style={{ paddingBottom: '140px' }}></div>
 
-      {/* Fixed Floating Buttons */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="flex gap-4 p-4 max-w-md mx-auto">
-          <Button
-            variant="secondary"
-            onClick={handleBack}
-            className="flex-1 bg-gray-900/40 backdrop-blur-sm border-2 border-gray-300/70 hover:border-gray-200/90 hover:bg-gray-900/50 text-gray-100 hover:text-white shadow-xl"
-            size="lg"
-          >
-            <span className="font-body font-medium">
+          </div>
+        </main>
+      </MobileLayout>
+
+      {/* Enhanced Floating Buttons - Fixed Outside Layout */}
+      <div className="mobile-sticky-button">
+        <div className="floating-button-bg">
+          <div className="flex gap-4 max-w-md mx-auto">
+            <Button
+              variant="secondary"
+              onClick={handleBack}
+              className="flex-1"
+              size="lg"
+            >
               {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
-            </span>
-          </Button>
-          
-          <Button
-            variant="outline"
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className="flex-1 mystical-glow bg-purple-900/40 backdrop-blur-sm border-2 border-purple-400/80 hover:border-purple-300/90 hover:bg-purple-900/50 text-purple-200 hover:text-white shadow-xl"
-            size="lg"
-          >
-            <span className="font-heading font-medium">
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={handleNext}
+              disabled={!isStepValid()}
+              className="flex-1"
+              size="lg"
+            >
               {currentStep === totalSteps ? 'ดูดวงเลย!' : 'ต่อไป'}
-            </span>
-          </Button>
+            </Button>
+          </div>
         </div>
       </div>
-    </MobileLayout>
+    </>
   )
 }
 

@@ -141,156 +141,150 @@ function FortuneResultPageContent() {
   }
 
   return (
-    <MobileLayout>
-      {/* Main Result Content */}
-      <main className="flex flex-col items-center justify-start min-h-[75vh] px-6 relative z-10 pt-8">
-        <div className="w-full max-w-md space-y-6">
+    <>
+      <MobileLayout>
+        {/* Main Result Content */}
+        <main className="flex flex-col items-center justify-start min-h-[75vh] px-6 relative z-10 pt-8">
+          <div className="w-full max-w-md space-y-6">
 
-          {/* Header - Title */}
-          <div className="text-center mb-2">
-            <h1 
-              className="font-heading text-white font-bold"
-              style={{ 
-                fontSize: 'var(--text-3xl)',
-                textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
-              }}
-            >
-              ดวงของคุณ
-            </h1>
-          </div>
+            {/* Header - Title */}
+            <div className="text-center mb-2">
+              <h1 
+                className="font-heading text-white font-bold"
+                style={{ 
+                  fontSize: 'var(--text-3xl)',
+                  textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
+                }}
+              >
+                ดวงของคุณ
+              </h1>
+            </div>
 
-          {/* Sub-header - User Info Only */}
-          <div className="text-center mb-6">
-            <div className="flex justify-center gap-6 text-center">
-              <div>
-                <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>อายุ</div>
-                <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.ageRange}</div>
+            {/* Sub-header - User Info Only */}
+            <div className="text-center mb-6">
+              <div className="flex justify-center gap-6 text-center">
+                <div>
+                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>อายุ</div>
+                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.ageRange}</div>
+                </div>
+                <div>
+                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</div>
+                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.birthDay}</div>
+                </div>
+                <div>
+                  <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</div>
+                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.bloodGroup}</div>
+                </div>
               </div>
-              <div>
-                <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</div>
-                <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.birthDay}</div>
+            </div>
+
+            {/* Lucky Number */}
+            <div className="card-mystical text-center">
+              <h2 
+                className="font-heading text-white font-bold mb-4"
+                style={{ fontSize: 'var(--text-xl)' }}
+              >
+  เลขนำโชค
+              </h2>
+              <div 
+                className="text-white font-heading font-bold"
+                style={{ fontSize: '4rem', lineHeight: '1' }}
+              >
+                {fortune.luckyNumber}
               </div>
-              <div>
-                <div className="font-body text-gray-400" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</div>
-                <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.bloodGroup}</div>
+            </div>
+
+            {/* Fortune Predictions - Combined Card */}
+            <div className="card-mystical">
+              {/* Relationship */}
+              <div className="mb-6">
+                <h3 
+                  className="font-heading font-bold mb-3 text-pink-300 flex items-center gap-2"
+                  style={{ fontSize: 'var(--text-lg)' }}
+                >
+                  💝 เรื่องรัก
+                </h3>
+                <p 
+                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                  style={{ fontSize: 'var(--text-sm)' }}
+                >
+                  {fortune.relationship}
+                </p>
               </div>
-            </div>
-          </div>
 
-          {/* Lucky Number */}
-          <div className="card-mystical text-center">
-            <h2 
-              className="font-heading text-white font-bold mb-4"
-              style={{ fontSize: 'var(--text-xl)' }}
+              {/* Divider */}
+              <div className="border-t border-gray-600/30 my-6"></div>
+
+              {/* Work */}
+              <div className="mb-6">
+                <h3 
+                  className="font-heading font-bold mb-3 text-blue-300 flex items-center gap-2"
+                  style={{ fontSize: 'var(--text-lg)' }}
+                >
+                  💼 การงาน
+                </h3>
+                <p 
+                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                  style={{ fontSize: 'var(--text-sm)' }}
+                >
+                  {fortune.work}
+                </p>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-600/30 my-6"></div>
+
+              {/* Health */}
+              <div>
+                <h3 
+                  className="font-heading font-bold mb-3 text-green-300 flex items-center gap-2"
+                  style={{ fontSize: 'var(--text-lg)' }}
+                >
+                  🏥 สุขภาพ
+                </h3>
+                <p 
+                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                  style={{ fontSize: 'var(--text-sm)' }}
+                >
+                  {fortune.health}
+                </p>
+                </div>
+            </div>
+
+            {/* Enhanced bottom padding for floating button - ensures content never gets hidden */}
+            <div style={{ paddingBottom: '140px' }}></div>
+
+            {/* Saving Status */}
+            {saving && (
+              <div className="text-center">
+                <p 
+                  className="font-body text-gray-400"
+                  style={{ fontSize: 'var(--text-xs)' }}
+                >
+                  กำลังบันทึกข้อมูล...
+                </p>
+              </div>
+            )}
+          </div>
+        </main>
+      </MobileLayout>
+
+      {/* Enhanced Floating Button - Fixed Outside Layout */}
+      <div className="mobile-sticky-button">
+        <div className="floating-button-bg">
+          <div className="flex justify-center max-w-md mx-auto">
+            <Button
+              variant="outline"
+              onClick={handleStartOver}
+              className="px-8"
+              size="lg"
             >
-เลขนำโชค
-            </h2>
-            <div 
-              className="text-white font-heading font-bold"
-              style={{ fontSize: '4rem', lineHeight: '1' }}
-            >
-              {fortune.luckyNumber}
-            </div>
+              หน้าแรก
+            </Button>
           </div>
-
-          {/* Fortune Predictions - Combined Card */}
-          <div className="card-mystical">
-            {/* Relationship */}
-            <div className="mb-6">
-              <h3 
-                className="font-heading font-bold mb-3 text-pink-300 flex items-center gap-2"
-                style={{ fontSize: 'var(--text-lg)' }}
-              >
-                💝 เรื่องรัก
-              </h3>
-              <p 
-                className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                style={{ fontSize: 'var(--text-sm)' }}
-              >
-                {fortune.relationship}
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-600/30 my-6"></div>
-
-            {/* Work */}
-            <div className="mb-6">
-              <h3 
-                className="font-heading font-bold mb-3 text-blue-300 flex items-center gap-2"
-                style={{ fontSize: 'var(--text-lg)' }}
-              >
-                💼 การงาน
-              </h3>
-              <p 
-                className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                style={{ fontSize: 'var(--text-sm)' }}
-              >
-                {fortune.work}
-              </p>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-gray-600/30 my-6"></div>
-
-            {/* Health */}
-            <div>
-              <h3 
-                className="font-heading font-bold mb-3 text-green-300 flex items-center gap-2"
-                style={{ fontSize: 'var(--text-lg)' }}
-              >
-                🏥 สุขภาพ
-              </h3>
-              <p 
-                className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                style={{ fontSize: 'var(--text-sm)' }}
-              >
-                {fortune.health}
-              </p>
-            </div>
-          </div>
-
-          {/* Powered by MOOF */}
-          <div className="mt-8 mb-4 text-center">
-            <div 
-              className="font-body text-gray-500"
-              style={{ fontSize: 'var(--text-xs)' }}
-            >
-              Powered by <span className="font-logo font-bold text-white">MOOF</span>
-            </div>
-          </div>
-
-          {/* Bottom padding for floating button */}
-          <div style={{ paddingBottom: '100px' }}></div>
-
-          {/* Saving Status */}
-          {saving && (
-            <div className="text-center">
-              <p 
-                className="font-body text-gray-400"
-                style={{ fontSize: 'var(--text-xs)' }}
-              >
-                กำลังบันทึกข้อมูล...
-              </p>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* Fixed Floating Button */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <div className="flex justify-center p-4 max-w-md mx-auto">
-          <Button
-            variant="outline"
-            onClick={handleStartOver}
-            className="px-8 py-4 bg-purple-900/40 backdrop-blur-sm border-2 border-purple-400/80 hover:border-purple-300/90 hover:bg-purple-900/50 text-purple-200 hover:text-white shadow-xl mystical-glow"
-            size="lg"
-          >
-            <span className="font-heading font-medium">หน้าแรก</span>
-          </Button>
         </div>
       </div>
-    </MobileLayout>
+    </>
   )
 }
 

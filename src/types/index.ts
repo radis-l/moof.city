@@ -16,11 +16,6 @@ export interface FortuneResult {
   generatedAt: string
 }
 
-export interface FortuneResponse {
-  success: boolean
-  data?: FortuneResult
-  error?: string
-}
 
 // Storage types
 export interface FortuneDataEntry {

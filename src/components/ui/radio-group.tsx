@@ -60,13 +60,11 @@ export const RadioGroup = ({
             </span>
             
             {/* Enhanced selection indicator */}
-            <div className={`
-              w-5 h-5 rounded-full transition-all duration-300
-              ${value === option.value 
+            <div className={`w-5 h-5 rounded-full transition-all duration-300 ${
+              value === option.value 
                 ? 'bg-purple-400 shadow-lg shadow-purple-400/50' 
                 : 'border-2 border-gray-400 group-hover:border-purple-300'
-              }
-            `}>
+            }`}>
               {value === option.value && (
                 <div className="w-2 h-2 rounded-full bg-white mx-auto mt-1.5"></div>
               )}

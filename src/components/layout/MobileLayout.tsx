@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, memo } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoofLogo } from '@/assets/logo'
 import { LazyParticleBackground } from '@/components/ui/lazy-particle-background'
@@ -10,7 +10,7 @@ interface MobileLayoutProps {
   showHeader?: boolean
 }
 
-export function MobileLayout({ children, showHeader = true }: MobileLayoutProps) {
+export const MobileLayout = memo(function MobileLayout({ children, showHeader = true }: MobileLayoutProps) {
   const router = useRouter()
 
   return (
@@ -70,4 +70,4 @@ export function MobileLayout({ children, showHeader = true }: MobileLayoutProps)
       </div>
     </>
   )
-}
+})

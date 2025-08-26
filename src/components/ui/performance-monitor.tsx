@@ -90,21 +90,3 @@ export const PerformanceMonitor = () => {
   return null
 }
 
-// Hook for manual performance tracking
-export const usePerformanceTracking = () => {
-  const trackUserTiming = (name: string, startMarkName?: string) => {
-    if (startMarkName) {
-      performance.measure(name, startMarkName)
-    } else {
-      performance.mark(name)
-    }
-  }
-
-  const trackCustomMetric = (name: string, value: number, unit = 'ms') => {
-    console.log(`Custom Metric - ${name}: ${value}${unit}`)
-    // In production, send to analytics
-    // analytics.track('custom_metric', { name, value, unit })
-  }
-
-  return { trackUserTiming, trackCustomMetric }
-}

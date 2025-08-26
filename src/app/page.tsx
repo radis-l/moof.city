@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ export default function Home() {
   const [agreed, setAgreed] = useState(false)
   const [emailError, setEmailError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -59,12 +60,28 @@ export default function Home() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   return (
     <MobileLayout>
       {/* Unified Hero Section */}
       <main className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10">
         <div className="w-full max-w-md text-center space-y-4">
           
+          {/* Powered by MOOF - Top of page */}
+          {mounted && (
+            <div className="mb-2 text-center">
+              <div 
+                className="font-body text-gray-500"
+                style={{ fontSize: 'var(--text-xs)' }}
+              >
+                Powered by <span className="font-logo font-bold text-white">MOOF</span>
+              </div>
+            </div>
+          )}
+
           {/* Main Heading - Integrated */}
           <h1 
             className="font-heading text-white font-bold" 
@@ -164,19 +181,6 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="content-section">
-        <div className="container-grid">
-          <div className="grid-full text-center">
-            <div 
-              className="font-body text-gray-500"
-              style={{ fontSize: 'var(--text-xs)' }}
-            >
-              Powered by <span className="font-logo font-bold text-white">MOOF</span>
-            </div>
-          </div>
-        </div>
-      </footer>
     </MobileLayout>
   )
 }
