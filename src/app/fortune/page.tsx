@@ -278,7 +278,14 @@ function FortunePageContent() {
 
 export default function FortunePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">กำลังโหลด...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">
+        <div className="text-center">
+          <MoofLogo />
+          <p className="mt-4 text-gray-300">กำลังโหลด...</p>
+        </div>
+      </div>
+    }>
       <FortunePageContent />
     </Suspense>
   )

@@ -133,7 +133,8 @@ function FortuneResultPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-400 mb-4">เกิดข้อผิดพลาด</p>
+          <MoofLogo />
+          <p className="text-red-400 mb-4 mt-4">เกิดข้อผิดพลาด</p>
           <Button onClick={handleStartOver}>กลับหน้าแรก</Button>
         </div>
       </div>
@@ -290,7 +291,14 @@ function FortuneResultPageContent() {
 
 export default function FortuneResultPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">กำลังโหลด...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">
+        <div className="text-center">
+          <MoofLogo />
+          <p className="mt-4 text-gray-300">กำลังโหลด...</p>
+        </div>
+      </div>
+    }>
       <FortuneResultPageContent />
     </Suspense>
   )
