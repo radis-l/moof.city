@@ -2,6 +2,8 @@
 // Development: JSON file, Production: Vercel KV
 
 import bcrypt from 'bcryptjs'
+import fs from 'fs'
+import path from 'path'
 
 interface AdminConfig {
   passwordHash: string
@@ -9,14 +11,12 @@ interface AdminConfig {
 }
 
 // Check if we're in a Vercel environment (production)
-const isProduction = process.env.VERCEL || process.env.NODE_ENV === 'production'
+const isProduction = !!process.env.VERCEL || process.env.NODE_ENV === 'production'
 
 // File storage (development)
 const fileStorage = {
   async getConfig(): Promise<AdminConfig | null> {
     try {
-      const fs = require('fs')
-      const path = require('path')
       const configPath = path.join(process.cwd(), 'data', 'admin-config.json')
       
       if (!fs.existsSync(configPath)) {
@@ -33,9 +33,13 @@ const fileStorage = {
 
   async saveConfig(config: AdminConfig): Promise<boolean> {
     try {
-      const fs = require('fs')
-      const path = require('path')
-      const configPath = path.join(process.cwd(), 'data', 'admin-config.json')
+      const dataDir = path.join(process.cwd(), 'data')
+      const configPath = path.join(dataDir, 'admin-config.json')
+      
+      // Ensure data directory exists
+      if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true })
+      }
       
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
       return true
