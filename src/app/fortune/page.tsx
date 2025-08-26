@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { RadioGroup } from '@/components/ui/radio-group'
 import { MoofLogo } from '@/assets/logo'
-import { ParticleBackground } from '@/components/ui/particle-background'
+import { MobileLayout } from '@/components/layout'
 import type { AgeRange, BirthDay, BloodGroup } from '@/types'
 
 const AGE_OPTIONS = [
@@ -234,117 +234,67 @@ function FortunePageContent() {
   }
 
   return (
-    <>
-      {/* Mobile Only - Main Content */}
-      <div className="block md:hidden mystical-background text-white relative overflow-hidden">
-        <ParticleBackground />
-        
-        {/* Header */}
-        <header className="content-section" style={{ paddingTop: 'var(--space-3)' }}>
-          <div className="container-grid">
-            <div className="grid-full flex justify-between items-center">
-              <button 
-                className="font-body cursor-pointer hover:opacity-80 transition-opacity" 
-                style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}
-                onClick={() => router.push('/')}
+    <MobileLayout>
+      {/* Unified Hero Section - Questionnaire */}
+      <main className="flex flex-col items-center justify-center min-h-[75vh] px-6 relative z-10">
+        <div className="w-full max-w-md text-center space-y-4">
+
+          {/* Progress Bar */}
+          <div>
+            <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+          </div>
+
+          {/* Step Content - Minimal */}
+          <div>
+            {renderStepContent()}
+          </div>
+
+          {/* Powered by MOOF - positioned after choices for non-final steps */}
+          {currentStep !== 3 && (
+            <div className="mt-8 mb-4 text-center">
+              <div 
+                className="font-body text-gray-500"
+                style={{ fontSize: 'var(--text-xs)' }}
               >
-                ดูดวงฟรีกับ <span className="font-logo font-bold text-white">MOOF</span>
-              </button>
-              <div style={{ fontSize: 'var(--text-sm)', color: 'var(--color-gray-400)' }}>
-                &lt;/&gt;
+                Powered by <span className="font-logo font-bold text-white">MOOF</span>
               </div>
             </div>
-          </div>
-        </header>
+          )}
 
-        {/* Unified Hero Section - Questionnaire */}
-        <main className="flex flex-col items-center justify-center min-h-[75vh] px-6 relative z-10">
-          <div className="w-full max-w-md text-center space-y-4">
+          {/* Bottom padding for floating buttons */}
+          <div style={{ paddingBottom: '120px' }}></div>
 
-            {/* Progress Bar */}
-            <div>
-              <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
-            </div>
+        </div>
+      </main>
 
-            {/* Step Content - Minimal */}
-            <div>
-              {renderStepContent()}
-            </div>
-
-            {/* Powered by MOOF - positioned after choices for non-final steps */}
-            {currentStep !== 3 && (
-              <div className="mt-8 mb-4 text-center">
-                <div 
-                  className="font-body text-gray-500"
-                  style={{ fontSize: 'var(--text-xs)' }}
-                >
-                  Powered by <span className="font-logo font-bold text-white">MOOF</span>
-                </div>
-              </div>
-            )}
-
-            {/* Bottom padding for floating buttons */}
-            <div style={{ paddingBottom: '120px' }}></div>
-
-          </div>
-        </main>
-
-
-        {/* Fixed Floating Buttons */}
-        <div className="fixed bottom-0 left-0 right-0 z-50">
-          <div className="flex gap-4 p-4 max-w-md mx-auto">
-            <Button
-              variant="secondary"
-              onClick={handleBack}
-              className="flex-1 bg-gray-900/40 backdrop-blur-sm border-2 border-gray-300/70 hover:border-gray-200/90 hover:bg-gray-900/50 text-gray-100 hover:text-white shadow-xl"
-              size="lg"
-            >
-              <span className="font-body font-medium">
-                {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
-              </span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              onClick={handleNext}
-              disabled={!isStepValid()}
-              className="flex-1 mystical-glow bg-purple-900/40 backdrop-blur-sm border-2 border-purple-400/80 hover:border-purple-300/90 hover:bg-purple-900/50 text-purple-200 hover:text-white shadow-xl"
-              size="lg"
-            >
-              <span className="font-heading font-medium">
-                {currentStep === totalSteps ? 'ดูดวงเลย!' : 'ต่อไป'}
-              </span>
-            </Button>
-          </div>
+      {/* Fixed Floating Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 z-50">
+        <div className="flex gap-4 p-4 max-w-md mx-auto">
+          <Button
+            variant="secondary"
+            onClick={handleBack}
+            className="flex-1 bg-gray-900/40 backdrop-blur-sm border-2 border-gray-300/70 hover:border-gray-200/90 hover:bg-gray-900/50 text-gray-100 hover:text-white shadow-xl"
+            size="lg"
+          >
+            <span className="font-body font-medium">
+              {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
+            </span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={handleNext}
+            disabled={!isStepValid()}
+            className="flex-1 mystical-glow bg-purple-900/40 backdrop-blur-sm border-2 border-purple-400/80 hover:border-purple-300/90 hover:bg-purple-900/50 text-purple-200 hover:text-white shadow-xl"
+            size="lg"
+          >
+            <span className="font-heading font-medium">
+              {currentStep === totalSteps ? 'ดูดวงเลย!' : 'ต่อไป'}
+            </span>
+          </Button>
         </div>
       </div>
-
-      {/* Desktop/Tablet - Mobile Only Message */}
-      <div className="hidden md:flex mystical-background text-white min-h-screen items-center justify-center relative overflow-hidden">
-        <ParticleBackground />
-        <div className="text-center relative z-10 px-6">
-          <div className="mb-8">
-            <MoofLogo />
-          </div>
-          <h1 
-            className="font-heading text-white font-bold mb-6"
-            style={{ 
-              fontSize: 'var(--text-3xl)', 
-              textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
-            }}
-          >
-            เว็บไซต์นี้รองรับเฉพาะมือถือ
-          </h1>
-          <p 
-            className="font-body text-gray-300 mb-8 max-w-md mx-auto leading-relaxed"
-            style={{ fontSize: 'var(--text-lg)' }}
-          >
-            กรุณาเปิดเว็บไซต์ผ่านมือถือของคุณ<br />
-            เพื่อประสบการณ์การใช้งานที่ดีที่สุด
-          </p>
-        </div>
-      </div>
-    </>
+    </MobileLayout>
   )
 }
 

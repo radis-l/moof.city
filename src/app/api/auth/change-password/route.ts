@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
     
     try {
       envContent = fs.readFileSync(envPath, 'utf8')
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { success: false, message: 'Could not read environment file' },
         { status: 500 }
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
 
     try {
       fs.writeFileSync(envPath, updatedContent, 'utf8')
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { success: false, message: 'Could not update environment file' },
         { status: 500 }
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     )
 
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: 'Server error' },
       { status: 500 }

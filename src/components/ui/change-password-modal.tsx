@@ -70,7 +70,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswo
       } else {
         setError(result.message || 'เกิดข้อผิดพลาด')
       }
-    } catch (err) {
+    } catch {
       setError('เกิดข้อผิดพลาดในการเชื่อมต่อ')
     } finally {
       setLoading(false)

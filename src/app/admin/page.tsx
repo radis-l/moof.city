@@ -159,7 +159,7 @@ export default function AdminPage() {
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch (e) {
+        } catch {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
@@ -189,7 +189,7 @@ export default function AdminPage() {
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch (e) {
+        } catch {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
@@ -222,7 +222,7 @@ export default function AdminPage() {
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch (e) {
+        } catch {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
@@ -249,7 +249,7 @@ export default function AdminPage() {
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch (e) {
+        } catch {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })

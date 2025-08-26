@@ -33,7 +33,7 @@ export function AdminLogin({ onAuthenticated }: AdminLoginProps) {
       } else {
         setError('รหัสผ่านไม่ถูกต้อง')
       }
-    } catch (err) {
+    } catch {
       setError('เกิดข้อผิดพลาด กรุณาลองใหม่')
     } finally {
       setLoading(false)
