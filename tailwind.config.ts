@@ -11,7 +11,6 @@ export default {
       fontFamily: {
         'kanit': ['var(--font-kanit)', 'sans-serif'],
         'museo-moderno': ['var(--font-museo-moderno)', 'sans-serif'],
-        'work-sans': ['var(--font-work-sans)', 'sans-serif'],
       },
     },
   },

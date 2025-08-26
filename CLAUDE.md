@@ -5,9 +5,10 @@ Thai fortune telling website with one-time fortune per email. Users submit age/b
 
 ## 🏗️ Architecture
 - **Framework**: Next.js 15.5.0 App Router + TypeScript
-- **Storage**: Hybrid (JSON files dev, Redis production)
-- **Authentication**: bcrypt + HTTP-only cookies + environment variables
-- **UI**: Tailwind CSS 4.0, mobile-first
+- **Storage**: Hybrid (JSON files dev, Vercel KV production)
+- **Authentication**: Database-based password storage + bcrypt + HTTP-only cookies
+- **UI**: Tailwind CSS 4.0, mobile-first with mystical particle effects
+- **Fonts**: MuseoModerno logo, Kanit body, Maitree headings
 - **Languages**: Thai interface, no external APIs
 
 ## 📁 Key Files
@@ -61,20 +62,19 @@ src/
 - **Spacing Consistency**: Standardized `mt-8 mb-4` for "Powered by MOOF"
 
 ## 🔧 Recent Changes (Latest Session)
-- ✅ **Result Page Redesign**: New 3-card layout (Header, Lucky Number, Combined Fortune)
-- ✅ **Mobile-Only Enforcement**: Added desktop/tablet redirect to all pages
-- ✅ **UI Consistency**: Removed container backgrounds, standardized spacing
-- ✅ **Button Optimization**: Individual blur backgrounds for floating effect
-- ✅ **Icon Cleanup**: Removed ✨ and 🍀 emojis from titles
-- ✅ **Header Enhancement**: Made "ดูดวงฟรีกับ MOOF" clickable across all pages
-- ✅ **Email Removal**: Removed email display from result page header
-- ✅ **Fortune Card Consolidation**: Combined 3 fortune categories in single card with dividers
+- ✅ **Database-Based Admin System**: Replaced .env password storage with hybrid database
+- ✅ **Logo Font Consistency**: Fixed MOOF logo rendering across all loading screens
+- ✅ **Codebase Cleanup**: Removed unused imports, optimized Tailwind config
+- ✅ **Spacing Improvements**: Better user info layout and divider visibility
+- ✅ **Sticky Button Optimization**: Reduced bottom padding (140px → 100px)
+- ✅ **Error Handling**: Enhanced admin password change with proper error messages
+- ✅ **Deployment Fixes**: Resolved Vercel build issues with proper ES6 imports
 
-## 🔐 Authentication System
-- **Login**: `/admin` requires password authentication
+## 🔐 Authentication System  
+- **Login**: `/admin` with password `Punpun12` (auto-initialized)
+- **Storage**: Development: `data/admin-config.json` (Git ignored) | Production: Vercel KV
 - **Security**: bcrypt hashing (salt rounds: 12) + HTTP-only session cookies
-- **Password Storage**: `.env.local` file (protected from Git)
-- **Password Management**: Change password via admin UI
+- **Password Management**: Change password via admin UI (persists across deployments)
 - **Session**: 24-hour expiry, secure logout functionality
 - **APIs**: `/api/auth/login`, `/api/auth/verify`, `/api/auth/logout`, `/api/auth/change-password`
 ## 🚀 Commands
@@ -85,4 +85,5 @@ npm run lint   # Code linting
 ```
 
 ---
-**Status**: Production Ready | **Features**: 22/22 ✅ | **Files**: 27 TypeScript
+**Status**: Production Ready | **Features**: 25/25 ✅ | **Files**: 36 TypeScript  
+**Latest Update**: Database-based admin system with font consistency fixes

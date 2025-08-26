@@ -68,11 +68,13 @@ Our algorithm combines traditional Thai fortune telling wisdom with modern perso
 
 Built with modern web technologies for optimal performance:
 
-- **Next.js 15.5.0** - React framework for production
-- **TypeScript** - Type-safe development
+- **Next.js 15.5.0** - React framework with App Router
+- **TypeScript** - Type-safe development 
 - **Tailwind CSS 4.0** - Modern styling framework
+- **Vercel KV** - Redis database for production storage
+- **bcrypt** - Secure password hashing for admin system
 - **Mobile-Exclusive Design** - Optimized specifically for smartphones
-- **Kanit Font** - Authentic Thai typography
+- **Multi-Font System** - MuseoModerno logo, Kanit body, Maitree headings
 
 ## 🎨 Design Philosophy
 
@@ -104,11 +106,13 @@ Track your fortune telling service performance:
 
 MOOF is optimized for production deployment:
 
-- **Static Generation** - Fast loading times
-- **SEO Optimized** - Meta tags and structured data
-- **Mobile Performance** - Lighthouse score optimized
-- **Admin Dashboard** - Secure analytics and data management
-- **Hybrid Storage** - JSON files (dev) + Redis (production)
+- **Static Generation** - Fast loading times with Next.js optimization
+- **SEO Optimized** - Meta tags and structured data for search engines
+- **Mobile Performance** - Lighthouse score optimized for mobile devices
+- **Admin Dashboard** - Secure analytics and data management (`/admin`)
+- **Database-Based Auth** - Password storage persists across deployments
+- **Hybrid Storage** - JSON files (dev) + Vercel KV (production)
+- **Auto-Scaling** - Handles traffic spikes with Vercel infrastructure
 
 ## 🎯 Perfect For
 
