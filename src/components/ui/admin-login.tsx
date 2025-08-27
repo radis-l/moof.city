@@ -30,14 +30,16 @@ export function AdminLogin({ onAuthenticated }: AdminLoginProps) {
       const result = await response.json()
 
       if (result.success) {
-        trackAdminLogin()
+        trackAdminLogin(true)
         onAuthenticated()
       } else {
-        trackError('admin_login_failed', 'Invalid password')
+        trackAdminLogin(false)
+        trackError('admin_login_failed', 'Invalid password', 'admin_login')
         setError('รหัสผ่านไม่ถูกต้อง')
       }
     } catch (error) {
-      trackError('admin_login_error', error instanceof Error ? error.message : 'Network error')
+      trackAdminLogin(false)
+      trackError('admin_login_error', error instanceof Error ? error.message : 'Network error', 'admin_login')
       setError('เกิดข้อผิดพลาด กรุณาลองใหม่')
     } finally {
       setLoading(false)

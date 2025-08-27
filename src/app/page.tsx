@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { MobileLayout } from '@/components/layout'
-import { trackEmailSubmission, trackError, trackPageView } from '@/lib/analytics'
+import { trackEmailSubmission, trackError, trackPageView, trackFormBegin, trackSessionStart } from '@/lib/analytics'
 
 export default function Home() {
   const router = useRouter()
@@ -49,16 +49,16 @@ export default function Home() {
       
       if (result.success && result.exists) {
         // Email exists, show existing fortune result
-        trackEmailSubmission(false)
+        trackEmailSubmission(false, email)
         router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
       } else {
         // Email doesn't exist, start new questionnaire
-        trackEmailSubmission(true)
+        trackEmailSubmission(true, email)
         router.push(`/fortune?email=${encodeURIComponent(email)}`)
       }
     } catch (error) {
       console.error('Error checking email:', error)
-      trackError('email_check_failed', error instanceof Error ? error.message : 'Unknown error')
+      trackError('email_check_failed', error instanceof Error ? error.message : 'Unknown error', 'home_page')
       setEmailError('เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง')
     } finally {
       setLoading(false)
@@ -67,7 +67,13 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true)
-    trackPageView('Landing Page')
+    if (typeof window !== 'undefined') {
+      const userType = 'unknown';
+      const deviceType = window.innerWidth < 768 ? 'mobile' : 'desktop';
+      trackSessionStart(userType, deviceType);
+      trackPageView('Landing Page', userType);
+      trackFormBegin('email_submission');
+    }
   }, [])
   return (
     <MobileLayout>

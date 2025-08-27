@@ -7,7 +7,7 @@ import { MoofLogo } from '@/assets/logo'
 import { MobileLayout } from '@/components/layout'
 import { generateFortune } from '@/lib/fortune-generator'
 import type { UserData, FortuneResult } from '@/types'
-import { trackResultView, trackFortuneGeneration, trackError, trackPageView } from '@/lib/analytics'
+import { trackResultView, trackFortuneGeneration, trackError, trackPageView, trackConversion, trackEngagementTime } from '@/lib/analytics'
 
 function FortuneResultPageContent() {
   const searchParams = useSearchParams()
@@ -17,6 +17,7 @@ function FortuneResultPageContent() {
   const [saving, setSaving] = useState(false)
   const [userData, setUserData] = useState<UserData | null>(null)
   const saveAttempted = useRef(false)
+  const [pageStartTime] = useState(Date.now())
 
   const loadExistingFortune = useCallback(async (email: string) => {
     try {
@@ -26,8 +27,9 @@ function FortuneResultPageContent() {
       if (result.success && result.exists && result.fortune) {
         setUserData(result.fortune.userData)
         setFortune(result.fortune.fortuneResult)
-        trackPageView('Fortune Result - Existing User')
-        trackResultView()
+        trackPageView('Fortune Result - Existing User', 'returning_user')
+        trackResultView(false, 'existing_fortune')
+        trackConversion('fortune_complete', 1)
       } else {
         // Email not found, redirect to home
         router.push('/')
@@ -35,7 +37,7 @@ function FortuneResultPageContent() {
       }
     } catch (error) {
       console.error('Error loading existing fortune:', error)
-      trackError('existing_fortune_load_failed', error instanceof Error ? error.message : 'Unknown error')
+      trackError('existing_fortune_load_failed', error instanceof Error ? error.message : 'Unknown error', 'result_page')
       router.push('/')
       return
     } finally {
@@ -78,9 +80,10 @@ function FortuneResultPageContent() {
       const generatedFortune = generateFortune(user)
       setFortune(generatedFortune)
       
-      trackPageView('Fortune Result - New User')
-      trackResultView()
-      trackFortuneGeneration()
+      trackPageView('Fortune Result - New User', 'new_user')
+      trackResultView(true, 'new_fortune')
+      trackFortuneGeneration({ age: user.ageRange, bloodGroup: user.bloodGroup, birthDay: user.birthDay })
+      trackConversion('fortune_complete', 1)
       
       // Save to storage only once
       if (!saveAttempted.current) {
@@ -110,12 +113,12 @@ function FortuneResultPageContent() {
       
       if (!result.success) {
         console.warn('Failed to save fortune:', result.error)
-        trackError('fortune_save_failed', result.error)
+        trackError('fortune_save_failed', result.error, 'result_page')
         // Don't show error to user, just log it
       }
     } catch (error) {
       console.error('Error saving fortune:', error)
-      trackError('fortune_save_error', error instanceof Error ? error.message : 'Unknown error')
+      trackError('fortune_save_error', error instanceof Error ? error.message : 'Unknown error', 'result_page')
       // Don't show error to user, just log it
     } finally {
       setSaving(false)
@@ -124,6 +127,8 @@ function FortuneResultPageContent() {
   }
 
   const handleStartOver = () => {
+    const timeSpent = Date.now() - pageStartTime;
+    trackEngagementTime(timeSpent, 'result_page');
     router.push('/')
   }
 
