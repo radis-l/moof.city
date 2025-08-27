@@ -5,32 +5,66 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 Thai fortune telling website with one-time fortune per email. Users submit age/birth day/blood group → get personalized prediction + lucky number.
 
+**Mobile-First Strategy**: Strictly mobile-only experience (768px breakpoint) with desktop/tablet redirect messaging. Optimized for Thai mobile users with mystical UI design system.
+
+**Performance-Optimized**: Lazy-loaded particle backgrounds, hardware-accelerated animations, optimized font loading with display:swap, and comprehensive performance monitoring.
+
+**Thai-Only Interface**: Complete Thai localization with no external API dependencies. Self-contained fortune generation using deterministic algorithms.
+
 ## Architecture
-- **Framework**: Next.js 15.5.0 App Router + TypeScript
-- **Storage**: Hybrid system (JSON files in development, Vercel KV in production)
-- **Authentication**: bcrypt + HTTP-only cookies with database persistence
-- **UI**: Tailwind CSS 4.0, mobile-first (768px breakpoint enforced)
-- **Fonts**: MuseoModerno (logo), Kanit (body), Maitree (headings)
+- **Framework**: Next.js 15.5.0 App Router + TypeScript with App Router optimization
+- **Storage**: Hybrid system (JSON files in development, Vercel KV in production) with auto-detection
+- **Authentication**: bcrypt (12 salt rounds) + HTTP-only cookies with 24-hour expiry and database persistence
+- **UI**: Tailwind CSS 4.0 with custom glassmorphism system, mobile-first (768px breakpoint strictly enforced)
+- **Fonts**: MuseoModerno (logo), Kanit (body), Maitree (headings) - Major Third typography scale (1.250)
 - **Languages**: Thai interface only, no external APIs
+- **Performance**: Hardware acceleration, lazy loading, particle system optimization
+- **Security**: CSP headers, XSS protection, secure session management
 
 ## Key Architecture Components
 
 ### Storage System (`src/lib/storage/`)
-- **hybrid-storage.ts**: Auto-detects environment and routes to appropriate storage
-- **file-storage.ts**: Development JSON file storage in `data/`
-- **kv-storage.ts**: Production Vercel KV storage
-- **admin-config-storage.ts**: Admin password management across environments
+- **hybrid-storage.ts**: Smart environment detection (`process.env.NODE_ENV === 'production' && process.env.VERCEL`) with automatic routing
+- **file-storage.ts**: Development JSON file storage in `data/` directory (git-ignored)
+- **kv-storage.ts**: Production Vercel KV storage with error handling and fallbacks
+- **admin-config-storage.ts**: Cross-environment admin password management with bcrypt persistence
 
-### Fortune Generation (`src/lib/fortune-generator.ts`)
-- **Deterministic Algorithm**: Seeded selection ensures identical results on refresh
-- **300+ Message Variations**: Love (14), Work (21), Health (24+) categories
-- **Multi-factor Personalization**: Age + blood group + birth day modifiers
-- **No Math.random()**: Uses prime number multipliers for consistent variety
+**Pattern**: Single interface with dual implementations - all storage calls go through hybrid-storage.ts which routes to appropriate backend based on runtime environment detection.
 
-### API Architecture
-- **Storage APIs** (6 endpoints): save-fortune, check-email, get-data, delete, clear-all, export-csv
-- **Auth APIs** (4 endpoints): login, verify, logout, change-password
-- **Session Management**: 24-hour expiry with HTTP-only cookies
+### Fortune Generation Algorithm (`src/lib/fortune-generator.ts`)
+- **Deterministic Seeded Selection**: Creates consistent seed from user data (age × 31 + birthDay × 17 + bloodGroup × 13)
+- **Prime Number Distribution**: Uses 997 modulo with 23 multiplier for even distribution across message arrays
+- **300+ Message Variations**: Relationship (42), Work (42), Health (24) with blood group and age modifiers
+- **Multi-factor Personalization**: Age ranges, birth day energy, blood group traits combined mathematically
+- **Lucky Number Generation**: 2-digit numbers (10-99) using deterministic formula
+- **No Randomness**: Zero Math.random() usage - same input always generates identical output
+
+**Algorithm Flow**: 
+1. Create user data seed → 2. Generate selector function → 3. Apply to message arrays → 4. Combine base + modifier messages
+
+### Next.js Performance Optimizations (`next.config.js`)
+- **Compression**: gzip enabled, modern image formats (WebP, AVIF)
+- **Bundle Optimization**: Package imports optimization, webpack fallbacks for client-side
+- **Security Headers**: X-Frame-Options: DENY, X-Content-Type-Options: nosniff
+- **Caching Strategy**: Static assets (1 year), favicon optimization
+- **Performance Budgets**: 400KB asset/entry limits with warnings
+
+### API Architecture (10 Endpoints)
+**Storage APIs** (6 endpoints):
+- `POST /api/storage/save-fortune` - Store user fortune data
+- `GET /api/storage/check-email` - Verify email existence  
+- `GET /api/storage/get-data` - Admin data retrieval
+- `DELETE /api/storage/delete?id=` - Remove single entry
+- `DELETE /api/storage/clear-all` - Bulk data deletion
+- `GET /api/storage/export-csv` - CSV data export
+
+**Authentication APIs** (4 endpoints):
+- `POST /api/auth/login` - Admin login with bcrypt verification
+- `GET /api/auth/verify` - Session validation
+- `POST /api/auth/logout` - Session termination
+- `POST /api/auth/change-password` - Password update with re-hashing
+
+**Session Management**: HTTP-only cookies, 24-hour expiry, secure flag in production
 
 ## Critical Business Logic
 
@@ -52,31 +86,76 @@ npm run build  # Production build with static optimization
 npm run lint   # ESLint code linting
 ```
 
+## Advanced UI/UX Implementation
+
+### Mystical Design System (`globals.css`)
+**Typography System**: Major Third scale (1.250) with CSS custom properties
+- Base size: 18px (`--text-base: 1.125rem`)
+- Scale: `--text-xs` (12px) → `--text-5xl` (68px)
+- Font families: `--font-heading` (Maitree), `--font-body` (Kanit), `--font-logo` (MuseoModerno)
+- 8-point spacing system: `--space-1` (8px) → `--space-10` (80px)
+
+**Particle Background System**: 
+- **Lazy Loading**: Dynamic import with performance monitoring
+- **Hardware Acceleration**: `transform: translateZ(0)`, `backface-visibility: hidden`
+- **Gradient Spheres**: 4 animated spheres with blur filters (60px-80px)
+- **Particle Types**: Small/medium/large with radial gradients and box-shadows
+- **Performance**: `will-change: transform`, layout containment
+
+**Glassmorphism System**:
+- `card-mystical`: `backdrop-filter: blur(12px)`, rgba backgrounds
+- Border: `1px solid rgba(139, 92, 246, 0.2)`
+- Hover states with transform and shadow effects
+
+### Mobile-First Component Patterns
+**Responsive Breakpoint Enforcement**:
+- Desktop users see mystical redirect message with animated logo
+- Mobile detection via `window.innerWidth >= 768`
+- Analytics tracking for desktop warning displays
+
+**Floating Button System**:
+- `mobile-sticky-button`: Fixed positioning with `z-index: 9999`
+- Safe area support: `padding-bottom: env(safe-area-inset-bottom)`
+- Individual backdrop-blur backgrounds for floating effect
+
+**Input Enhancement Patterns**:
+- `focus:placeholder-transparent` for UX improvement
+- Purple accent colors matching design system
+- Thai text optimization with proper word-break and line-height
+
+### Animation & Performance Systems
+**StarBorder Component**: Configurable animated borders
+- Speed, color, thickness customization
+- CSS keyframes: `star-movement-top/bottom`
+- Opacity and transform animations
+
+**Performance Monitoring** (`PerformanceMonitor`):
+- Client-side performance tracking
+- Memory usage monitoring
+- Frame rate optimization alerts
+
 ## Development Patterns
 
-### Fortune Generation Consistency
-- Always use seeded selection instead of Math.random()
-- Same user data must generate identical fortune across sessions
-- Age-based advice combined with blood group traits and birth day energy
+### Component Architecture Standards
+- **Functional Components**: React hooks pattern with TypeScript
+- **Error Boundaries**: Thai language error messages
+- **Memoization**: React.memo for performance-critical components
+- **Lazy Loading**: Dynamic imports for heavy components (particle backgrounds)
+- **Type Safety**: Full TypeScript coverage with strict mode
 
-### Component Architecture
-- Functional components with hooks
-- Full TypeScript coverage
-- Error handling in Thai language
-- `card-mystical` class for glassmorphism containers
+### Fortune Generation Consistency Rules
+- **Zero Randomness**: All fortune generation must be deterministic
+- **Seed Consistency**: Same user data → identical results across sessions/devices
+- **Message Combination**: Base message + personality modifier pattern
+- **Age-Appropriate Content**: Different advice templates per age range
+- **Cultural Appropriateness**: Thai cultural context in all messaging
 
-### Authentication Flow
-- Admin password defaults to `Punpun12` (auto-initialized)
-- bcrypt salt rounds: 12
-- Password changes persist across deployments via hybrid storage
-- Session verification required for all admin operations
-
-## UI/UX Implementation
-- **Floating Buttons**: Individual backdrop-blur backgrounds
-- **Input Enhancement**: `focus:placeholder-transparent` for better UX
-- **Purple-to-blue Gradients**: Consistent button styling with hover effects
-- **StarBorder Component**: Configurable animated borders (speed/color/thickness)
-- **Typography Variables**: Use `var(--text-*)` for consistent sizing
+### Authentication & Security Patterns
+- **Default Credentials**: Admin password `Punpun12` (auto-initialized on first run)
+- **bcrypt Configuration**: 12 salt rounds for optimal security/performance balance
+- **Session Management**: 24-hour expiry, HTTP-only cookies, secure flag in production
+- **Cross-Environment Persistence**: Password changes survive deployments via hybrid storage
+- **Verification Flow**: All admin routes require session validation
 
 ## Environment-Specific Behavior
 - **Development**: JSON files in `data/` directory (git-ignored)
@@ -89,33 +168,167 @@ npm run lint   # ESLint code linting
 - User management and data export (CSV)
 - Password change functionality with UI modal
 
-## Analytics & Tracking
+## Analytics & Tracking System
 
-### Google Analytics 4 Integration
-- **Package**: `@next/third-parties/google` for optimized Next.js integration
-- **Measurement ID**: Set via `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
-- **Implementation**: `src/lib/analytics.ts` - Comprehensive tracking utilities
+### Google Analytics 4 Integration (`@next/third-parties/google`)
+**Implementation Architecture**:
+- **Loading Strategy**: `afterInteractive` with installation verification
+- **Environment Detection**: Development debug logging, production optimization
+- **Measurement ID**: `NEXT_PUBLIC_GA_MEASUREMENT_ID` environment variable
+- **Error Handling**: Graceful degradation when GA4 fails to load
+- **Performance**: Async loading with 10-retry wait system
 
-### Tracked Events
-- **User Journey**: Email submissions, questionnaire start/completion, result views
-- **Engagement**: Fortune generation completions, page views
-- **Errors**: API failures, storage errors, form validation issues
-- **UI Interactions**: Mobile warning displays (desktop users)
-- **Admin Actions**: Login attempts and authentication events
+**GA4 Script Integration**:
+```javascript
+// Layout.tsx automatic initialization with verification callback
+gtag('config', MEASUREMENT_ID, {
+  page_title: document.title,
+  page_location: window.location.href
+});
+```
 
-### Event Categories
-- `form_interaction` - Email submissions and form events
-- `user_journey` - Questionnaire and navigation flow
-- `engagement` - Content consumption and fortune interactions  
-- `ui_interaction` - Interface and responsive design events
-- `error` - System errors and debugging information
-- `admin` - Administrative operations and authentication
+### Comprehensive Event Tracking (15+ Events)
+**User Journey Funnel**:
+- `session_start` - Initial app load with device/user type
+- `form_begin` - Email form interaction start
+- `email_submit` - New vs returning user differentiation  
+- `questionnaire_begin` - 3-step form start
+- `form_progress` - Step completion with percentage tracking
+- `questionnaire_complete` - Conversion with completion time
+- `fortune_complete` - Final fortune generation
+- `result_view` - Fortune result engagement
+- `result_share` - Social sharing actions
+
+**Technical & UI Events**:
+- `page_view` - Custom page naming with user context
+- `mobile_warning_show` - Desktop user redirect tracking
+- `admin_login` - Authentication success/failure
+- `error_occur` - System errors with location context
+- `user_engagement` - Time spent tracking
+
+### Event Categorization System
+**Categories with Purpose**:
+- `user_journey` - Conversion funnel and user flow
+- `form_interaction` - Form engagement and submissions
+- `engagement` - Content consumption and sharing
+- `ui_interaction` - Interface and responsive design
+- `error` - Debugging and system monitoring
+- `admin` - Administrative operations
+- `conversion` - Revenue/value events
+
+### Advanced Analytics Features
+**User Segmentation**:
+- New vs returning user tracking
+- Age group demographics (6 ranges)
+- Blood group personality insights (4 types)
+- Birth day energy tracking (7 types)
+- Email domain analysis
+
+**Conversion Tracking**:
+- Fortune completion funnel
+- Questionnaire abandonment rates
+- Email verification success rates
+- Admin dashboard engagement
+
+**Performance Monitoring**:
+- Page load times and engagement
+- Error rates by location and type
+- Mobile vs desktop usage patterns
+- Session duration and bounce rates
 
 ### Analytics Functions (`src/lib/analytics.ts`)
-- `trackEvent()` - Generic event tracking with categories
-- `trackEmailSubmission()` - New vs returning user differentiation
-- `trackQuestionnaireStart/Complete()` - Conversion funnel tracking
-- `trackResultView()` - Fortune result engagement
-- `trackFortuneGeneration()` - New fortune creation events
-- `trackError()` - Error logging with context
-- `trackPageView()` - Custom page view naming
+**Core Functions**:
+- `trackEvent()` - Generic event with parameter validation
+- `trackPageView()` - Custom page naming with measurement ID routing
+- `trackEmailSubmission()` - User type differentiation with email domain tracking
+- `trackQuestionnaireStart/Complete()` - Funnel conversion with completion time
+- `trackFortuneGeneration()` - Final conversion with user demographic data
+- `trackResultView()` - Engagement tracking with context
+- `trackError()` - Error logging with type, message, and location
+- `trackMobileWarningShown()` - UX analytics for desktop users
+- `trackAdminLogin()` - Security monitoring
+- `verifyGAInstallation()` - Development debugging and verification
+
+## Page Flow Architecture
+
+### User Journey Flow
+1. **Landing Page** (`/`) - Email submission with existence check
+2. **Fortune Questionnaire** (`/fortune`) - 3-step form (age → birth day → blood group)
+3. **Results Page** (`/fortune/result`) - Generated fortune display
+4. **Admin Dashboard** (`/admin`) - Protected analytics and management
+
+### Route Protection & Logic
+- **Email Validation**: Real-time regex validation + existence check via API
+- **Questionnaire Guards**: Email parameter required, existing users redirected to results
+- **Admin Protection**: Session-based authentication with bcrypt verification
+- **Mobile Enforcement**: Desktop users redirected at layout level
+
+## Data Flow & State Management
+
+### Client-Side State
+- **Form State**: Local React state with validation
+- **User Data**: URL parameters for questionnaire flow
+- **Session State**: Server-side only (no client-side auth tokens)
+- **Loading States**: Per-component loading management
+
+### Server-Side Data Flow
+1. **Email Check** → Hybrid Storage lookup
+2. **Fortune Generation** → Deterministic algorithm
+3. **Data Persistence** → Hybrid storage save
+4. **Admin Operations** → Protected CRUD operations
+
+## Security Implementation
+
+### Data Protection
+- **Email Privacy**: 30-day retention policy (documented in UI)
+- **No PII Storage**: Only age ranges, not exact ages
+- **Secure Defaults**: HTTP-only cookies, CSRF protection
+- **Input Validation**: Zod schemas, SQL injection prevention
+
+### Authentication Security
+- **Password Hashing**: bcrypt with 12 salt rounds
+- **Session Management**: 24-hour expiry, secure flags
+- **Admin Access**: Single admin account with changeable password
+- **Brute Force Protection**: Rate limiting considerations
+
+## Performance & Optimization
+
+### Frontend Optimizations
+- **Code Splitting**: Dynamic imports for heavy components
+- **Image Optimization**: WebP/AVIF formats, responsive sizing
+- **Font Loading**: display:swap, preload critical fonts
+- **Bundle Analysis**: 400KB performance budgets
+
+### Runtime Performance
+- **Particle System**: Hardware acceleration, will-change properties
+- **Lazy Loading**: Intersection observer for animations
+- **Memory Management**: Component cleanup, event listener removal
+- **Analytics**: Async event tracking with fallbacks
+
+## Deployment & Environment
+
+### Production Considerations
+- **Environment Variables**: GA4 measurement ID, storage detection
+- **Build Optimization**: Static generation where possible
+- **CDN Strategy**: Static asset caching (1 year)
+- **Database**: Vercel KV auto-scaling
+
+### Development Workflow
+- **Local Storage**: JSON files in git-ignored `data/` directory
+- **Hot Reloading**: Next.js development server
+- **Type Safety**: Strict TypeScript configuration
+- **Linting**: ESLint with Next.js configuration
+
+## Troubleshooting & Maintenance
+
+### Common Issues
+- **Storage Errors**: Check environment detection logic
+- **Fortune Duplicates**: Verify deterministic algorithm consistency
+- **Analytics Missing**: Verify GA4 measurement ID setup
+- **Mobile Layout**: Confirm 768px breakpoint enforcement
+
+### Monitoring
+- **Error Tracking**: GA4 error events with context
+- **Performance**: Client-side monitoring via PerformanceMonitor
+- **User Analytics**: Conversion funnel tracking
+- **Admin Alerts**: Failed authentication attempts
