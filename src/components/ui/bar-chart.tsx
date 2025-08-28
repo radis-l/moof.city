@@ -32,17 +32,17 @@ export function BarChart({ data, maxHeight = 200, className = '' }: BarChartProp
       <div className="flex items-end space-x-1" style={{ height: maxHeight }}>
         {data.map((item, index) => {
           const height = (item.value / maxValue) * maxHeight
-          const heightPercent = (item.value / maxValue) * 100
           
           return (
             <div 
               key={`${item.label}-${index}`} 
               className="flex-1 flex flex-col items-center group relative"
+              style={{ height: maxHeight }}
             >
               {/* Bar */}
               <div
-                className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t-sm flex items-end justify-center relative"
-                style={{ height: `${heightPercent}%`, minHeight: item.value > 0 ? '4px' : '0px' }}
+                className="w-full bg-blue-500 hover:bg-blue-600 transition-colors rounded-t-sm flex items-end justify-center relative mt-auto"
+                style={{ height: `${height}px`, minHeight: item.value > 0 ? '4px' : '0px' }}
               >
                 {/* Value label on hover */}
                 <div className="opacity-0 group-hover:opacity-100 absolute -top-6 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-10 transition-opacity">

@@ -22,7 +22,9 @@ export async function DELETE(request: NextRequest) {
     }, { status: result.success ? 200 : 404 })
     
   } catch (error: unknown) {
-    console.error('Error deleting data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error deleting data:', error)
+    }
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

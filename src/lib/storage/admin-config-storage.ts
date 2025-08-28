@@ -26,7 +26,9 @@ const fileStorage = {
       const data = fs.readFileSync(configPath, 'utf8')
       return JSON.parse(data)
     } catch (error) {
-      console.error('Error reading admin config:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error reading admin config:', error)
+      }
       return null
     }
   },
@@ -44,7 +46,9 @@ const fileStorage = {
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2))
       return true
     } catch (error) {
-      console.error('Error saving admin config:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving admin config:', error)
+      }
       return false
     }
   }
@@ -58,7 +62,9 @@ const kvStorage = {
       const config = await kv.get<AdminConfig>('admin-config')
       return config
     } catch (error) {
-      console.error('Error reading admin config from KV:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error reading admin config from KV:', error)
+      }
       return null
     }
   },
@@ -69,7 +75,9 @@ const kvStorage = {
       await kv.set('admin-config', config)
       return true
     } catch (error) {
-      console.error('Error saving admin config to KV:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error saving admin config to KV:', error)
+      }
       return false
     }
   }

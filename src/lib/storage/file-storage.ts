@@ -25,7 +25,9 @@ const readFortuneData = (): FortuneDataEntry[] => {
     const data = fs.readFileSync(FORTUNE_FILE, 'utf8')
     return JSON.parse(data) || []
   } catch (error) {
-    console.error('Error reading fortune data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error reading fortune data:', error)
+    }
     return []
   }
 }
@@ -37,7 +39,9 @@ const writeFortuneData = (data: FortuneDataEntry[]): boolean => {
     fs.writeFileSync(FORTUNE_FILE, JSON.stringify(data, null, 2))
     return true
   } catch (error) {
-    console.error('Error writing fortune data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error writing fortune data:', error)
+    }
     return false
   }
 }

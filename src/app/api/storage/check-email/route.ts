@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
     }
     
   } catch (error: unknown) {
-    console.error('Error checking email:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error checking email:', error)
+    }
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

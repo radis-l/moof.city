@@ -14,7 +14,9 @@ export async function GET() {
     }, { status: result.success ? 200 : 500 })
     
   } catch (error: unknown) {
-    console.error('Error retrieving data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error retrieving data:', error)
+    }
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

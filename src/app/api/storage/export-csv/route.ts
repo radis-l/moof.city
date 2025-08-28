@@ -23,7 +23,9 @@ export async function GET() {
     }
     
   } catch (error: unknown) {
-    console.error('Error exporting data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error exporting data:', error)
+    }
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

@@ -12,14 +12,15 @@ Thai fortune telling website with one-time fortune per email. Users submit age/b
 **Thai-Only Interface**: Complete Thai localization with no external API dependencies. Self-contained fortune generation using deterministic algorithms.
 
 ## Architecture
-- **Framework**: Next.js 15.5.0 App Router + TypeScript with App Router optimization
+- **Framework**: Next.js 15.5.2 App Router + TypeScript with App Router optimization
 - **Storage**: Hybrid system (JSON files in development, Vercel KV in production) with auto-detection
 - **Authentication**: bcrypt (12 salt rounds) + HTTP-only cookies with 24-hour expiry and database persistence
 - **UI**: Tailwind CSS 4.0 with custom glassmorphism system, mobile-first (768px breakpoint strictly enforced)
 - **Fonts**: MuseoModerno (logo), Kanit (body), Maitree (headings) - Major Third typography scale (1.250)
 - **Languages**: Thai interface only, no external APIs
-- **Performance**: Hardware acceleration, lazy loading, particle system optimization
+- **Performance**: Hardware acceleration, lazy loading, particle system optimization, 680KB bundle size reduction
 - **Security**: CSP headers, XSS protection, secure session management
+- **Utilities**: Custom parseThaiTimestamp utility for consistent date handling
 
 ## Key Architecture Components
 
@@ -81,10 +82,20 @@ Thai fortune telling website with one-time fortune per email. Users submit age/b
 
 ## Development Commands
 ```bash
-npm run dev    # Development server with hot reload
-npm run build  # Production build with static optimization
-npm run lint   # ESLint code linting
+npm run dev         # Development server with hot reload
+npm run build       # Production build with static optimization
+npm run lint        # ESLint code linting
+npm run type-check  # TypeScript compilation check
+npm run test        # Full Playwright test suite
+npm run test:core   # Core user journey tests only
 ```
+
+## Recent Optimizations (2024)
+- **Bundle Size**: Reduced by 680KB through dependency cleanup (removed unused react-datepicker)
+- **Code Quality**: Production-ready console logging, eliminated development-only output
+- **Utility Functions**: Extracted reusable parseThaiTimestamp utility reducing code duplication
+- **Dependencies**: Updated to Next.js 15.5.2, React 19.1.1, with latest security patches
+- **Testing**: Comprehensive test coverage including utility function tests
 
 ## Advanced UI/UX Implementation
 
@@ -235,6 +246,19 @@ gtag('config', MEASUREMENT_ID, {
 - Error rates by location and type
 - Mobile vs desktop usage patterns
 - Session duration and bounce rates
+
+### Utility Functions (`src/lib/utils.ts`)
+**Thai Timestamp Processing**: Handles Thai Buddhist year conversion and timestamp parsing
+- **parseThaiTimestamp()**: Converts "DD/MM/YYYY HH:MM:SS" format with BE/AD year detection
+- **isTimestampInRange()**: Checks if timestamp falls within specified time range
+- **Consistent Date Handling**: Eliminates duplicate parsing logic across components
+- **Production Ready**: Proper error handling with null returns for invalid input
+
+**Algorithm Features**:
+1. Auto-detection of Thai Buddhist Era (BE) vs Gregorian (AD) years
+2. Month zero-indexing correction for JavaScript Date objects  
+3. Flexible seconds parameter (optional in input format)
+4. Range validation utilities for time-based filtering
 
 ### Analytics Functions (`src/lib/analytics.ts`)
 **Core Functions**:

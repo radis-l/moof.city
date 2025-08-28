@@ -52,7 +52,9 @@ export async function POST(request: NextRequest) {
     }
     
   } catch (error: unknown) {
-    console.error('Error saving fortune data:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error saving fortune data:', error)
+    }
     return NextResponse.json({
       success: false,
       error: 'Internal server error',

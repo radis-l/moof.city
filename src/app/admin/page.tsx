@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { Button } from '@/components/ui/button'
 import { AdminLogin } from '@/components/ui/admin-login'
+import { parseThaiTimestamp } from '@/lib/utils'
 import type { FortuneDataEntry } from '@/types'
 
 // Dynamic imports for performance
@@ -144,31 +145,60 @@ export default function AdminPage() {
   const chartData = useMemo(() => {
     if (data.length === 0) return []
 
-    const now = new Date()
+    // Find the latest timestamp in the data to use as reference point
+    let latestDate = new Date(0)
+    data.forEach(item => {
+      const itemDate = parseThaiTimestamp(item.timestamp)
+      if (itemDate && itemDate > latestDate) {
+        latestDate = itemDate
+      }
+    })
+
     const counts: Record<string, number> = {}
 
     if (chartPeriod === 'hourly') {
-      // Last 24 hours
+      // Past 60 minutes from latest data point
+      for (let i = 59; i >= 0; i--) {
+        const date = new Date(latestDate)
+        date.setMinutes(date.getMinutes() - i, 0, 0)
+        const key = date.toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
+        counts[key] = 0
+      }
+
+      data.forEach(item => {
+        const date = parseThaiTimestamp(item.timestamp)
+        if (date) {
+          const key = date.toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
+          if (counts.hasOwnProperty(key)) {
+            counts[key]++
+          }
+        } else if (process.env.NODE_ENV === 'development') {
+          console.warn('Failed to parse timestamp:', item.timestamp)
+        }
+      })
+
+      return Object.entries(counts).map(([dateMinute, count]) => ({
+        label: new Date(dateMinute + ':00').toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        value: count,
+        date: dateMinute
+      }))
+    } else if (chartPeriod === 'daily') {
+      // Past 24 hours from latest data point
       for (let i = 23; i >= 0; i--) {
-        const date = new Date(now)
+        const date = new Date(latestDate)
         date.setHours(date.getHours() - i, 0, 0, 0)
         const key = date.toISOString().substring(0, 13) // YYYY-MM-DDTHH
         counts[key] = 0
       }
 
       data.forEach(item => {
-        try {
-          // Parse timestamp format "25/08/2567 01:45:23"
-          const [datePart, timePart] = item.timestamp.split(' ')
-          const [day, month, year] = datePart.split('/')
-          const [hour] = timePart.split(':')
-          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
-          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day), parseInt(hour))
+        const date = parseThaiTimestamp(item.timestamp)
+        if (date) {
           const key = date.toISOString().substring(0, 13) // YYYY-MM-DDTHH
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch {
+        } else if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
@@ -178,27 +208,24 @@ export default function AdminPage() {
         value: count,
         date: dateHour
       }))
-    } else if (chartPeriod === 'daily') {
-      // Last 7 days
+    } else if (chartPeriod === 'weekly') {
+      // Past 7 days from latest data point
       for (let i = 6; i >= 0; i--) {
-        const date = new Date(now)
+        const date = new Date(latestDate)
         date.setDate(date.getDate() - i)
+        date.setHours(0, 0, 0, 0)
         const key = date.toISOString().split('T')[0]
         counts[key] = 0
       }
 
       data.forEach(item => {
-        try {
-          // Parse timestamp format "25/08/2567 01:45:23"
-          const [datePart] = item.timestamp.split(' ')
-          const [day, month, year] = datePart.split('/')
-          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year) // Convert Buddhist year to Gregorian
-          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
+        const date = parseThaiTimestamp(item.timestamp)
+        if (date) {
           const key = date.toISOString().split('T')[0]
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch {
+        } else if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
@@ -208,63 +235,30 @@ export default function AdminPage() {
         value: count,
         date
       }))
-    } else if (chartPeriod === 'weekly') {
-      // Last 8 weeks
-      for (let i = 7; i >= 0; i--) {
-        const date = new Date(now)
-        date.setDate(date.getDate() - (i * 7))
-        const weekStart = new Date(date)
-        weekStart.setDate(date.getDate() - date.getDay())
-        const key = weekStart.toISOString().split('T')[0]
-        counts[key] = 0
-      }
-
-      data.forEach(item => {
-        try {
-          const [datePart] = item.timestamp.split(' ')
-          const [day, month, year] = datePart.split('/')
-          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
-          const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
-          const weekStart = new Date(date)
-          weekStart.setDate(date.getDate() - date.getDay())
-          const key = weekStart.toISOString().split('T')[0]
-          if (counts.hasOwnProperty(key)) {
-            counts[key]++
-          }
-        } catch {
-          console.warn('Failed to parse timestamp:', item.timestamp)
-        }
-      })
-
-      return Object.entries(counts).map(([date, count]) => ({
-        label: `W${Math.ceil((new Date(date).getTime() - new Date(new Date(date).getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000))}`,
-        value: count,
-        date
-      }))
     } else {
-      // Last 6 months
-      for (let i = 5; i >= 0; i--) {
-        const date = new Date(now.getFullYear(), now.getMonth() - i, 1)
-        const key = date.toISOString().split('T')[0].substring(0, 7) // YYYY-MM
+      // Past 30 days from latest data point
+      for (let i = 29; i >= 0; i--) {
+        const date = new Date(latestDate)
+        date.setDate(date.getDate() - i)
+        date.setHours(0, 0, 0, 0)
+        const key = date.toISOString().split('T')[0]
         counts[key] = 0
       }
 
       data.forEach(item => {
-        try {
-          const [datePart] = item.timestamp.split(' ')
-          const [, month, year] = datePart.split('/')
-          const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
-          const key = `${actualYear}-${month.padStart(2, '0')}`
+        const date = parseThaiTimestamp(item.timestamp)
+        if (date) {
+          const key = date.toISOString().split('T')[0]
           if (counts.hasOwnProperty(key)) {
             counts[key]++
           }
-        } catch {
+        } else if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to parse timestamp:', item.timestamp)
         }
       })
 
       return Object.entries(counts).map(([date, count]) => ({
-        label: new Date(date + '-01').toLocaleDateString('en-US', { month: 'short', year: '2-digit' }),
+        label: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
         value: count,
         date
       }))
@@ -494,20 +488,17 @@ export default function AdminPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {(() => {
-                              try {
-                                const [datePart, timePart] = item.timestamp.split(' ')
-                                const [day, month, year] = datePart.split('/')
-                                const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
-                                const date = new Date(actualYear, parseInt(month) - 1, parseInt(day))
+                              const date = parseThaiTimestamp(item.timestamp)
+                              if (date) {
+                                const timePart = item.timestamp.split(' ')[1]
                                 return (
                                   <>
                                     {date.toLocaleDateString('en-GB')}<br/>
-                                    <span className="text-xs">{timePart}</span>
+                                    <span className="text-xs">{timePart || ''}</span>
                                   </>
                                 )
-                              } catch {
-                                return item.timestamp
                               }
+                              return item.timestamp
                             })()}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right">

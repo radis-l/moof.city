@@ -6,10 +6,10 @@ test.describe('Loading Animations and Lottie Integration', () => {
     await page.waitForLoadState('networkidle');
   });
 
-  test('Star AI Lottie animation displays on homepage', async ({ page }) => {
-    // Check for Star AI branding with Lottie
-    const starAiText = page.getByText('Star AI').first();
-    await expect(starAiText).toBeVisible();
+  test('MOOF Lottie animation displays on homepage', async ({ page }) => {
+    // Check for MOOF branding with Lottie
+    const moofText = page.getByText('MOOF').first();
+    await expect(moofText).toBeVisible();
     
     // Look for Lottie animation container
     const lottieContainer = page.locator('[style*="filter: drop-shadow"]');
@@ -116,12 +116,12 @@ test.describe('Loading Animations and Lottie Integration', () => {
       await page.setViewportSize(viewport);
       await page.goto('/');
       
-      // Verify Star AI animation is visible and properly sized
-      const starAiText = page.getByText('Star AI').first();
-      await expect(starAiText).toBeVisible();
+      // Verify MOOF animation is visible and properly sized
+      const moofText = page.getByText('MOOF').first();
+      await expect(moofText).toBeVisible();
       
       // Check that main content is visible (not desktop redirect)
-      await expect(page.getByText('ดูดวงฟรีกับ Star AI')).toBeVisible();
+      await expect(page.getByText('ดวงประจำวัน')).toBeVisible();
     }
   });
 
@@ -130,7 +130,7 @@ test.describe('Loading Animations and Lottie Integration', () => {
     await page.goto('/');
     
     // Verify text content is still accessible
-    await expect(page.getByRole('button', { name: /ดูดวงฟรีกับ/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /ดูดวง/i })).toBeVisible();
     
     // Check that form inputs are properly labeled
     const emailInput = page.locator('input[type="email"]');

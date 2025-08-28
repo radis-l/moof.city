@@ -14,7 +14,7 @@ test.describe('Core User Journey', () => {
     const testEmail = `test${Date.now()}@example.com`;
     
     // Step 1: Homepage - Email submission
-    await expect(page.getByText('ดูดวงฟรีกับ Star AI')).toBeVisible();
+    await expect(page.getByText('ดวงประจำวัน')).toBeVisible();
     
     // Fill email and submit
     const emailInput = page.locator('input[type="email"]');
@@ -121,7 +121,7 @@ test.describe('Core User Journey', () => {
     await expect(page.getByText('เว็บไซต์นี้รองรับเฉพาะมือถือ')).toBeVisible();
     
     // Should not show main fortune content
-    await expect(page.getByText('ดูดวงฟรีกับ Star AI')).not.toBeVisible();
+    await expect(page.getByText('ดวงประจำวัน')).not.toBeVisible();
   });
 
   test('Back navigation works correctly', async ({ page }) => {

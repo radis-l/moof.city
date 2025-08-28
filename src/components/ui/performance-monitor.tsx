@@ -14,11 +14,12 @@ export const PerformanceMonitor = () => {
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') return
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const reportMetrics = (metrics: Partial<PerformanceMetrics>) => {
-      // In production, you'd send this to your analytics service
-      // Example: Send to analytics
-      // analytics.track('performance_metrics', metrics)
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Performance Metrics:', metrics)
+      }
+      // In production, metrics are monitored via Vercel Analytics
+      // Could extend with custom analytics service if needed
     }
 
     // Measure Core Web Vitals

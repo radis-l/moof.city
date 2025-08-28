@@ -25,7 +25,7 @@ test.describe('Visual Regression & Accessibility Tests', () => {
       await expect(page).toHaveScreenshot(`homepage-${viewport.name.toLowerCase().replace(/\s+/g, '-')}.png`);
       
       // Verify core elements are visible
-      await expect(page.getByText('ดูดวงฟรีกับ Star AI')).toBeVisible();
+      await expect(page.getByText('ดวงประจำวัน')).toBeVisible();
       await expect(page.locator('input[type="email"]')).toBeVisible();
     }
   });
@@ -149,7 +149,7 @@ test.describe('Visual Regression & Accessibility Tests', () => {
     await page.goto('/');
     
     // Check main text elements have sufficient contrast
-    const mainHeading = page.getByText('ดูดวงฟรีกับ Star AI');
+    const mainHeading = page.getByText('ดวงประจำวัน');
     await expect(mainHeading).toBeVisible();
     
     // Check button text is visible
@@ -172,7 +172,7 @@ test.describe('Visual Regression & Accessibility Tests', () => {
 
   test('Thai font rendering consistency', async ({ page }) => {
     const thaiTexts = [
-      'ดูดวงฟรีกับ Star AI',
+      'ดวงประจำวัน',
       'คุณอายุเท่าไหร่?',
       'เลือกช่วงอายุของคุณ'
     ];
