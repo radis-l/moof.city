@@ -8,27 +8,26 @@
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed",
-    "test:core": "playwright test tests/core-user-journey.spec.ts tests/loading-animations.spec.ts",
-    "pre-commit": "npm run lint && npm run type-check && npm run test:core",
+    "test:utils": "vitest tests/utils-only.spec.ts",
+    "test:essential": "npm run build && npm run lint && npm run type-check",
+    "push-auto": "node scripts/push-automation.js",
     "prepare": "husky"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.1",
     "@types/bcryptjs": "^2.4.6",
+    "@types/react-datetime-picker": "^3.4.1",
     "@vercel/kv": "^3.0.0",
     "bcryptjs": "^3.0.2",
     "lottie-react": "^2.4.1",
     "next": "^15.5.2",
     "react": "^19.1.1",
+    "react-datetime-picker": "^7.0.1",
     "react-dom": "^19.1.1",
     "zod": "^4.1.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -36,8 +35,8 @@
     "eslint": "^9",
     "eslint-config-next": "^15.5.2",
     "husky": "^9.1.7",
-    "playwright": "^1.55.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

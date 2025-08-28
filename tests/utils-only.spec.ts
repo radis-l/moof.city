@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { describe, test, expect } from 'vitest';
 import { parseThaiTimestamp, isTimestampInRange } from '../src/lib/utils';
 
-test.describe('Utility Functions Tests', () => {
-  test.describe('parseThaiTimestamp', () => {
+describe('Utility Functions Tests', () => {
+  describe('parseThaiTimestamp', () => {
     test('parses Thai Buddhist year timestamp correctly', () => {
       const timestamp = '27/08/2567 10:30:15';
       const result = parseThaiTimestamp(timestamp);
@@ -78,7 +78,7 @@ test.describe('Utility Functions Tests', () => {
     });
   });
 
-  test.describe('isTimestampInRange', () => {
+  describe('isTimestampInRange', () => {
     test('correctly identifies timestamp within range', () => {
       const referenceDate = new Date(2024, 7, 27, 15, 0, 0); // Aug 27, 2024 15:00:00
       const timestamp = '27/08/2567 14:30:00'; // 30 minutes before reference

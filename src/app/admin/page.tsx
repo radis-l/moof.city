@@ -2,10 +2,16 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
+import DateTimePicker from 'react-datetime-picker'
 import { Button } from '@/components/ui/button'
 import { AdminLogin } from '@/components/ui/admin-login'
 import { parseThaiTimestamp } from '@/lib/utils'
 import type { FortuneDataEntry } from '@/types'
+
+// Import CSS for datetime picker
+import 'react-datetime-picker/dist/DateTimePicker.css'
+import 'react-calendar/dist/Calendar.css'
+import 'react-clock/dist/Clock.css'
 
 // Dynamic imports for performance
 const BarChart = dynamic(() => import('@/components/ui/bar-chart').then(mod => ({ default: mod.BarChart })), {
@@ -26,6 +32,7 @@ export default function AdminPage() {
   const [chartPeriod, setChartPeriod] = useState<'hourly' | 'daily' | 'weekly' | 'monthly'>('daily')
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
+  const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null)
 
   const checkAuthentication = async () => {
     try {
@@ -145,22 +152,28 @@ export default function AdminPage() {
   const chartData = useMemo(() => {
     if (data.length === 0) return []
 
-    // Find the latest timestamp in the data to use as reference point
-    let latestDate = new Date(0)
-    data.forEach(item => {
-      const itemDate = parseThaiTimestamp(item.timestamp)
-      if (itemDate && itemDate > latestDate) {
-        latestDate = itemDate
-      }
-    })
+    // Use selected datetime or find the latest timestamp in the data as reference point
+    let referenceDate: Date
+    if (selectedDateTime) {
+      referenceDate = selectedDateTime
+    } else {
+      let latestDate = new Date(0)
+      data.forEach(item => {
+        const itemDate = parseThaiTimestamp(item.timestamp)
+        if (itemDate && itemDate > latestDate) {
+          latestDate = itemDate
+        }
+      })
+      referenceDate = latestDate
+    }
 
     const counts: Record<string, number> = {}
 
     if (chartPeriod === 'hourly') {
-      // Past 60 minutes from latest data point
-      for (let i = 59; i >= 0; i--) {
-        const date = new Date(latestDate)
-        date.setMinutes(date.getMinutes() - i, 0, 0)
+      // Past 60 minutes from reference point, in 5-minute intervals (12 bars)
+      for (let i = 11; i >= 0; i--) {
+        const date = new Date(referenceDate)
+        date.setMinutes(date.getMinutes() - (i * 5), 0, 0)
         const key = date.toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
         counts[key] = 0
       }
@@ -168,9 +181,18 @@ export default function AdminPage() {
       data.forEach(item => {
         const date = parseThaiTimestamp(item.timestamp)
         if (date) {
-          const key = date.toISOString().substring(0, 16) // YYYY-MM-DDTHH:MM
-          if (counts.hasOwnProperty(key)) {
-            counts[key]++
+          // Find the appropriate 5-minute bucket for this timestamp
+          for (let i = 11; i >= 0; i--) {
+            const bucketDate = new Date(referenceDate)
+            bucketDate.setMinutes(bucketDate.getMinutes() - (i * 5), 0, 0)
+            const nextBucketDate = new Date(bucketDate)
+            nextBucketDate.setMinutes(nextBucketDate.getMinutes() + 5)
+            
+            if (date >= bucketDate && date < nextBucketDate) {
+              const key = bucketDate.toISOString().substring(0, 16)
+              counts[key]++
+              break
+            }
           }
         } else if (process.env.NODE_ENV === 'development') {
           console.warn('Failed to parse timestamp:', item.timestamp)
@@ -183,9 +205,9 @@ export default function AdminPage() {
         date: dateMinute
       }))
     } else if (chartPeriod === 'daily') {
-      // Past 24 hours from latest data point
+      // Past 24 hours from reference point
       for (let i = 23; i >= 0; i--) {
-        const date = new Date(latestDate)
+        const date = new Date(referenceDate)
         date.setHours(date.getHours() - i, 0, 0, 0)
         const key = date.toISOString().substring(0, 13) // YYYY-MM-DDTHH
         counts[key] = 0
@@ -209,9 +231,9 @@ export default function AdminPage() {
         date: dateHour
       }))
     } else if (chartPeriod === 'weekly') {
-      // Past 7 days from latest data point
+      // Past 7 days from reference point
       for (let i = 6; i >= 0; i--) {
-        const date = new Date(latestDate)
+        const date = new Date(referenceDate)
         date.setDate(date.getDate() - i)
         date.setHours(0, 0, 0, 0)
         const key = date.toISOString().split('T')[0]
@@ -236,9 +258,9 @@ export default function AdminPage() {
         date
       }))
     } else {
-      // Past 30 days from latest data point
+      // Past 30 days from reference point
       for (let i = 29; i >= 0; i--) {
-        const date = new Date(latestDate)
+        const date = new Date(referenceDate)
         date.setDate(date.getDate() - i)
         date.setHours(0, 0, 0, 0)
         const key = date.toISOString().split('T')[0]
@@ -263,7 +285,7 @@ export default function AdminPage() {
         date
       }))
     }
-  }, [data, chartPeriod])
+  }, [data, chartPeriod, selectedDateTime])
 
   useEffect(() => {
     checkAuthentication()
@@ -422,6 +444,20 @@ export default function AdminPage() {
                   >
                     Monthly
                   </button>
+                </div>
+                
+                {/* Date/Time Picker */}
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Select Date & Time (leave blank for latest data):
+                  </label>
+                  <DateTimePicker
+                    onChange={setSelectedDateTime}
+                    value={selectedDateTime}
+                    className="w-full text-sm"
+                    clearIcon={null}
+                    calendarIcon={null}
+                  />
                 </div>
               </div>
               <div className="h-48">
@@ -648,6 +684,20 @@ export default function AdminPage() {
                 >
                   Monthly
                 </button>
+              </div>
+              
+              {/* Date/Time Picker */}
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Date & Time (leave blank for latest data):
+                </label>
+                <DateTimePicker
+                  onChange={setSelectedDateTime}
+                  value={selectedDateTime}
+                  className="w-full text-sm"
+                  clearIcon={null}
+                  calendarIcon={null}
+                />
               </div>
             </div>
             <div className="h-56">
@@ -877,6 +927,20 @@ export default function AdminPage() {
                 >
                   Monthly
                 </button>
+              </div>
+              
+              {/* Date/Time Picker */}
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Date & Time (leave blank for latest data):
+                </label>
+                <DateTimePicker
+                  onChange={setSelectedDateTime}
+                  value={selectedDateTime}
+                  className="text-sm"
+                  clearIcon={null}
+                  calendarIcon={null}
+                />
               </div>
             </div>
             <div className="h-48 sm:h-64">

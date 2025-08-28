@@ -92,10 +92,12 @@ npm run test:core   # Core user journey tests only
 
 ## Recent Optimizations (2024)
 - **Bundle Size**: Reduced by 680KB through dependency cleanup (removed unused react-datepicker)
+- **DateTime Picker**: Added react-datetime-picker (v7.0.1) for historical data viewing in admin dashboard
+- **Chart Optimization**: Improved hourly charts from 60x 1-minute to 12x 5-minute intervals for better readability
 - **Code Quality**: Production-ready console logging, eliminated development-only output
 - **Utility Functions**: Extracted reusable parseThaiTimestamp utility reducing code duplication
 - **Dependencies**: Updated to Next.js 15.5.2, React 19.1.1, with latest security patches
-- **Testing**: Comprehensive test coverage including utility function tests
+- **Testing**: Comprehensive test coverage including utility function tests and datetime picker functionality
 
 ## Advanced UI/UX Implementation
 
@@ -176,6 +178,9 @@ npm run test:core   # Core user journey tests only
 ## Admin Dashboard
 - Protected route at `/admin`
 - Analytics with H/D/W/M filters (Hourly/Daily/Weekly/Monthly)
+- **DateTime Picker Integration**: Historical data viewing with react-datetime-picker
+- **Improved Chart Intervals**: Hourly charts now show 5-minute intervals (12 bars) instead of 1-minute (60 bars)
+- **Flexible Reference Points**: Charts can display data from selected datetime or latest data timestamp
 - User management and data export (CSV)
 - Password change functionality with UI modal
 
@@ -477,8 +482,11 @@ gtag('config', MEASUREMENT_ID, {
 **Test Organization by Feature**:
 - `core-user-journey.spec.ts`: Complete user flow testing
 - `loading-animations.spec.ts`: Lottie animation functionality
-- `admin-functionality.spec.ts`: Admin dashboard operations
+- `admin-functionality.spec.ts`: Admin dashboard operations (updated for datetime picker)
+- `admin-datetime-picker.spec.ts`: DateTime picker functionality and chart integration
 - `admin-theme-consistency.spec.ts`: Responsive design validation
+- `utils.spec.ts`: Utility function testing (parseThaiTimestamp, isTimestampInRange)
+- `visual-regression.spec.ts`: Visual consistency and accessibility
 
 **Testing Scripts**:
 ```bash
