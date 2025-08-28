@@ -332,3 +332,195 @@ gtag('config', MEASUREMENT_ID, {
 - **Performance**: Client-side monitoring via PerformanceMonitor
 - **User Analytics**: Conversion funnel tracking
 - **Admin Alerts**: Failed authentication attempts
+
+## Design System & Component Architecture
+
+### UI Component Library (`src/components/ui/`)
+
+**Form Components**:
+- `Button`: Multiple variants (primary, secondary, outline) with size options (sm, lg)
+  - Usage: `<Button variant="outline" size="lg">Text</Button>`
+  - Classes: Glassmorphism backgrounds, purple accent colors
+- `Input`: Email and text inputs with Thai placeholder support
+  - Features: Focus states, validation styles, mobile-optimized
+- `RadioGroup`: Custom radio buttons for questionnaire
+  - Usage: `<RadioGroup options={OPTIONS} value={value} onChange={setValue} />`
+
+**UI Components**:
+- `ProgressBar`: Multi-step progress indicator
+  - Usage: `<ProgressBar currentStep={2} totalSteps={3} />`
+  - Visual: Purple gradient progress with mystical glow
+- `LoadingAnimation`: Lottie-based Star AI loader
+  - Usage: `<LoadingAnimation size="medium" className="mx-auto mb-4" />`
+  - Sizes: small (32x32), medium (64x64), large (96x96)
+  - Features: Hardware acceleration, mystical purple glow effects
+
+**Background Components**:
+- `LazyParticleBackground`: Dynamically imported particle system
+  - Performance: Lazy loaded, hardware accelerated
+  - Visual: Animated gradient spheres with blur effects
+- `OptimizedParticleBackground`: Performance-optimized version
+  - Features: Reduced particle count, efficient animations
+
+**Layout Components**:
+- `MobileLayout`: Main app wrapper with mobile-first design
+  - Features: Desktop redirect, particle background integration
+  - Breakpoint: 768px enforcement
+
+### Design Tokens & CSS Variables
+
+**Color System** (`globals.css`):
+```css
+--color-purple-primary: rgba(139, 92, 246, 1)    /* Main brand purple */
+--color-purple-glow: rgba(139, 92, 246, 0.4)     /* Glow effects */
+--color-gray-900: #111827                         /* Dark backgrounds */
+--color-glass-bg: rgba(255, 255, 255, 0.1)       /* Glassmorphism */
+```
+
+**Typography Scale** (Major Third - 1.250):
+```css
+--text-xs: 0.75rem    /* 12px */
+--text-sm: 0.875rem   /* 14px */
+--text-base: 1.125rem /* 18px - Base size */
+--text-lg: 1.25rem    /* 20px */
+--text-xl: 1.5rem     /* 24px */
+--text-2xl: 1.875rem  /* 30px */
+--text-3xl: 2.375rem  /* 38px */
+--text-5xl: 4.25rem   /* 68px - Fortune numbers */
+```
+
+**Spacing System** (8-point grid):
+```css
+--space-1: 8px    --space-6: 48px
+--space-2: 16px   --space-8: 64px
+--space-3: 24px   --space-10: 80px
+--space-4: 32px   --space-12: 96px
+--space-5: 40px   --space-16: 128px
+```
+
+### Component Usage Patterns
+
+**Glassmorphism Cards**:
+```tsx
+<div className="card-mystical">
+  {/* Content with backdrop-blur and purple border */}
+</div>
+```
+
+**Floating Buttons** (Mobile sticky):
+```tsx
+<div className="mobile-sticky-button">
+  <div className="floating-button-bg">
+    <Button>Action</Button>
+  </div>
+</div>
+```
+
+**Loading States**:
+```tsx
+{loading && (
+  <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
+    <div className="text-center">
+      <LoadingAnimation size="medium" className="mx-auto mb-4" />
+      <p className="text-gray-300">กำลังโหลด...</p>
+    </div>
+  </div>
+)}
+```
+
+### Animation Guidelines
+
+**Hardware Acceleration Standards**:
+- Always use `transform: translateZ(0)` for GPU acceleration
+- Apply `backface-visibility: hidden` for 3D transforms
+- Use `will-change: transform` for animated elements
+
+**Lottie Animation Best Practices**:
+- Size: 64x64px (medium) for main loading states
+- Colors: Purple theme matching `[0.5294,0.2745,1,1]`
+- Performance: Enable autoplay and loop for loading contexts
+- Effects: Drop-shadow filters for mystical glow
+
+**Particle System Performance**:
+- Lazy load particle backgrounds with dynamic imports
+- Use `contain: layout` for animation containers  
+- Implement performance monitoring for frame rate
+
+## Testing Strategy & Coverage
+
+### Playwright Test Architecture (`tests/`)
+
+**Test Organization by Feature**:
+- `core-user-journey.spec.ts`: Complete user flow testing
+- `loading-animations.spec.ts`: Lottie animation functionality
+- `admin-functionality.spec.ts`: Admin dashboard operations
+- `admin-theme-consistency.spec.ts`: Responsive design validation
+
+**Testing Scripts**:
+```bash
+npm run test          # Full test suite
+npm run test:core     # Core user flows only
+npm run test:ui       # Interactive UI mode
+npm run test:headed   # Visual browser testing
+```
+
+**Pre-Commit Workflow**:
+1. ESLint code quality checks
+2. TypeScript type validation
+3. Core user journey tests
+4. Prevents broken code deployment
+
+### Test Coverage Areas
+
+**User Flow Testing**:
+- Email submission and validation
+- 3-step questionnaire completion
+- Fortune generation and display
+- Existing user redirection
+- Mobile-only enforcement
+- Back navigation functionality
+
+**Component Testing**:
+- Lottie animations load and display
+- Loading states during transitions
+- Button interactions and form validation
+- Responsive design across viewports
+- Admin authentication and operations
+
+**Performance Testing**:
+- Animation loading times
+- Network request monitoring
+- Mobile viewport optimization
+- Hardware acceleration verification
+
+### Visual Regression & Accessibility
+
+**Accessibility Standards**:
+- Screen reader compatibility
+- Proper form labeling
+- Keyboard navigation support
+- Thai language content structure
+
+**Visual Consistency**:
+- Cross-browser rendering (Chrome, Firefox, Safari)
+- Mobile device compatibility (iPhone SE to iPhone Pro Max)
+- Theme consistency across breakpoints
+- Loading animation display validation
+
+## Troubleshooting & Development Workflow
+
+### Common Component Issues
+- **Loading Animation Not Showing**: Verify Lottie file exists at `/assets/loading-star-animation.json`
+- **Glassmorphism Not Rendering**: Check `backdrop-filter` browser support
+- **Mobile Layout Issues**: Confirm viewport meta tag and 768px breakpoint
+
+### Performance Debugging
+- **Slow Animations**: Check for hardware acceleration CSS properties
+- **Large Bundle Size**: Review dynamic imports for particle backgrounds
+- **Memory Leaks**: Verify component cleanup in useEffect hooks
+
+### Testing Workflow
+- **Development**: `npm run test:core` for quick validation
+- **Pre-Commit**: Automatic linting, type-check, and core tests
+- **CI/CD**: Full test suite with visual regression checks
+- **Debugging**: `npm run test:headed` for visual test debugging

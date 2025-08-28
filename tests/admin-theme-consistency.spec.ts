@@ -194,7 +194,7 @@ test.describe('Admin Dashboard Theme Consistency', () => {
       { width: 1440, height: 900, type: 'desktop' }
     ];
 
-    const colorSchemes = {};
+    const colorSchemes: Record<string, Record<string, { background: string; backgroundColor: string }>> = {};
     
     for (const viewport of testViewports) {
       await page.setViewportSize(viewport);
@@ -207,7 +207,7 @@ test.describe('Admin Dashboard Theme Consistency', () => {
           desktop: document.querySelector('.hidden.xl\\:block')
         };
         
-        const colors = {};
+        const colors: Record<string, { background: string; backgroundColor: string }> = {};
         for (const [type, element] of Object.entries(layouts)) {
           if (element && getComputedStyle(element).display !== 'none') {
             colors[type] = {
@@ -227,7 +227,7 @@ test.describe('Admin Dashboard Theme Consistency', () => {
     
     // Store results for theme consistency decision
     await page.evaluate((schemes) => {
-      window.themeAnalysis = schemes;
+      (window as { themeAnalysis?: unknown }).themeAnalysis = schemes;
     }, colorSchemes);
   });
 
