@@ -14,10 +14,9 @@ export const PerformanceMonitor = () => {
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') return
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const reportMetrics = (metrics: Partial<PerformanceMetrics>) => {
       // In production, you'd send this to your analytics service
-      console.log('Performance Metrics:', metrics)
-      
       // Example: Send to analytics
       // analytics.track('performance_metrics', metrics)
     }

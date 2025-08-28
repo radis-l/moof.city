@@ -32,10 +32,7 @@ export async function POST(request: NextRequest) {
     // Get current password hash from database
     const currentHash = await getAdminPasswordHash()
     
-    console.log('Change password attempt - hash exists:', !!currentHash)
-    
     if (!currentHash) {
-      console.log('No password hash available')
       return NextResponse.json(
         { success: false, message: 'Server configuration error' },
         { status: 500 }

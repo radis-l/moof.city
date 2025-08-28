@@ -48,3 +48,11 @@ next-env.d.ts
 
 # Admin config (contains password hash)
 /data/admin-config.json
+
+# Playwright test results
+/test-results/
+/playwright-report/
+/blob-report/
+
+# Development data files
+/data/fortune-data.json

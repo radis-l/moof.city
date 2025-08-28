@@ -79,7 +79,7 @@ const nextConfig = {
 
     // Add performance hints
     config.performance = {
-      maxAssetSize: 400000, // 400KB (relaxed for current bundle size)
+      maxAssetSize: 400000, // 400KB (reasonable for current state)
       maxEntrypointSize: 400000, // 400KB
       hints: process.env.NODE_ENV === 'production' ? 'warning' : false,
     }

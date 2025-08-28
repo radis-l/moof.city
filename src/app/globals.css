@@ -268,6 +268,44 @@
   }
 }
 
+/* Admin Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .admin-container {
+    background: linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.9) 100%);
+    min-height: 100vh;
+  }
+  
+  .admin-card-mobile {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  .admin-card-mobile:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(139, 92, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+  }
+  
+  .admin-button-mystical {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    transition: all 0.2s ease;
+  }
+  
+  .admin-button-mystical:hover {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: rgba(139, 92, 246, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+  }
+}
+
 /* Mobile Floating Buttons - Fixed to Screen Viewport */
 .mobile-sticky-button {
   position: fixed !important;

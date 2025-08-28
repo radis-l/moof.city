@@ -47,7 +47,6 @@ export const trackEvent = async (
   
   try {
     window.gtag('event', eventName, parameters || {});
-    console.log(`GA4 Event tracked: ${eventName}`, parameters);
   } catch (error) {
     console.error('Error tracking GA4 event:', error);
   }
@@ -189,8 +188,6 @@ export const trackPageView = async (pageName: string, userType?: string) => {
     }
     
     trackEvent('page_view', parameters);
-    
-    console.log(`GA4 Page view tracked: ${pageName}`);
   } catch (error) {
     console.error('Error tracking GA4 page view:', error);
   }
@@ -260,11 +257,6 @@ export const verifyGAInstallation = async (): Promise<boolean> => {
   
   const gaReady = await waitForGA();
   if (gaReady) {
-    console.log('✅ Google Analytics 4 is properly loaded');
-    console.log('🔍 gtag function available:', typeof window.gtag === 'function');
-    console.log('📊 dataLayer available:', Array.isArray(window.dataLayer));
-    console.log('🆔 Measurement ID:', process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID);
-    console.log('🎯 GA4 2025 optimized tracking active');
     return true;
   } else {
     console.error('❌ Google Analytics 4 failed to load');
