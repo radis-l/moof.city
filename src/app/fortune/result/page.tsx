@@ -27,7 +27,7 @@ function FortuneResultPageContent() {
       if (result.success && result.exists && result.fortune) {
         setUserData(result.fortune.userData)
         setFortune(result.fortune.fortuneResult)
-        trackPageView('Fortune Result - Existing User', 'returning_user')
+        trackPageView('05_result_fortune_existing', 'returning_user')
         trackResultView(false, 'existing_fortune')
         trackConversion('fortune_complete', 1)
       } else {
@@ -80,7 +80,7 @@ function FortuneResultPageContent() {
       const generatedFortune = generateFortune(user)
       setFortune(generatedFortune)
       
-      trackPageView('Fortune Result - New User', 'new_user')
+      trackPageView('05_result_fortune_new', 'new_user')
       trackResultView(true, 'new_fortune')
       trackFortuneGeneration({ age: user.ageRange, bloodGroup: user.bloodGroup, birthDay: user.birthDay })
       trackConversion('fortune_complete', 1)

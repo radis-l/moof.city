@@ -62,6 +62,17 @@ function FortunePageContent() {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
       trackFormProgress('questionnaire', currentStep + 1, totalSteps)
+      
+      // Track specific page views for each step
+      const stepPageNames = {
+        2: '03_question_birthday_selection',
+        3: '04_question_bloodgroup_selection'
+      }
+      
+      const pageName = stepPageNames[currentStep + 1 as keyof typeof stepPageNames]
+      if (pageName) {
+        trackPageView(pageName, 'new_user')
+      }
     } else {
       // Submit form and go to results
       handleSubmit()
@@ -207,7 +218,7 @@ function FortunePageContent() {
         }
         
         // Email doesn't exist, allow questionnaire
-        trackPageView('Fortune Questionnaire', 'new_user')
+        trackPageView('02_question_age_selection', 'new_user')
         trackQuestionnaireStart()
         trackFormProgress('questionnaire', 1, totalSteps)
         setLoading(false)
@@ -215,7 +226,7 @@ function FortunePageContent() {
         console.error('Error checking email:', error)
         trackError('questionnaire_email_check_failed', error instanceof Error ? error.message : 'Unknown error', 'questionnaire_page')
         // On error, allow questionnaire
-        trackPageView('Fortune Questionnaire', 'new_user')
+        trackPageView('02_question_age_selection', 'new_user')
         trackQuestionnaireStart()
         trackFormProgress('questionnaire', 1, totalSteps)
         setLoading(false)

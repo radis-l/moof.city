@@ -71,7 +71,7 @@ export default function Home() {
       const userType = 'unknown';
       const deviceType = window.innerWidth < 768 ? 'mobile' : 'desktop';
       trackSessionStart(userType, deviceType);
-      trackPageView('Landing Page', userType);
+      trackPageView('01_landing_email_entry', userType);
       trackFormBegin('email_submission');
     }
   }, [])
