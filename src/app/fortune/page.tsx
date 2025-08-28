@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { RadioGroup } from '@/components/ui/radio-group'
-import { MoofLogo } from '@/assets/logo'
+import { LoadingAnimation } from '@/components/ui/loading-animation'
 import { MobileLayout } from '@/components/layout'
 import type { AgeRange, BirthDay, BloodGroup } from '@/types'
 import { trackQuestionnaireStart, trackQuestionnaireComplete, trackPageView, trackError, trackFormProgress } from '@/lib/analytics'
@@ -240,8 +240,8 @@ function FortunePageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <MoofLogo />
-          <p className="mt-4 text-gray-300">กำลังตรวจสอบ...</p>
+          <LoadingAnimation size="medium" className="mx-auto mb-4" />
+          <p className="text-gray-300">กำลังโหลด...</p>
         </div>
       </div>
     )
@@ -305,8 +305,8 @@ export default function FortunePage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">
         <div className="text-center">
-          <MoofLogo />
-          <p className="mt-4 text-gray-300">กำลังโหลด...</p>
+          <LoadingAnimation size="medium" className="mx-auto mb-4" />
+          <p className="text-gray-300">กำลังโหลด...</p>
         </div>
       </div>
     }>

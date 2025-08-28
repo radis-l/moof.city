@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { MoofLogo } from '@/assets/logo'
+import { LoadingAnimation } from '@/components/ui/loading-animation'
 import { MobileLayout } from '@/components/layout'
 import { generateFortune } from '@/lib/fortune-generator'
 import type { UserData, FortuneResult } from '@/types'
@@ -137,8 +137,8 @@ function FortuneResultPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <MoofLogo />
-          <p className="mt-4 text-gray-300">กำลังอ่านดวงของคุณ...</p>
+          <LoadingAnimation size="medium" className="mx-auto mb-4" />
+          <p className="text-gray-300">กำลังโหลด...</p>
         </div>
       </div>
     )
@@ -148,8 +148,8 @@ function FortuneResultPageContent() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
         <div className="text-center">
-          <MoofLogo />
-          <p className="text-red-400 mb-4 mt-4">เกิดข้อผิดพลาด</p>
+          <LoadingAnimation size="medium" className="mx-auto mb-4" />
+          <p className="text-red-400">เกิดข้อผิดพลาด</p>
           <Button onClick={handleStartOver}>กลับหน้าแรก</Button>
         </div>
       </div>
@@ -309,8 +309,8 @@ export default function FortuneResultPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">
         <div className="text-center">
-          <MoofLogo />
-          <p className="mt-4 text-gray-300">กำลังโหลด...</p>
+          <LoadingAnimation size="medium" className="mx-auto mb-4" />
+          <p className="text-gray-300">กำลังโหลด...</p>
         </div>
       </div>
     }>
