@@ -1,7 +1,6 @@
 'use client'
 
-import Lottie from 'lottie-react'
-import loadingStarAnimation from '@/assets/loading-star-animation.json'
+import { useState, useEffect } from 'react'
 
 interface LoadingAnimationProps {
   className?: string
@@ -12,16 +11,62 @@ export const LoadingAnimation = ({
   className = '', 
   size = 'medium'
 }: LoadingAnimationProps) => {
+  const [LottieComponent, setLottieComponent] = useState<React.ComponentType<{
+    animationData: object
+    autoplay: boolean
+    loop: boolean
+    style: React.CSSProperties
+  }> | null>(null)
+  const [animationData, setAnimationData] = useState<object | null>(null)
+
   const sizeClasses = {
     small: 'w-12 h-12',
     medium: 'w-16 h-16', 
     large: 'w-24 h-24'
   }
 
+  useEffect(() => {
+    // Dynamic import to reduce bundle size
+    const loadAnimation = async () => {
+      try {
+        const [{ default: Lottie }, animationModule] = await Promise.all([
+          import('lottie-react'),
+          import('@/assets/loading-star-animation.json')
+        ])
+        
+        setLottieComponent(() => Lottie)
+        setAnimationData(animationModule.default)
+      } catch (error) {
+        console.error('Failed to load animation:', error)
+      }
+    }
+
+    loadAnimation()
+  }, [])
+
+  // Fallback loading spinner if Lottie isn't loaded yet
+  if (!LottieComponent || !animationData) {
+    return (
+      <div className={`${sizeClasses[size]} ${className} relative flex items-center justify-center`}>
+        <div className="animate-spin rounded-full h-full w-full border-2 border-purple-400 border-t-transparent opacity-75"></div>
+        
+        {/* Mystical glow effect */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
+            filter: 'blur(8px)',
+            zIndex: -1
+          }}
+        />
+      </div>
+    )
+  }
+
   return (
     <div className={`${sizeClasses[size]} ${className} relative flex items-center justify-center`}>
-      <Lottie
-        animationData={loadingStarAnimation}
+      <LottieComponent
+        animationData={animationData}
         autoplay={true}
         loop={true}
         style={{

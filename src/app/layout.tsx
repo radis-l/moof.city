@@ -68,14 +68,6 @@ export default function RootLayout({
           </>
         )}
         
-        {process.env.NODE_ENV === 'development' && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-              `
-            }}
-          />
-        )}
       </body>
     </html>
   );

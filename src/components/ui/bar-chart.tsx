@@ -28,15 +28,15 @@ export function BarChart({ data, maxHeight = 200, className = '' }: BarChartProp
   }
 
   return (
-    <div className={`w-full ${className}`}>
-      <div className="flex items-end space-x-1" style={{ height: maxHeight }}>
+    <div className={`w-full overflow-hidden ${className}`}>
+      <div className="flex items-end space-x-1 px-1" style={{ height: maxHeight }}>
         {data.map((item, index) => {
           const height = (item.value / maxValue) * maxHeight
           
           return (
             <div 
               key={`${item.label}-${index}`} 
-              className="flex-1 flex flex-col items-center group relative"
+              className="flex-1 flex flex-col items-center group relative min-w-0"
               style={{ height: maxHeight }}
             >
               {/* Bar */}
@@ -58,7 +58,7 @@ export function BarChart({ data, maxHeight = 200, className = '' }: BarChartProp
               </div>
               
               {/* Label */}
-              <div className="mt-2 text-xs text-gray-600 text-center leading-tight">
+              <div className="mt-2 text-xs text-gray-600 text-center leading-tight truncate w-full px-1">
                 {item.label}
               </div>
             </div>

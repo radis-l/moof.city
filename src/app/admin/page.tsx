@@ -2,16 +2,11 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
-import DateTimePicker from 'react-datetime-picker'
 import { Button } from '@/components/ui/button'
 import { AdminLogin } from '@/components/ui/admin-login'
 import { parseThaiTimestamp } from '@/lib/utils'
 import type { FortuneDataEntry } from '@/types'
 
-// Import CSS for datetime picker
-import 'react-datetime-picker/dist/DateTimePicker.css'
-import 'react-calendar/dist/Calendar.css'
-import 'react-clock/dist/Clock.css'
 
 // Dynamic imports for performance
 const BarChart = dynamic(() => import('@/components/ui/bar-chart').then(mod => ({ default: mod.BarChart })), {
@@ -32,7 +27,6 @@ export default function AdminPage() {
   const [chartPeriod, setChartPeriod] = useState<'hourly' | 'daily' | 'weekly' | 'monthly'>('daily')
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const [showPasswordModal, setShowPasswordModal] = useState(false)
-  const [selectedDateTime, setSelectedDateTime] = useState<Date | null>(null)
 
   const checkAuthentication = async () => {
     try {
@@ -152,20 +146,8 @@ export default function AdminPage() {
   const chartData = useMemo(() => {
     if (data.length === 0) return []
 
-    // Use selected datetime or find the latest timestamp in the data as reference point
-    let referenceDate: Date
-    if (selectedDateTime) {
-      referenceDate = selectedDateTime
-    } else {
-      let latestDate = new Date(0)
-      data.forEach(item => {
-        const itemDate = parseThaiTimestamp(item.timestamp)
-        if (itemDate && itemDate > latestDate) {
-          latestDate = itemDate
-        }
-      })
-      referenceDate = latestDate
-    }
+    // Use current time as reference point
+    const referenceDate = new Date()
 
     const counts: Record<string, number> = {}
 
@@ -285,7 +267,7 @@ export default function AdminPage() {
         date
       }))
     }
-  }, [data, chartPeriod, selectedDateTime])
+  }, [data, chartPeriod])
 
   useEffect(() => {
     checkAuthentication()
@@ -399,71 +381,6 @@ export default function AdminPage() {
               </div>
             </div>
 
-            {/* Mobile Chart */}
-            <div className="bg-white rounded-lg shadow p-4 mb-4">
-              <div className="flex flex-col gap-3 mb-4">
-                <h2 className="text-base font-semibold text-gray-900">Email Count Trends</h2>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => setChartPeriod('hourly')}
-                    className={`px-4 py-3 text-sm rounded-lg min-h-[48px] font-medium transition-all duration-200 touch-manipulation active:scale-95 ${
-                      chartPeriod === 'hourly'
-                        ? 'bg-blue-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
-                    }`}
-                  >
-                    Hourly
-                  </button>
-                  <button
-                    onClick={() => setChartPeriod('daily')}
-                    className={`px-4 py-3 text-sm rounded-lg min-h-[48px] font-medium transition-all duration-200 touch-manipulation active:scale-95 ${
-                      chartPeriod === 'daily'
-                        ? 'bg-blue-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
-                    }`}
-                  >
-                    Daily
-                  </button>
-                  <button
-                    onClick={() => setChartPeriod('weekly')}
-                    className={`px-4 py-3 text-sm rounded-lg min-h-[48px] font-medium transition-all duration-200 touch-manipulation active:scale-95 ${
-                      chartPeriod === 'weekly'
-                        ? 'bg-blue-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
-                    }`}
-                  >
-                    Weekly
-                  </button>
-                  <button
-                    onClick={() => setChartPeriod('monthly')}
-                    className={`px-4 py-3 text-sm rounded-lg min-h-[48px] font-medium transition-all duration-200 touch-manipulation active:scale-95 ${
-                      chartPeriod === 'monthly'
-                        ? 'bg-blue-500 text-white shadow-md'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
-                    }`}
-                  >
-                    Monthly
-                  </button>
-                </div>
-                
-                {/* Date/Time Picker */}
-                <div className="mt-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Date & Time (leave blank for latest data):
-                  </label>
-                  <DateTimePicker
-                    onChange={setSelectedDateTime}
-                    value={selectedDateTime}
-                    className="w-full text-sm"
-                    clearIcon={null}
-                    calendarIcon={null}
-                  />
-                </div>
-              </div>
-              <div className="h-48">
-                <BarChart data={chartData} maxHeight={200} />
-              </div>
-            </div>
 
             {/* Mobile Error Display */}
             {error && (
@@ -684,20 +601,6 @@ export default function AdminPage() {
                 >
                   Monthly
                 </button>
-              </div>
-              
-              {/* Date/Time Picker */}
-              <div className="mt-3">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Date & Time (leave blank for latest data):
-                </label>
-                <DateTimePicker
-                  onChange={setSelectedDateTime}
-                  value={selectedDateTime}
-                  className="w-full text-sm"
-                  clearIcon={null}
-                  calendarIcon={null}
-                />
               </div>
             </div>
             <div className="h-56">
@@ -927,20 +830,6 @@ export default function AdminPage() {
                 >
                   Monthly
                 </button>
-              </div>
-              
-              {/* Date/Time Picker */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Date & Time (leave blank for latest data):
-                </label>
-                <DateTimePicker
-                  onChange={setSelectedDateTime}
-                  value={selectedDateTime}
-                  className="text-sm"
-                  clearIcon={null}
-                  calendarIcon={null}
-                />
               </div>
             </div>
             <div className="h-48 sm:h-64">

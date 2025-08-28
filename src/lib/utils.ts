@@ -16,39 +16,41 @@ export function parseThaiTimestamp(timestamp: string): Date | null {
     
     if (!day || !month || !year || !hour || !minute) return null
 
+    // Parse and validate numeric values
+    const dayNum = parseInt(day)
+    const monthNum = parseInt(month)
+    const yearNum = parseInt(year)
+    const hourNum = parseInt(hour)
+    const minuteNum = parseInt(minute)
+    const secondNum = second ? parseInt(second) : 0
+
+    // Validate ranges
+    if (dayNum < 1 || dayNum > 31) return null
+    if (monthNum < 1 || monthNum > 12) return null
+    if (hourNum < 0 || hourNum > 23) return null
+    if (minuteNum < 0 || minuteNum > 59) return null
+    if (secondNum < 0 || secondNum > 59) return null
+
     // Convert Thai Buddhist year to Gregorian year if needed
-    const actualYear = parseInt(year) > 2500 ? parseInt(year) - 543 : parseInt(year)
+    const actualYear = yearNum > 2500 ? yearNum - 543 : yearNum
     
-    return new Date(
+    const date = new Date(
       actualYear,
-      parseInt(month) - 1, // Month is 0-indexed
-      parseInt(day),
-      parseInt(hour),
-      parseInt(minute),
-      second ? parseInt(second) : 0
+      monthNum - 1, // Month is 0-indexed
+      dayNum,
+      hourNum,
+      minuteNum,
+      secondNum
     )
+
+    // Check if the date was auto-adjusted by JavaScript (invalid date)
+    if (date.getDate() !== dayNum || date.getMonth() !== monthNum - 1 || date.getFullYear() !== actualYear) {
+      return null
+    }
+
+    return date
   } catch {
     return null
   }
 }
 
-/**
- * Check if a timestamp is within a time range from a reference date
- * @param timestamp - Thai format timestamp string
- * @param referenceDate - Reference date to compare against
- * @param rangeMinutes - Time range in minutes
- * @returns boolean indicating if timestamp is within range
- */
-export function isTimestampInRange(
-  timestamp: string,
-  referenceDate: Date,
-  rangeMinutes: number
-): boolean {
-  const parsedDate = parseThaiTimestamp(timestamp)
-  if (!parsedDate) return false
-  
-  const timeDiff = referenceDate.getTime() - parsedDate.getTime()
-  const rangeMills = rangeMinutes * 60 * 1000
-  
-  return timeDiff >= 0 && timeDiff <= rangeMills
-}

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { parseThaiTimestamp, isTimestampInRange } from '../src/lib/utils';
+import { parseThaiTimestamp } from '../src/lib/utils';
 
 describe('Utility Functions Tests', () => {
   describe('parseThaiTimestamp', () => {
@@ -78,53 +78,4 @@ describe('Utility Functions Tests', () => {
     });
   });
 
-  describe('isTimestampInRange', () => {
-    test('correctly identifies timestamp within range', () => {
-      const referenceDate = new Date(2024, 7, 27, 15, 0, 0); // Aug 27, 2024 15:00:00
-      const timestamp = '27/08/2567 14:30:00'; // 30 minutes before reference
-      
-      const result = isTimestampInRange(timestamp, referenceDate, 60); // 60-minute range
-      expect(result).toBe(true);
-    });
-
-    test('correctly identifies timestamp outside range', () => {
-      const referenceDate = new Date(2024, 7, 27, 15, 0, 0); // Aug 27, 2024 15:00:00
-      const timestamp = '27/08/2567 13:00:00'; // 2 hours before reference
-      
-      const result = isTimestampInRange(timestamp, referenceDate, 60); // 60-minute range
-      expect(result).toBe(false);
-    });
-
-    test('correctly identifies future timestamp outside range', () => {
-      const referenceDate = new Date(2024, 7, 27, 15, 0, 0); // Aug 27, 2024 15:00:00
-      const timestamp = '27/08/2567 16:00:00'; // 1 hour after reference (future)
-      
-      const result = isTimestampInRange(timestamp, referenceDate, 60); // 60-minute range
-      expect(result).toBe(false);
-    });
-
-    test('handles invalid timestamp gracefully', () => {
-      const referenceDate = new Date(2024, 7, 27, 15, 0, 0);
-      const invalidTimestamp = 'invalid-timestamp';
-      
-      const result = isTimestampInRange(invalidTimestamp, referenceDate, 60);
-      expect(result).toBe(false);
-    });
-
-    test('handles exact range boundaries correctly', () => {
-      const referenceDate = new Date(2024, 7, 27, 15, 0, 0); // Aug 27, 2024 15:00:00
-      
-      // Exactly at the start of range (60 minutes before)
-      const startRangeTimestamp = '27/08/2567 14:00:00';
-      expect(isTimestampInRange(startRangeTimestamp, referenceDate, 60)).toBe(true);
-      
-      // Exactly at reference time
-      const exactTimestamp = '27/08/2567 15:00:00';
-      expect(isTimestampInRange(exactTimestamp, referenceDate, 60)).toBe(true);
-      
-      // Just outside range (61 minutes before)
-      const outsideRangeTimestamp = '27/08/2567 13:59:00';
-      expect(isTimestampInRange(outsideRangeTimestamp, referenceDate, 60)).toBe(false);
-    });
-  });
 });

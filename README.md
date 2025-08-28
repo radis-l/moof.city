@@ -76,7 +76,7 @@ Built with modern web technologies for optimal performance:
 - **bcrypt** - Secure password hashing for admin system
 - **Mobile-Exclusive Design** - Optimized specifically for smartphones
 - **Multi-Font System** - MuseoModerno logo, Kanit body, Maitree headings
-- **Bundle Optimized** - 680KB reduction through dependency cleanup
+- **Bundle Optimized** - 680KB reduction + dynamic Lottie imports (additional 300KB savings)
 
 ## 🎨 Design Philosophy
 
