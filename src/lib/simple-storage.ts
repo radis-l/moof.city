@@ -11,7 +11,7 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 
 // Simple in-memory storage for development
 const devStorage = new Map<string, FortuneDataEntry>()
-let devAdminPassword = 'admin123' // Default dev password
+const devAdminPassword = process.env.ADMIN_PASSWORD || 'temp_dev_password_change_me'
 
 // Simple table name
 const FORTUNES_TABLE = isProduction ? 'prod_fortunes' : 'dev_fortunes'
@@ -229,9 +229,30 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
     }
   }
 
-  // Development: simple password check
-  return password === devAdminPassword
+  // Development: use bcrypt hashing for security consistency
+  try {
+    const bcrypt = await import('bcryptjs')
+    
+    // First check if there's a hashed password stored in memory (from password changes)
+    if (devAdminPasswordHash) {
+      return await bcrypt.compare(password, devAdminPasswordHash)
+    }
+    
+    // Check if devAdminPassword is already hashed (starts with $2)
+    if (devAdminPassword.startsWith('$2')) {
+      return await bcrypt.compare(password, devAdminPassword)
+    } else {
+      // Plain text comparison (for backward compatibility during transition)
+      return password === devAdminPassword
+    }
+  } catch {
+    // Fallback to plain text if bcrypt fails
+    return password === devAdminPassword
+  }
 }
+
+// In-memory development password storage (hashed)
+let devAdminPasswordHash: string | null = null
 
 export const changeAdminPassword = async (newPassword: string): Promise<boolean> => {
   if (supabase && isProduction) {
@@ -253,7 +274,12 @@ export const changeAdminPassword = async (newPassword: string): Promise<boolean>
     }
   }
 
-  // Development: update in-memory password
-  devAdminPassword = newPassword
-  return true
+  // Development: hash and store in memory
+  try {
+    const bcrypt = await import('bcryptjs')
+    devAdminPasswordHash = await bcrypt.hash(newPassword, 12)
+    return true
+  } catch {
+    return false
+  }
 }

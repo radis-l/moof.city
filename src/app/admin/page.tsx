@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { EnvironmentBadge } from '@/components/ui/environment-badge'
 import type { FortuneDataEntry } from '@/types'
 
 export default function AdminPage() {
@@ -15,6 +16,7 @@ export default function AdminPage() {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [initializing, setInitializing] = useState(true)
 
   // Simple login
   const handleLogin = async () => {
@@ -60,6 +62,12 @@ export default function AdminPage() {
       if (result.success) {
         setData(result.data)
         setMessage(`พบข้อมูล ${result.data.length} รายการ`)
+        
+        // Handle token refresh
+        const newToken = response.headers.get('X-New-Token')
+        if (newToken) {
+          localStorage.setItem('adminToken', newToken)
+        }
       } else {
         setMessage('ไม่สามารถโหลดข้อมูลได้')
         if (result.error.includes('Authentication')) {
@@ -83,8 +91,11 @@ export default function AdminPage() {
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'delete', password: authToken, id })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ action: 'delete', id })
       })
       
       const result = await response.json()
@@ -111,8 +122,11 @@ export default function AdminPage() {
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'clear-all', password: authToken })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ action: 'clear-all' })
       })
       
       const result = await response.json()
@@ -166,37 +180,21 @@ export default function AdminPage() {
       const result = await response.json()
       
       if (result.success) {
-        setMessage('เปลี่ยนรหัสผ่านสำเร็จ - กำลังเข้าสู่ระบบใหม่')
         setShowChangePassword(false)
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
         
-        // Secure: Re-authenticate with new password instead of storing plain text
-        setTimeout(async () => {
-          try {
-            const loginResponse = await fetch('/api/admin', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'login', password: newPassword })
-            })
-            
-            const loginResult = await loginResponse.json()
-            if (loginResult.success) {
-              localStorage.setItem('adminToken', loginResult.token)
-              setMessage('เข้าสู่ระบบใหม่สำเร็จ')
-            } else {
-              // Force re-login if auto-login fails
-              setIsAuthenticated(false)
-              localStorage.removeItem('adminToken')
-              setMessage('กรุณาเข้าสู่ระบบใหม่')
-            }
-          } catch {
-            setIsAuthenticated(false)
-            localStorage.removeItem('adminToken')
-            setMessage('กรุณาเข้าสู่ระบบใหม่')
-          }
-        }, 1000)
+        // Use new token from response (JWT implementation)
+        if (result.token) {
+          localStorage.setItem('adminToken', result.token)
+          setMessage('เปลี่ยนรหัสผ่านสำเร็จ - ได้รับ Token ใหม่')
+        } else {
+          // Fallback: Force re-login
+          setIsAuthenticated(false)
+          localStorage.removeItem('adminToken')
+          setMessage('เปลี่ยนรหัสผ่านสำเร็จ - กรุณาเข้าสู่ระบบใหม่')
+        }
       } else {
         setMessage(result.error || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
       }
@@ -213,12 +211,29 @@ export default function AdminPage() {
       setIsAuthenticated(true)
       fetchData(token)
     }
+    setInitializing(false)
   }, [])
+
+  // Show loading state during initialization to prevent hydration mismatch
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+        <EnvironmentBadge />
+        <div className="card-mystical max-w-md w-full p-8">
+          <h1 className="text-2xl font-bold text-white text-center mb-8">
+            🔮 กำลังโหลด...
+          </h1>
+          <div className="text-center text-white/60">กำลังตรวจสอบสถานะการเข้าสู่ระบบ</div>
+        </div>
+      </div>
+    )
+  }
 
   // Login form
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+        <EnvironmentBadge />
         <div className="card-mystical max-w-md w-full p-8">
           <h1 className="text-2xl font-bold text-white text-center mb-8">
             🔮 ระบบจัดการผู้ดูแล
@@ -256,6 +271,7 @@ export default function AdminPage() {
   // Admin dashboard
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+      <EnvironmentBadge />
       <div className="max-w-6xl mx-auto">
         <div className="card-mystical p-6 mb-6">
           <div className="flex justify-between items-center">
