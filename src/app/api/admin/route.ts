@@ -1,6 +1,6 @@
 // Consolidated Admin API - handles login, data retrieval, and basic admin operations
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword } from '@/lib/simple-storage'
+import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/simple-storage'
 
 // GET: Retrieve all fortune data (requires auth)
 export async function GET(request: NextRequest) {
@@ -80,6 +80,30 @@ export async function POST(request: NextRequest) {
       
       const result = await clearAllFortunes()
       return NextResponse.json(result)
+    }
+    
+    // Change password (requires current password)
+    if (action === 'change-password') {
+      const { currentPassword, newPassword } = await request.json()
+      
+      if (!currentPassword || !newPassword) {
+        return NextResponse.json({ success: false, error: 'Both current and new passwords required' }, { status: 400 })
+      }
+      
+      // Verify current password
+      const isValid = await verifyAdminPassword(currentPassword)
+      if (!isValid) {
+        return NextResponse.json({ success: false, error: 'Current password incorrect' }, { status: 401 })
+      }
+      
+      // Change to new password
+      const success = await changeAdminPassword(newPassword)
+      
+      if (success) {
+        return NextResponse.json({ success: true, message: 'Password changed successfully' })
+      } else {
+        return NextResponse.json({ success: false, error: 'Failed to change password' }, { status: 500 })
+      }
     }
     
     return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 })

@@ -11,6 +11,9 @@ export default function AdminPage() {
   const [data, setData] = useState<FortuneDataEntry[]>([])
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [showChangePassword, setShowChangePassword] = useState(false)
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
 
   // Simple login
   const handleLogin = async () => {
@@ -125,6 +128,43 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  const handleChangePassword = async () => {
+    if (!currentPassword || !newPassword) {
+      setMessage('กรุณากรอกรหัสผ่านครบถ้วน')
+      return
+    }
+
+    setLoading(true)
+    
+    try {
+      const response = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          action: 'change-password', 
+          currentPassword, 
+          newPassword 
+        })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        setMessage('เปลี่ยนรหัสผ่านสำเร็จ')
+        setShowChangePassword(false)
+        setCurrentPassword('')
+        setNewPassword('')
+        // Update stored token to new password
+        localStorage.setItem('adminToken', newPassword)
+      } else {
+        setMessage(result.error || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
+      }
+    } catch {
+      setMessage('เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน')
+    }
+    setLoading(false)
+  }
+
   // Check if already logged in on mount
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
@@ -188,6 +228,13 @@ export default function AdminPage() {
               </Button>
               <Button onClick={handleClearAll} disabled={loading} className="bg-red-600 hover:bg-red-700">
                 ล้างทั้งหมด
+              </Button>
+              <Button 
+                onClick={() => setShowChangePassword(true)} 
+                disabled={loading} 
+                className="bg-yellow-600 hover:bg-yellow-700"
+              >
+                เปลี่ยนรหัสผ่าน
               </Button>
               <Button 
                 onClick={() => {
@@ -258,6 +305,62 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
+
+      {/* Change Password Modal */}
+      {showChangePassword && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="card-mystical max-w-md w-full p-6">
+            <h2 className="text-xl font-bold text-white mb-6 text-center">
+              🔑 เปลี่ยนรหัสผ่าน
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-white text-sm mb-2">รหัสผ่านปัจจุบัน</label>
+                <Input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full"
+                  placeholder="กรอกรหัสผ่านปัจจุบัน"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-white text-sm mb-2">รหัสผ่านใหม่</label>
+                <Input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full"
+                  placeholder="กรอกรหัสผ่านใหม่"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3 mt-6">
+              <Button
+                onClick={() => {
+                  setShowChangePassword(false)
+                  setCurrentPassword('')
+                  setNewPassword('')
+                }}
+                disabled={loading}
+                className="flex-1 bg-gray-600 hover:bg-gray-700"
+              >
+                ยกเลิก
+              </Button>
+              <Button
+                onClick={handleChangePassword}
+                disabled={loading || !currentPassword || !newPassword}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                {loading ? 'กำลังเปลี่ยน...' : 'เปลี่ยนรหัสผ่าน'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
