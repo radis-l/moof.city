@@ -46,10 +46,9 @@ export async function POST(request: NextRequest) {
       response.cookies.set('admin-session', sessionToken, {
         httpOnly: true,
         secure: isProduction,
-        sameSite: isProduction ? 'none' : 'strict',
+        sameSite: 'lax',
         expires: expiresAt,
-        path: '/',
-        domain: isProduction ? undefined : 'localhost'
+        path: '/'
       })
       
       return response
