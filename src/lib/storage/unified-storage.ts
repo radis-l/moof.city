@@ -143,22 +143,22 @@ export const getAllFortuneData = async (): Promise<{
 
       if (error) throw error
 
-      const formattedData: FortuneDataEntry[] = data.map((row: Record<string, any>) => ({
-        id: row.id,
+      const formattedData: FortuneDataEntry[] = data.map((row: Record<string, unknown>) => ({
+        id: row.id as string,
         userData: {
-          email: row.email,
-          ageRange: row.age_range,
-          birthDay: row.birth_day,
-          bloodGroup: row.blood_group
+          email: row.email as string,
+          ageRange: row.age_range as string,
+          birthDay: row.birth_day as string,
+          bloodGroup: row.blood_group as string
         },
         fortuneResult: {
-          luckyNumber: row.lucky_number,
-          relationship: row.relationship,
-          work: row.work,
-          health: row.health,
-          generatedAt: row.generated_at
+          luckyNumber: row.lucky_number as number,
+          relationship: row.relationship as string,
+          work: row.work as string,
+          health: row.health as string,
+          generatedAt: row.generated_at as string
         },
-        timestamp: row.generated_at
+        timestamp: row.generated_at as string
       }))
 
       return {
