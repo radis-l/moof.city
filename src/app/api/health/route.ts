@@ -20,7 +20,7 @@ export async function GET() {
       anonKey: process.env.SUPABASE_ANON_KEY ? 'SET' : 'MISSING',
       connection: 'TESTING...',
       adminConfigTest: 'TESTING...',
-      latestRecord: null as any
+      latestRecord: null as { id: string; hashPrefix: string; created: string } | null
     }
   }
 
