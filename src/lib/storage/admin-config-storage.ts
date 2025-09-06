@@ -1,10 +1,11 @@
 // Admin Configuration Storage
-// Development: JSON file fallback, Production: Supabase primary
+// Production: Supabase primary, Local Dev: SQLite > JSON file fallback
 
 import bcrypt from 'bcryptjs'
 import fs from 'fs'
 import path from 'path'
 import { createClient } from '@supabase/supabase-js'
+import { getAdminPasswordHashSQLite, saveAdminPasswordHashSQLite } from './sqlite-storage'
 
 interface AdminConfig {
   passwordHash: string
@@ -19,9 +20,10 @@ const supabase = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey)
   : null
 
-// Check if we should use Supabase
+// Check environment and storage priority
 const hasSupabase = !!supabase
 const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false'
+const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
 
 // Environment-based table names
 const getTableName = (baseTable: string) => {
@@ -130,12 +132,45 @@ const supabaseStorage = {
   }
 }
 
+// SQLite storage (local development)
+const sqliteStorage = {
+  async getConfig(): Promise<AdminConfig | null> {
+    try {
+      const passwordHash = await getAdminPasswordHashSQLite()
+      if (!passwordHash) return null
+      
+      return {
+        passwordHash,
+        lastUpdated: new Date().toISOString()
+      }
+    } catch (error) {
+      console.error('Error reading admin config from SQLite:', error)
+      return null
+    }
+  },
+
+  async saveConfig(config: AdminConfig): Promise<boolean> {
+    try {
+      return await saveAdminPasswordHashSQLite(config.passwordHash)
+    } catch (error) {
+      console.error('Error saving admin config to SQLite:', error)
+      return false
+    }
+  }
+}
+
 // Storage method selection
 const getStorage = () => {
-  const storage = hasSupabase && useSupabasePrimary ? supabaseStorage : fileStorage
-  console.log('Storage method:', storage === supabaseStorage ? 'Supabase' : 'File', 
-             'hasSupabase:', hasSupabase, 'useSupabasePrimary:', useSupabasePrimary)
-  return storage
+  if (hasSupabase && useSupabasePrimary) {
+    console.log('Storage method: Supabase')
+    return supabaseStorage
+  }
+  if (!isProduction) {
+    console.log('Storage method: SQLite (local development)')
+    return sqliteStorage
+  }
+  console.log('Storage method: File (fallback)')
+  return fileStorage
 }
 
 // Main functions

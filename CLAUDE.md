@@ -17,17 +17,16 @@ npm run test:utils  # Unit tests (vitest only)
 - **Components**: `src/components/ui/` (buttons, inputs, animations)
 - **Pages**: `src/app/` (Next.js 15 App Router)
 - **APIs**: `src/app/api/` (storage & auth endpoints)
-- **Storage**: `src/lib/storage/` (Supabase primary system)
+- **Storage**: `src/lib/storage/` (Hybrid: SQLite local, Supabase prod)
 - **Types**: `src/types/index.ts` (TypeScript definitions)
 - **Utils**: `src/lib/utils.ts` (parseThaiTimestamp, etc.)
 
 ### Environment Detection
 ```typescript
-// Supabase primary check
-process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
-
-// Primary: Supabase (both dev/prod)
-// Fallback: JSON files in data/ (dev only, git-ignored)
+// Storage method priority:
+// Production: Supabase (when SUPABASE_URL && SUPABASE_ANON_KEY exist)
+// Local Dev: SQLite (data/local.db) - fast, isolated
+// Fallback: JSON files in data/ (emergency only, git-ignored)
 ```
 
 ---
@@ -40,7 +39,7 @@ process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
 ### Tech Stack
 - **Framework**: Next.js 15.5.2 + React 19.1.1 + TypeScript 5.x
 - **Styling**: Tailwind CSS 4.0 + Custom glassmorphism system  
-- **Storage**: Supabase Primary (JSON files fallback)
+- **Storage**: Hybrid System (SQLite local, Supabase prod, JSON fallback)
 - **Auth**: bcrypt + HTTP-only cookies (24h expiry)
 - **Animation**: Dynamic Lottie imports (bundle optimized)
 
@@ -70,7 +69,7 @@ src/
 
 ### 1. Storage Operations
 ```typescript
-// Always use optimized storage (Supabase primary, file fallback)
+// Always use hybrid storage (SQLite local, Supabase prod, JSON fallback)
 import { saveFortuneData, checkEmailExists } from '@/lib/storage/hybrid-storage'
 
 // Save fortune

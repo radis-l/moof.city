@@ -17,20 +17,32 @@ import {
   exportToCSVSupabase
 } from './supabase-storage'
 
+import {
+  saveFortuneDataSQLite,
+  getAllFortuneDataSQLite,
+  deleteFortuneDataSQLite,
+  clearAllFortuneDataSQLite,
+  checkEmailExistsSQLite,
+  exportToCSVSQLite
+} from './sqlite-storage'
+
 // Detect storage method based on environment
 const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
 const hasSupabase = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
 const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false' // Default to true
 
-// Storage method priority: Supabase Primary > File Storage (dev fallback only)
-// Note: Vercel KV removed to reduce costs and complexity
+// Storage method priority: 
+// Production: Supabase Primary
+// Local Dev: SQLite > File Storage (fallback only)
 const getStorageMethod = () => {
+  console.log('Storage method:', hasSupabase ? 'Supabase' : 'SQLite/File', 'hasSupabase:', hasSupabase, 'useSupabasePrimary:', useSupabasePrimary)
+  
   if (hasSupabase && useSupabasePrimary) return 'supabase'
-  if (!isProduction) return 'file' // Development fallback when no Supabase credentials
+  if (!isProduction) return 'sqlite' // Local development uses SQLite
   
   // Fallback for production without Supabase (should not happen)
-  console.warn('Production environment without Supabase credentials - using file storage fallback')
-  return 'file'
+  console.warn('Production environment without Supabase credentials - using SQLite fallback')
+  return 'sqlite'
 }
 
 // Hybrid save function
@@ -43,6 +55,8 @@ export const saveFortuneData = async (
   switch (storageMethod) {
     case 'supabase':
       return saveFortuneDataSupabase(userData, fortuneResult)
+    case 'sqlite':
+      return saveFortuneDataSQLite(userData, fortuneResult)
     default:
       return saveFile(userData, fortuneResult)
   }
@@ -60,6 +74,8 @@ export const getAllFortuneData = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return getAllFortuneDataSupabase()
+    case 'sqlite':
+      return getAllFortuneDataSQLite()
     default:
       return getAllFile()
   }
@@ -75,6 +91,8 @@ export const deleteFortuneData = async (id: string): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return deleteFortuneDataSupabase(id)
+    case 'sqlite':
+      return deleteFortuneDataSQLite(id)
     default:
       return deleteFile(id)
   }
@@ -90,6 +108,8 @@ export const clearAllFortuneData = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return clearAllFortuneDataSupabase()
+    case 'sqlite':
+      return clearAllFortuneDataSQLite()
     default:
       // For local development, use file system
       try {
@@ -129,6 +149,8 @@ export const checkEmailExists = async (email: string): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return checkEmailExistsSupabase(email)
+    case 'sqlite':
+      return checkEmailExistsSQLite(email)
     default:
       // Use file storage for development
       try {
@@ -170,6 +192,8 @@ export const exportToCSV = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return exportToCSVSupabase()
+    case 'sqlite':
+      return exportToCSVSQLite()
     default:
       return exportFile()
   }
