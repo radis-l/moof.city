@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
+
 const nextConfig = {
   // Performance optimizations
   compress: true, // Enable gzip compression
@@ -12,15 +16,22 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
+  // Server external packages (moved from experimental)
+  serverExternalPackages: ['better-sqlite3'],
+
   // Experimental features for better performance
   experimental: {
     // Enable React 18 concurrent features
     esmExternals: true,
     
+    // Optimize server React rendering
+    optimizeServerReact: true,
+    
     // Optimize font loading
     optimizePackageImports: [
       '@/components/ui',
       '@/components/layout',
+      'lottie-react'
     ],
   },
 
@@ -95,4 +106,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withBundleAnalyzer(nextConfig)

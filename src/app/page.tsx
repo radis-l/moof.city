@@ -44,7 +44,7 @@ export default function Home() {
     
     try {
       // Check if email already exists
-      const response = await fetch(`/api/storage/check-email?email=${encodeURIComponent(email)}`)
+      const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
       const result = await response.json()
       
       if (result.success && result.exists) {

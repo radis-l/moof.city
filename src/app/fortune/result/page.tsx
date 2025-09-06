@@ -21,7 +21,7 @@ function FortuneResultPageContent() {
 
   const loadExistingFortune = useCallback(async (email: string) => {
     try {
-      const response = await fetch(`/api/storage/check-email?email=${encodeURIComponent(email)}`)
+      const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
       const result = await response.json()
       
       if (result.success && result.exists && result.fortune) {
@@ -98,7 +98,7 @@ function FortuneResultPageContent() {
   const saveFortune = async (userData: UserData, fortuneResult: FortuneResult) => {
     setSaving(true)
     try {
-      const response = await fetch('/api/storage/save-fortune', {
+      const response = await fetch('/api/fortune', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

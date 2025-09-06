@@ -3,7 +3,7 @@
 import { ReactNode, memo, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoofLogo } from '@/assets/logo'
-import { LazyParticleBackground } from '@/components/ui/lazy-particle-background'
+// Removed over-engineered particle background
 import { trackMobileWarningShown } from '@/lib/analytics'
 
 interface MobileLayoutProps {
@@ -37,7 +37,6 @@ export const MobileLayout = memo(function MobileLayout({ children, showHeader = 
     <>
       {/* Mobile Only - Main Content */}
       <div className="block md:hidden mystical-background text-white relative overflow-hidden">
-        <LazyParticleBackground />
         
         {/* Header */}
         {showHeader && (
@@ -65,7 +64,6 @@ export const MobileLayout = memo(function MobileLayout({ children, showHeader = 
 
       {/* Desktop/Tablet - Mobile Only Message */}
       <div className="hidden md:flex mystical-background text-white min-h-screen items-center justify-center relative overflow-hidden">
-        <LazyParticleBackground />
         <div className="text-center relative z-10 px-6">
           <div className="mb-8">
             <MoofLogo />

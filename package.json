@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit",
     "test:utils": "vitest tests/utils-only.spec.ts",
     "test:essential": "npm run build && npm run lint && npm run type-check",
+    "analyze": "ANALYZE=true npm run build",
     "push-auto": "node scripts/push-automation.js"
   },
   "dependencies": {
@@ -30,6 +31,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@next/bundle-analyzer": "^15.5.2",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
