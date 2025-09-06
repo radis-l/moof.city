@@ -1,20 +1,17 @@
+// Safe SQLite storage with production environment handling
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
-// Dynamic import for SQLite to handle production environments
-let Database: any = null
-try {
-  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
-    Database = require('better-sqlite3')
-  }
-} catch (error) {
-  // SQLite not available (production environment)
-  Database = null
-}
-
 const DB_PATH = path.join(process.cwd(), 'data', 'local.db')
+
+// Check if we're in a SQLite-compatible environment
+const isSQLiteAvailable = () => {
+  return typeof window === 'undefined' && 
+         process.env.NODE_ENV !== 'production' && 
+         !process.env.VERCEL
+}
 
 // Ensure data directory exists
 const ensureDataDir = () => {
@@ -24,59 +21,43 @@ const ensureDataDir = () => {
   }
 }
 
-// Initialize database with tables
-const initDatabase = () => {
-  if (!Database) {
-    throw new Error('SQLite not available in production environment')
-  }
-  ensureDataDir()
-  const db = new Database(DB_PATH)
-  
-  // Create fortunes table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS fortunes (
-      id TEXT PRIMARY KEY,
-      email TEXT UNIQUE NOT NULL,
-      age_range TEXT NOT NULL,
-      birth_day TEXT NOT NULL,
-      blood_group TEXT NOT NULL,
-      lucky_number INTEGER NOT NULL,
-      relationship TEXT NOT NULL,
-      work TEXT NOT NULL,
-      health TEXT NOT NULL,
-      generated_at TEXT NOT NULL,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-  `)
-  
-  // Create admin_config table
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS admin_config (
-      id TEXT PRIMARY KEY,
-      password_hash TEXT NOT NULL,
-      created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
-    )
-  `)
-  
-  return db
-}
-
-// Get database instance
-const getDatabase = () => {
-  if (!Database) {
-    throw new Error('SQLite not available in production environment')
-  }
-  return initDatabase()
-}
+// Generic error response for unavailable SQLite
+const sqliteUnavailableError = () => ({
+  success: false,
+  message: 'SQLite not available in production environment'
+})
 
 // Save fortune data to SQLite
 export const saveFortuneDataSQLite = async (
   userData: UserData,
   fortuneResult: FortuneResult
 ): Promise<{ success: boolean; message: string; id?: string }> => {
+  if (!isSQLiteAvailable()) {
+    return sqliteUnavailableError()
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    ensureDataDir()
+    const db = new Database(DB_PATH)
+    
+    // Create table if not exists
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS fortunes (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        age_range TEXT NOT NULL,
+        birth_day TEXT NOT NULL,
+        blood_group TEXT NOT NULL,
+        lucky_number INTEGER NOT NULL,
+        relationship TEXT NOT NULL,
+        work TEXT NOT NULL,
+        health TEXT NOT NULL,
+        generated_at TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+    
     const id = uuidv4()
     const timestamp = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok' })
     
@@ -128,8 +109,18 @@ export const getAllFortuneDataSQLite = async (): Promise<{
   totalRecords: number
   message: string
 }> => {
+  if (!isSQLiteAvailable()) {
+    return {
+      success: false,
+      data: [],
+      totalRecords: 0,
+      message: 'SQLite not available in production environment'
+    }
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
     
     const rows = db.prepare(`
       SELECT 
@@ -174,12 +165,12 @@ export const getAllFortuneDataSQLite = async (): Promise<{
       totalRecords: data.length,
       message: 'Data retrieved successfully'
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
       data: [],
       totalRecords: 0,
-      message: error.message || 'Failed to retrieve data'
+      message: error instanceof Error ? error.message : 'Failed to retrieve data'
     }
   }
 }
@@ -189,8 +180,13 @@ export const deleteFortuneDataSQLite = async (id: string): Promise<{
   success: boolean
   message: string
 }> => {
+  if (!isSQLiteAvailable()) {
+    return sqliteUnavailableError()
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
     
     const stmt = db.prepare('DELETE FROM fortunes WHERE id = ?')
     const result = stmt.run(id)
@@ -208,10 +204,10 @@ export const deleteFortuneDataSQLite = async (id: string): Promise<{
       success: true,
       message: 'Fortune data deleted successfully'
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error.message || 'Failed to delete fortune data'
+      message: error instanceof Error ? error.message : 'Failed to delete fortune data'
     }
   }
 }
@@ -221,8 +217,13 @@ export const clearAllFortuneDataSQLite = async (): Promise<{
   success: boolean
   message: string
 }> => {
+  if (!isSQLiteAvailable()) {
+    return sqliteUnavailableError()
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
     
     db.prepare('DELETE FROM fortunes').run()
     
@@ -232,10 +233,10 @@ export const clearAllFortuneDataSQLite = async (): Promise<{
       success: true,
       message: 'All fortune data cleared successfully'
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      message: error.message || 'Failed to clear all data'
+      message: error instanceof Error ? error.message : 'Failed to clear all data'
     }
   }
 }
@@ -247,8 +248,17 @@ export const checkEmailExistsSQLite = async (email: string): Promise<{
   fortune?: FortuneDataEntry
   message: string
 }> => {
+  if (!isSQLiteAvailable()) {
+    return {
+      success: false,
+      exists: false,
+      message: 'SQLite not available in production environment'
+    }
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
     
     const row = db.prepare(`
       SELECT 
@@ -300,11 +310,11 @@ export const checkEmailExistsSQLite = async (email: string): Promise<{
       exists: false,
       message: 'Email not found'
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
       exists: false,
-      message: error.message || 'Failed to check email'
+      message: error instanceof Error ? error.message : 'Failed to check email'
     }
   }
 }
@@ -315,46 +325,54 @@ export const exportToCSVSQLite = async (): Promise<{
   csvData?: string
   message: string
 }> => {
-  try {
-    const result = await getAllFortuneDataSQLite()
-    
-    if (!result.success) {
-      return {
-        success: false,
-        message: result.message
-      }
-    }
-    
-    if (result.data.length === 0) {
-      return {
-        success: true,
-        csvData: 'ID,Email,Age Range,Birth Day,Blood Group,Lucky Number,Relationship,Work,Health,Generated At\n',
-        message: 'No data to export'
-      }
-    }
-    
-    const headers = 'ID,Email,Age Range,Birth Day,Blood Group,Lucky Number,Relationship,Work,Health,Generated At\n'
-    const rows = result.data.map(item => 
-      `${item.id},"${item.userData.email}","${item.userData.ageRange}","${item.userData.birthDay}","${item.userData.bloodGroup}",${item.fortuneResult.luckyNumber},"${item.fortuneResult.relationship}","${item.fortuneResult.work}","${item.fortuneResult.health}","${item.timestamp}"`
-    ).join('\n')
-    
-    return {
-      success: true,
-      csvData: headers + rows,
-      message: 'CSV data generated successfully'
-    }
-  } catch (error: any) {
+  const result = await getAllFortuneDataSQLite()
+  
+  if (!result.success) {
     return {
       success: false,
-      message: error.message || 'Failed to export CSV'
+      message: result.message
     }
+  }
+  
+  if (result.data.length === 0) {
+    return {
+      success: true,
+      csvData: 'ID,Email,Age Range,Birth Day,Blood Group,Lucky Number,Relationship,Work,Health,Generated At\n',
+      message: 'No data to export'
+    }
+  }
+  
+  const headers = 'ID,Email,Age Range,Birth Day,Blood Group,Lucky Number,Relationship,Work,Health,Generated At\n'
+  const rows = result.data.map(item => 
+    `${item.id},"${item.userData.email}","${item.userData.ageRange}","${item.userData.birthDay}","${item.userData.bloodGroup}",${item.fortuneResult.luckyNumber},"${item.fortuneResult.relationship}","${item.fortuneResult.work}","${item.fortuneResult.health}","${item.timestamp}"`
+  ).join('\n')
+  
+  return {
+    success: true,
+    csvData: headers + rows,
+    message: 'CSV data generated successfully'
   }
 }
 
 // Admin password management
 export const getAdminPasswordHashSQLite = async (): Promise<string | null> => {
+  if (!isSQLiteAvailable()) {
+    return null
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
+    
+    // Ensure admin_config table exists
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS admin_config (
+        id TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
     
     const row = db.prepare('SELECT password_hash FROM admin_config ORDER BY created_at DESC LIMIT 1').get() as any
     
@@ -368,8 +386,23 @@ export const getAdminPasswordHashSQLite = async (): Promise<string | null> => {
 }
 
 export const saveAdminPasswordHashSQLite = async (passwordHash: string): Promise<boolean> => {
+  if (!isSQLiteAvailable()) {
+    return false
+  }
+
   try {
-    const db = getDatabase()
+    const Database = require('better-sqlite3')
+    const db = new Database(DB_PATH)
+    
+    // Ensure admin_config table exists
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS admin_config (
+        id TEXT PRIMARY KEY,
+        password_hash TEXT NOT NULL,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
     
     // Clear existing passwords and insert new one
     db.prepare('DELETE FROM admin_config').run()
