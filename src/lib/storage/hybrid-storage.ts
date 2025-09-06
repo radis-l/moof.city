@@ -1,6 +1,6 @@
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
-// Import both storage methods
+// Import all storage methods
 import {
   saveFortuneData as saveFile,
   getAllFortuneData as getAllFile,
@@ -17,18 +17,40 @@ import {
   exportToCSVKV
 } from './kv-storage'
 
-// Detect if we're in production (Vercel) or development
+import {
+  saveFortuneDataSupabase,
+  getAllFortuneDataSupabase,
+  deleteFortuneDataSupabase,
+  clearAllFortuneDataSupabase,
+  checkEmailExistsSupabase,
+  exportToCSVSupabase
+} from './supabase-storage'
+
+// Detect storage method based on environment
 const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
+const hasSupabase = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
+
+// Storage method priority: Supabase > Vercel KV > File Storage
+const getStorageMethod = () => {
+  if (hasSupabase) return 'supabase'
+  if (isProduction) return 'kv'
+  return 'file'
+}
 
 // Hybrid save function
 export const saveFortuneData = async (
   userData: UserData,
   fortuneResult: FortuneResult
 ): Promise<{ success: boolean; message: string; id?: string }> => {
-  if (isProduction) {
-    return saveFortuneDataKV(userData, fortuneResult)
-  } else {
-    return saveFile(userData, fortuneResult)
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return saveFortuneDataSupabase(userData, fortuneResult)
+    case 'kv':
+      return saveFortuneDataKV(userData, fortuneResult)
+    default:
+      return saveFile(userData, fortuneResult)
   }
 }
 
@@ -39,10 +61,15 @@ export const getAllFortuneData = async (): Promise<{
   totalRecords: number
   message: string
 }> => {
-  if (isProduction) {
-    return getAllFortuneDataKV()
-  } else {
-    return getAllFile()
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return getAllFortuneDataSupabase()
+    case 'kv':
+      return getAllFortuneDataKV()
+    default:
+      return getAllFile()
   }
 }
 
@@ -51,44 +78,54 @@ export const deleteFortuneData = async (id: string): Promise<{
   success: boolean
   message: string
 }> => {
-  if (isProduction) {
-    return deleteFortuneDataKV(id)
-  } else {
-    return deleteFile(id)
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return deleteFortuneDataSupabase(id)
+    case 'kv':
+      return deleteFortuneDataKV(id)
+    default:
+      return deleteFile(id)
   }
 }
 
-// Clear all function (KV only, file storage uses direct file write)
+// Clear all function
 export const clearAllFortuneData = async (): Promise<{
   success: boolean
   message: string
 }> => {
-  if (isProduction) {
-    return clearAllFortuneDataKV()
-  } else {
-    // For local development, use file system
-    try {
-      const fs = await import('fs')
-      const path = await import('path')
-      const DATA_DIR = path.join(process.cwd(), 'data')
-      const FORTUNE_FILE = path.join(DATA_DIR, 'fortune-data.json')
-      
-      if (!fs.existsSync(DATA_DIR)) {
-        fs.mkdirSync(DATA_DIR, { recursive: true })
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return clearAllFortuneDataSupabase()
+    case 'kv':
+      return clearAllFortuneDataKV()
+    default:
+      // For local development, use file system
+      try {
+        const fs = await import('fs')
+        const path = await import('path')
+        const DATA_DIR = path.join(process.cwd(), 'data')
+        const FORTUNE_FILE = path.join(DATA_DIR, 'fortune-data.json')
+        
+        if (!fs.existsSync(DATA_DIR)) {
+          fs.mkdirSync(DATA_DIR, { recursive: true })
+        }
+        
+        fs.writeFileSync(FORTUNE_FILE, '[]')
+        
+        return {
+          success: true,
+          message: 'All fortune data cleared successfully'
+        }
+      } catch (error: unknown) {
+        return {
+          success: false,
+          message: error instanceof Error ? error.message : 'Error clearing all data'
+        }
       }
-      
-      fs.writeFileSync(FORTUNE_FILE, '[]')
-      
-      return {
-        success: true,
-        message: 'All fortune data cleared successfully'
-      }
-    } catch (error: unknown) {
-      return {
-        success: false,
-        message: error instanceof Error ? error.message : 'Error clearing all data'
-      }
-    }
   }
 }
 
@@ -99,35 +136,40 @@ export const checkEmailExists = async (email: string): Promise<{
   fortune?: FortuneDataEntry
   message: string
 }> => {
-  if (isProduction) {
-    return checkEmailExistsKV(email)
-  } else {
-    // Use file storage for development
-    try {
-      const allData = await getAllFile()
-      if (!allData.success) {
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return checkEmailExistsSupabase(email)
+    case 'kv':
+      return checkEmailExistsKV(email)
+    default:
+      // Use file storage for development
+      try {
+        const allData = await getAllFile()
+        if (!allData.success) {
+          return {
+            success: false,
+            exists: false,
+            message: allData.message
+          }
+        }
+        
+        const existingEntry = allData.data.find(entry => entry.userData.email === email)
+        
+        return {
+          success: true,
+          exists: !!existingEntry,
+          fortune: existingEntry,
+          message: existingEntry ? 'Email found' : 'Email not found'
+        }
+      } catch (error: unknown) {
         return {
           success: false,
           exists: false,
-          message: allData.message
+          message: error instanceof Error ? error.message : 'Error checking email'
         }
       }
-      
-      const existingEntry = allData.data.find(entry => entry.userData.email === email)
-      
-      return {
-        success: true,
-        exists: !!existingEntry,
-        fortune: existingEntry,
-        message: existingEntry ? 'Email found' : 'Email not found'
-      }
-    } catch (error: unknown) {
-      return {
-        success: false,
-        exists: false,
-        message: error instanceof Error ? error.message : 'Error checking email'
-      }
-    }
   }
 }
 
@@ -137,9 +179,14 @@ export const exportToCSV = async (): Promise<{
   csvData?: string
   message: string
 }> => {
-  if (isProduction) {
-    return exportToCSVKV()
-  } else {
-    return exportFile()
+  const storageMethod = getStorageMethod()
+  
+  switch (storageMethod) {
+    case 'supabase':
+      return exportToCSVSupabase()
+    case 'kv':
+      return exportToCSVKV()
+    default:
+      return exportFile()
   }
 }
