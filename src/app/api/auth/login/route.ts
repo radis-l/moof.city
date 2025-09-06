@@ -30,7 +30,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Password hash found, proceeding with verification')
+    console.log('Password hash found:', ADMIN_PASSWORD_HASH?.substring(0, 20) + '...', 'proceeding with verification')
+    
+    // Log environment info for debugging
+    const isProduction = Boolean(process.env.NODE_ENV === 'production' || process.env.VERCEL)
+    const tableName = isProduction ? 'prod_admin_config' : 'dev_admin_config'
+    console.log('Environment - isProduction:', isProduction, 'tableName:', tableName)
 
     // Use bcrypt to compare password with hash
     const isValidPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH)
