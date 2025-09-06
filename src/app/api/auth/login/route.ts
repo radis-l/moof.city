@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import { getAdminPasswordHash, initializeAdminPassword } from '@/lib/storage/admin-config-storage'
+import { getAdminPasswordHash, initializeAdminPassword } from '@/lib/storage/unified-storage'
 
 export async function POST(request: NextRequest) {
   try {
