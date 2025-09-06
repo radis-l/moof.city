@@ -1,17 +1,27 @@
 import { createClient } from '@supabase/supabase-js'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_ANON_KEY!
+// Initialize Supabase client (with build-time fallback)
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseKey = process.env.SUPABASE_ANON_KEY
 
-const supabase = createClient(supabaseUrl, supabaseKey)
+// Create client only if both credentials exist
+const supabase = supabaseUrl && supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey)
+  : null
 
 // Save fortune data to Supabase
 export const saveFortuneDataSupabase = async (
   userData: UserData,
   fortuneResult: FortuneResult
 ): Promise<{ success: boolean; message: string; id?: string }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from('fortunes')
@@ -58,6 +68,15 @@ export const getAllFortuneDataSupabase = async (): Promise<{
   totalRecords: number
   message: string
 }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      data: [],
+      totalRecords: 0,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from('fortunes')
@@ -116,6 +135,14 @@ export const checkEmailExistsSupabase = async (email: string): Promise<{
   fortune?: FortuneDataEntry
   message: string
 }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      exists: false,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const { data, error } = await supabase
       .from('fortunes')
@@ -180,6 +207,13 @@ export const deleteFortuneDataSupabase = async (id: string): Promise<{
   success: boolean
   message: string
 }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const { error } = await supabase
       .from('fortunes')
@@ -210,6 +244,13 @@ export const clearAllFortuneDataSupabase = async (): Promise<{
   success: boolean
   message: string
 }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const { error } = await supabase
       .from('fortunes')
@@ -241,6 +282,13 @@ export const exportToCSVSupabase = async (): Promise<{
   csvData?: string
   message: string
 }> => {
+  if (!supabase) {
+    return {
+      success: false,
+      message: 'Supabase client not configured - missing credentials'
+    }
+  }
+
   try {
     const result = await getAllFortuneDataSupabase()
     

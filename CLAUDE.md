@@ -17,17 +17,17 @@ npm run test:utils  # Unit tests (vitest only)
 - **Components**: `src/components/ui/` (buttons, inputs, animations)
 - **Pages**: `src/app/` (Next.js 15 App Router)
 - **APIs**: `src/app/api/` (storage & auth endpoints)
-- **Storage**: `src/lib/storage/` (hybrid dev/prod system)
+- **Storage**: `src/lib/storage/` (Supabase primary system)
 - **Types**: `src/types/index.ts` (TypeScript definitions)
 - **Utils**: `src/lib/utils.ts` (parseThaiTimestamp, etc.)
 
 ### Environment Detection
 ```typescript
-// Production check
-process.env.NODE_ENV === 'production' && process.env.VERCEL
+// Supabase primary check
+process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
 
-// Development uses JSON files in data/ (git-ignored)
-// Production uses Vercel KV automatically
+// Primary: Supabase (both dev/prod)
+// Fallback: JSON files in data/ (dev only, git-ignored)
 ```
 
 ---
@@ -40,7 +40,7 @@ process.env.NODE_ENV === 'production' && process.env.VERCEL
 ### Tech Stack
 - **Framework**: Next.js 15.5.2 + React 19.1.1 + TypeScript 5.x
 - **Styling**: Tailwind CSS 4.0 + Custom glassmorphism system  
-- **Storage**: Hybrid (JSON files ↔ Vercel KV)
+- **Storage**: Supabase Primary (JSON files fallback)
 - **Auth**: bcrypt + HTTP-only cookies (24h expiry)
 - **Animation**: Dynamic Lottie imports (bundle optimized)
 
@@ -70,14 +70,14 @@ src/
 
 ### 1. Storage Operations
 ```typescript
-// Always use hybrid storage (auto-detects environment)
-import { hybridStorage } from '@/lib/storage/hybrid-storage'
+// Always use optimized storage (Supabase primary, file fallback)
+import { saveFortuneData, checkEmailExists } from '@/lib/storage/hybrid-storage'
 
 // Save fortune
-await hybridStorage.saveFortune(email, userData, fortuneResult)
+await saveFortuneData(userData, fortuneResult)
 
 // Check email existence  
-const result = await hybridStorage.checkEmail(email)
+const result = await checkEmailExists(email)
 ```
 
 ### 2. Fortune Generation (Deterministic)

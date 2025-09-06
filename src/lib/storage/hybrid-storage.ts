@@ -1,21 +1,12 @@
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
-// Import all storage methods
+// Import storage methods
 import {
   saveFortuneData as saveFile,
   getAllFortuneData as getAllFile,
   deleteFortuneData as deleteFile,
   exportToCSV as exportFile
 } from './file-storage'
-
-import {
-  saveFortuneDataKV,
-  getAllFortuneDataKV,
-  deleteFortuneDataKV,
-  clearAllFortuneDataKV,
-  checkEmailExistsKV,
-  exportToCSVKV
-} from './kv-storage'
 
 import {
   saveFortuneDataSupabase,
@@ -29,11 +20,16 @@ import {
 // Detect storage method based on environment
 const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
 const hasSupabase = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
+const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false' // Default to true
 
-// Storage method priority: Supabase > Vercel KV > File Storage
+// Storage method priority: Supabase Primary > File Storage (dev fallback only)
+// Note: Vercel KV removed to reduce costs and complexity
 const getStorageMethod = () => {
-  if (hasSupabase) return 'supabase'
-  if (isProduction) return 'kv'
+  if (hasSupabase && useSupabasePrimary) return 'supabase'
+  if (!isProduction) return 'file' // Development fallback when no Supabase credentials
+  
+  // Fallback for production without Supabase (should not happen)
+  console.warn('Production environment without Supabase credentials - using file storage fallback')
   return 'file'
 }
 
@@ -47,8 +43,6 @@ export const saveFortuneData = async (
   switch (storageMethod) {
     case 'supabase':
       return saveFortuneDataSupabase(userData, fortuneResult)
-    case 'kv':
-      return saveFortuneDataKV(userData, fortuneResult)
     default:
       return saveFile(userData, fortuneResult)
   }
@@ -66,8 +60,6 @@ export const getAllFortuneData = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return getAllFortuneDataSupabase()
-    case 'kv':
-      return getAllFortuneDataKV()
     default:
       return getAllFile()
   }
@@ -83,8 +75,6 @@ export const deleteFortuneData = async (id: string): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return deleteFortuneDataSupabase(id)
-    case 'kv':
-      return deleteFortuneDataKV(id)
     default:
       return deleteFile(id)
   }
@@ -100,8 +90,6 @@ export const clearAllFortuneData = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return clearAllFortuneDataSupabase()
-    case 'kv':
-      return clearAllFortuneDataKV()
     default:
       // For local development, use file system
       try {
@@ -141,8 +129,6 @@ export const checkEmailExists = async (email: string): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return checkEmailExistsSupabase(email)
-    case 'kv':
-      return checkEmailExistsKV(email)
     default:
       // Use file storage for development
       try {
@@ -184,8 +170,6 @@ export const exportToCSV = async (): Promise<{
   switch (storageMethod) {
     case 'supabase':
       return exportToCSVSupabase()
-    case 'kv':
-      return exportToCSVKV()
     default:
       return exportFile()
   }

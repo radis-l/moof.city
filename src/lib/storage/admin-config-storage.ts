@@ -1,17 +1,27 @@
 // Admin Configuration Storage
-// Development: JSON file, Production: Vercel KV
+// Development: JSON file fallback, Production: Supabase primary
 
 import bcrypt from 'bcryptjs'
 import fs from 'fs'
 import path from 'path'
+import { createClient } from '@supabase/supabase-js'
 
 interface AdminConfig {
   passwordHash: string
   lastUpdated: string
 }
 
-// Check if we're in a Vercel environment (production)
-const isProduction = !!process.env.VERCEL || process.env.NODE_ENV === 'production'
+// Initialize Supabase client (if credentials available)
+const supabaseUrl = process.env.SUPABASE_URL
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+const supabase = supabaseUrl && supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null
+
+// Check if we should use Supabase
+const hasSupabase = !!supabase
+const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false'
 
 // File storage (development)
 const fileStorage = {
@@ -54,38 +64,73 @@ const fileStorage = {
   }
 }
 
-// KV storage (production)
-const kvStorage = {
+// Supabase storage (primary)
+const supabaseStorage = {
   async getConfig(): Promise<AdminConfig | null> {
+    if (!supabase) return null
+    
     try {
-      const { kv } = await import('@vercel/kv')
-      const config = await kv.get<AdminConfig>('admin-config')
-      return config
-    } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error reading admin config from KV:', error)
+      const { data, error } = await supabase
+        .from('admin_config')
+        .select('password_hash, updated_at')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (error) {
+        if (error.code !== 'PGRST116') { // Not "no rows returned"
+          console.error('Error reading admin config from Supabase:', error)
+        }
+        return null
       }
+
+      return {
+        passwordHash: data.password_hash,
+        lastUpdated: data.updated_at
+      }
+    } catch (error) {
+      console.error('Error reading admin config from Supabase:', error)
       return null
     }
   },
 
   async saveConfig(config: AdminConfig): Promise<boolean> {
+    if (!supabase) return false
+    
     try {
-      const { kv } = await import('@vercel/kv')
-      await kv.set('admin-config', config)
+      // Delete existing config (we only want 1 record)
+      await supabase.from('admin_config').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+      
+      // Insert new config
+      const { error } = await supabase
+        .from('admin_config')
+        .insert([{
+          password_hash: config.passwordHash,
+          updated_at: config.lastUpdated
+        }])
+
+      if (error) {
+        console.error('Error saving admin config to Supabase:', error)
+        return false
+      }
+
       return true
     } catch (error) {
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Error saving admin config to KV:', error)
-      }
+      console.error('Error saving admin config to Supabase:', error)
       return false
     }
   }
 }
 
+// Storage method selection
+const getStorage = () => {
+  if (hasSupabase && useSupabasePrimary) return supabaseStorage
+  return fileStorage // Fallback to file storage
+}
+
 // Main functions
 export async function getAdminPasswordHash(): Promise<string | null> {
-  const storage = isProduction ? kvStorage : fileStorage
+  const storage = getStorage()
   const config = await storage.getConfig()
   return config?.passwordHash || null
 }
@@ -97,7 +142,7 @@ export async function setAdminPasswordHash(password: string): Promise<boolean> {
     lastUpdated: new Date().toISOString()
   }
   
-  const storage = isProduction ? kvStorage : fileStorage
+  const storage = getStorage()
   return await storage.saveConfig(config)
 }
 
