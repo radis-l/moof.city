@@ -25,7 +25,7 @@ const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false'
 
 // Environment-based table names
 const getTableName = (baseTable: string) => {
-  const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
+  const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL
   return isProduction ? `prod_${baseTable}` : `dev_${baseTable}`
 }
 
@@ -132,8 +132,10 @@ const supabaseStorage = {
 
 // Storage method selection
 const getStorage = () => {
-  if (hasSupabase && useSupabasePrimary) return supabaseStorage
-  return fileStorage // Fallback to file storage
+  const storage = hasSupabase && useSupabasePrimary ? supabaseStorage : fileStorage
+  console.log('Storage method:', storage === supabaseStorage ? 'Supabase' : 'File', 
+             'hasSupabase:', hasSupabase, 'useSupabasePrimary:', useSupabasePrimary)
+  return storage
 }
 
 // Main functions

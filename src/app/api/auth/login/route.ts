@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const { password } = await request.json()
 
     if (!password) {
+      console.log('Login attempt failed: No password provided')
       return NextResponse.json(
         { success: false, message: 'Password required' },
         { status: 400 }
@@ -15,17 +16,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize default password if none exists
-    await initializeAdminPassword('Punpun12')
+    const initialized = await initializeAdminPassword('Punpun12')
+    console.log('Password initialization:', initialized ? 'Created new password' : 'Password already exists')
 
     // Get current password hash from database
     const ADMIN_PASSWORD_HASH = await getAdminPasswordHash()
 
     if (!ADMIN_PASSWORD_HASH) {
+      console.error('Login failed: No password hash found in storage')
       return NextResponse.json(
         { success: false, message: 'Server configuration error' },
         { status: 500 }
       )
     }
+
+    console.log('Password hash found, proceeding with verification')
 
     // Use bcrypt to compare password with hash
     const isValidPassword = await bcrypt.compare(password, ADMIN_PASSWORD_HASH)
@@ -41,22 +46,29 @@ export async function POST(request: NextRequest) {
       )
       
       // Set secure HTTP-only cookie
+      const isProduction = Boolean(process.env.NODE_ENV === 'production' || process.env.VERCEL)
+      console.log('Setting cookie - Production:', isProduction, 'Environment:', process.env.NODE_ENV, 'Vercel:', !!process.env.VERCEL)
+      
       response.cookies.set('admin-session', sessionToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'strict', // 'none' for production HTTPS
         expires: expiresAt,
-        path: '/'
+        path: '/',
+        domain: isProduction ? undefined : 'localhost' // Let browser handle production domain
       })
       
+      console.log('Login successful - Cookie set')
       return response
     } else {
+      console.log('Login failed: Invalid password')
       return NextResponse.json(
         { success: false, message: 'Invalid password' },
         { status: 401 }
       )
     }
-  } catch {
+  } catch (error) {
+    console.error('Login error:', error)
     return NextResponse.json(
       { success: false, message: 'Server error' },
       { status: 500 }
