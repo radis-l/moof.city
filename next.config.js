@@ -68,13 +68,20 @@ const nextConfig = {
 
   // Webpack optimizations
   webpack: (config, { isServer }) => {
-    // Optimize bundle splitting
+    // Exclude SQLite from client bundle and production server
     if (!isServer) {
       config.resolve.fallback = {
         fs: false,
         net: false,
         tls: false,
+        'better-sqlite3': false,
       }
+    }
+
+    // Exclude SQLite from server build in production (Vercel)
+    if (isServer && process.env.NODE_ENV === 'production') {
+      config.externals = config.externals || []
+      config.externals.push('better-sqlite3')
     }
 
     // Add performance hints

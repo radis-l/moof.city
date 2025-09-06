@@ -1,8 +1,18 @@
-import Database from 'better-sqlite3'
 import { v4 as uuidv4 } from 'uuid'
 import path from 'path'
 import fs from 'fs'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
+
+// Dynamic import for SQLite to handle production environments
+let Database: any = null
+try {
+  if (typeof window === 'undefined' && process.env.NODE_ENV !== 'production') {
+    Database = require('better-sqlite3')
+  }
+} catch (error) {
+  // SQLite not available (production environment)
+  Database = null
+}
 
 const DB_PATH = path.join(process.cwd(), 'data', 'local.db')
 
@@ -16,6 +26,9 @@ const ensureDataDir = () => {
 
 // Initialize database with tables
 const initDatabase = () => {
+  if (!Database) {
+    throw new Error('SQLite not available in production environment')
+  }
   ensureDataDir()
   const db = new Database(DB_PATH)
   
@@ -51,6 +64,9 @@ const initDatabase = () => {
 
 // Get database instance
 const getDatabase = () => {
+  if (!Database) {
+    throw new Error('SQLite not available in production environment')
+  }
   return initDatabase()
 }
 
