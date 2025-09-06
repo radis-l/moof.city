@@ -13,15 +13,23 @@ interface AdminConfig {
 
 // Initialize Supabase client (if credentials available)
 const supabaseUrl = process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseKey = process.env.SUPABASE_ANON_KEY
 
-const supabase = supabaseUrl && supabaseServiceKey 
-  ? createClient(supabaseUrl, supabaseServiceKey)
+const supabase = supabaseUrl && supabaseKey 
+  ? createClient(supabaseUrl, supabaseKey)
   : null
 
 // Check if we should use Supabase
 const hasSupabase = !!supabase
 const useSupabasePrimary = process.env.USE_SUPABASE_PRIMARY !== 'false'
+
+// Environment-based table names
+const getTableName = (baseTable: string) => {
+  const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
+  return isProduction ? `prod_${baseTable}` : `dev_${baseTable}`
+}
+
+const ADMIN_CONFIG_TABLE = getTableName('admin_config')
 
 // File storage (development)
 const fileStorage = {
@@ -71,7 +79,7 @@ const supabaseStorage = {
     
     try {
       const { data, error } = await supabase
-        .from('admin_config')
+        .from(ADMIN_CONFIG_TABLE)
         .select('password_hash, updated_at')
         .order('created_at', { ascending: false })
         .limit(1)
@@ -99,11 +107,11 @@ const supabaseStorage = {
     
     try {
       // Delete existing config (we only want 1 record)
-      await supabase.from('admin_config').delete().neq('id', '00000000-0000-0000-0000-000000000000')
+      await supabase.from(ADMIN_CONFIG_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000')
       
       // Insert new config
       const { error } = await supabase
-        .from('admin_config')
+        .from(ADMIN_CONFIG_TABLE)
         .insert([{
           password_hash: config.passwordHash,
           updated_at: config.lastUpdated

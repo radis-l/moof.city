@@ -10,6 +10,14 @@ const supabase = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey)
   : null
 
+// Environment-based table names
+const getTableName = (baseTable: string) => {
+  const isProduction = process.env.NODE_ENV === 'production' && process.env.VERCEL
+  return isProduction ? `prod_${baseTable}` : `dev_${baseTable}`
+}
+
+const FORTUNES_TABLE = getTableName('fortunes')
+
 // Save fortune data to Supabase
 export const saveFortuneDataSupabase = async (
   userData: UserData,
@@ -23,9 +31,10 @@ export const saveFortuneDataSupabase = async (
   }
 
   try {
+    // Use upsert to handle duplicate emails
     const { data, error } = await supabase
-      .from('fortunes')
-      .insert([
+      .from(FORTUNES_TABLE)
+      .upsert([
         {
           email: userData.email,
           age_range: userData.ageRange,
@@ -37,7 +46,10 @@ export const saveFortuneDataSupabase = async (
           health: fortuneResult.health,
           generated_at: fortuneResult.generatedAt
         }
-      ])
+      ], { 
+        onConflict: 'email',
+        ignoreDuplicates: false 
+      })
       .select()
       .single()
 
@@ -79,7 +91,7 @@ export const getAllFortuneDataSupabase = async (): Promise<{
 
   try {
     const { data, error } = await supabase
-      .from('fortunes')
+      .from(FORTUNES_TABLE)
       .select('*')
       .order('created_at', { ascending: false })
 
@@ -145,7 +157,7 @@ export const checkEmailExistsSupabase = async (email: string): Promise<{
 
   try {
     const { data, error } = await supabase
-      .from('fortunes')
+      .from(FORTUNES_TABLE)
       .select('*')
       .eq('email', email)
       .order('created_at', { ascending: false })
@@ -216,7 +228,7 @@ export const deleteFortuneDataSupabase = async (id: string): Promise<{
 
   try {
     const { error } = await supabase
-      .from('fortunes')
+      .from(FORTUNES_TABLE)
       .delete()
       .eq('id', id)
 
@@ -253,7 +265,7 @@ export const clearAllFortuneDataSupabase = async (): Promise<{
 
   try {
     const { error } = await supabase
-      .from('fortunes')
+      .from(FORTUNES_TABLE)
       .delete()
       .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all records
 
