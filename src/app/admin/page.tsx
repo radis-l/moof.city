@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [showChangePassword, setShowChangePassword] = useState(false)
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
 
   // Simple login
   const handleLogin = async () => {
@@ -129,17 +130,32 @@ export default function AdminPage() {
   }
 
   const handleChangePassword = async () => {
-    if (!currentPassword || !newPassword) {
+    // Validation
+    if (!currentPassword || !newPassword || !confirmPassword) {
       setMessage('กรุณากรอกรหัสผ่านครบถ้วน')
       return
     }
 
+    if (newPassword !== confirmPassword) {
+      setMessage('รหัสผ่านใหม่และการยืนยันไม่ตรงกัน')
+      return
+    }
+
+    if (newPassword.length < 6) {
+      setMessage('รหัสผ่านใหม่ต้องมีอย่างน้อย 6 ตัวอักษร')
+      return
+    }
+
     setLoading(true)
+    const authToken = localStorage.getItem('adminToken')
     
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}` // Add proper authorization
+        },
         body: JSON.stringify({ 
           action: 'change-password', 
           currentPassword, 
@@ -150,12 +166,37 @@ export default function AdminPage() {
       const result = await response.json()
       
       if (result.success) {
-        setMessage('เปลี่ยนรหัสผ่านสำเร็จ')
+        setMessage('เปลี่ยนรหัสผ่านสำเร็จ - กำลังเข้าสู่ระบบใหม่')
         setShowChangePassword(false)
         setCurrentPassword('')
         setNewPassword('')
-        // Update stored token to new password
-        localStorage.setItem('adminToken', newPassword)
+        setConfirmPassword('')
+        
+        // Secure: Re-authenticate with new password instead of storing plain text
+        setTimeout(async () => {
+          try {
+            const loginResponse = await fetch('/api/admin', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'login', password: newPassword })
+            })
+            
+            const loginResult = await loginResponse.json()
+            if (loginResult.success) {
+              localStorage.setItem('adminToken', loginResult.token)
+              setMessage('เข้าสู่ระบบใหม่สำเร็จ')
+            } else {
+              // Force re-login if auto-login fails
+              setIsAuthenticated(false)
+              localStorage.removeItem('adminToken')
+              setMessage('กรุณาเข้าสู่ระบบใหม่')
+            }
+          } catch {
+            setIsAuthenticated(false)
+            localStorage.removeItem('adminToken')
+            setMessage('กรุณาเข้าสู่ระบบใหม่')
+          }
+        }, 1000)
       } else {
         setMessage(result.error || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
       }
@@ -308,7 +349,25 @@ export default function AdminPage() {
 
       {/* Change Password Modal */}
       {showChangePassword && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowChangePassword(false)
+              setCurrentPassword('')
+              setNewPassword('')
+              setConfirmPassword('')
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setShowChangePassword(false)
+              setCurrentPassword('')
+              setNewPassword('')
+              setConfirmPassword('')
+            }
+          }}
+        >
           <div className="card-mystical max-w-md w-full p-6">
             <h2 className="text-xl font-bold text-white mb-6 text-center">
               🔑 เปลี่ยนรหัสผ่าน
@@ -323,6 +382,7 @@ export default function AdminPage() {
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   className="w-full"
                   placeholder="กรอกรหัสผ่านปัจจุบัน"
+                  disabled={loading}
                 />
               </div>
               
@@ -333,8 +393,31 @@ export default function AdminPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full"
-                  placeholder="กรอกรหัสผ่านใหม่"
+                  placeholder="กรอกรหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)"
+                  disabled={loading}
                 />
+                {newPassword && newPassword.length < 6 && (
+                  <p className="text-red-400 text-xs mt-1">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</p>
+                )}
+              </div>
+              
+              <div>
+                <label className="block text-white text-sm mb-2">ยืนยันรหัสผ่านใหม่</label>
+                <Input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full"
+                  placeholder="กรอกรหัสผ่านใหม่อีกครั้ง"
+                  disabled={loading}
+                  onKeyPress={(e) => e.key === 'Enter' && handleChangePassword()}
+                />
+                {confirmPassword && newPassword !== confirmPassword && (
+                  <p className="text-red-400 text-xs mt-1">รหัสผ่านไม่ตรงกัน</p>
+                )}
+                {confirmPassword && newPassword === confirmPassword && newPassword.length >= 6 && (
+                  <p className="text-green-400 text-xs mt-1">✓ รหัสผ่านตรงกัน</p>
+                )}
               </div>
             </div>
             
@@ -344,6 +427,7 @@ export default function AdminPage() {
                   setShowChangePassword(false)
                   setCurrentPassword('')
                   setNewPassword('')
+                  setConfirmPassword('')
                 }}
                 disabled={loading}
                 className="flex-1 bg-gray-600 hover:bg-gray-700"
@@ -352,7 +436,7 @@ export default function AdminPage() {
               </Button>
               <Button
                 onClick={handleChangePassword}
-                disabled={loading || !currentPassword || !newPassword}
+                disabled={loading || !currentPassword || !newPassword || !confirmPassword || newPassword !== confirmPassword || newPassword.length < 6}
                 className="flex-1 bg-green-600 hover:bg-green-700"
               >
                 {loading ? 'กำลังเปลี่ยน...' : 'เปลี่ยนรหัสผ่าน'}

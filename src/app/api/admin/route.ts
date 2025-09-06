@@ -82,17 +82,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(result)
     }
     
-    // Change password (requires current password)
+    // Change password (requires authorization and current password verification)
     if (action === 'change-password') {
+      // Check authorization header first
+      const authHeader = request.headers.get('authorization')
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return NextResponse.json({ success: false, error: 'Authorization required' }, { status: 401 })
+      }
+
+      const token = authHeader.replace('Bearer ', '')
+      const isTokenValid = await verifyAdminPassword(token)
+      if (!isTokenValid) {
+        return NextResponse.json({ success: false, error: 'Invalid session' }, { status: 401 })
+      }
+
       const { currentPassword, newPassword } = await request.json()
       
       if (!currentPassword || !newPassword) {
         return NextResponse.json({ success: false, error: 'Both current and new passwords required' }, { status: 400 })
       }
+
+      if (newPassword.length < 6) {
+        return NextResponse.json({ success: false, error: 'New password must be at least 6 characters' }, { status: 400 })
+      }
       
-      // Verify current password
-      const isValid = await verifyAdminPassword(currentPassword)
-      if (!isValid) {
+      // Verify current password (double verification for security)
+      const isCurrentValid = await verifyAdminPassword(currentPassword)
+      if (!isCurrentValid) {
         return NextResponse.json({ success: false, error: 'Current password incorrect' }, { status: 401 })
       }
       
