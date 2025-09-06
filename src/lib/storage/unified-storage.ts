@@ -143,7 +143,7 @@ export const getAllFortuneData = async (): Promise<{
 
       if (error) throw error
 
-      const formattedData: FortuneDataEntry[] = data.map((row: any) => ({
+      const formattedData: FortuneDataEntry[] = data.map((row: Record<string, any>) => ({
         id: row.id,
         userData: {
           email: row.email,
