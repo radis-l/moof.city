@@ -7,6 +7,10 @@
  * @returns Date object or null if parsing fails
  */
 export function parseThaiTimestamp(timestamp: string): Date | null {
+  if (!timestamp || typeof timestamp !== 'string') {
+    return null
+  }
+  
   try {
     const [datePart, timePart] = timestamp.split(' ')
     if (!datePart || !timePart) return null

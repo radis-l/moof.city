@@ -205,6 +205,7 @@ function FortuneResultPageContent() {
               <div 
                 className="text-white font-heading font-bold"
                 style={{ fontSize: '4rem', lineHeight: '1' }}
+                data-testid="fortune-numbers"
               >
                 {fortune.luckyNumber}
               </div>

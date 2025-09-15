@@ -35,6 +35,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           className={inputStyles}
           style={{ fontSize: 'var(--text-base)' }}
+          suppressHydrationWarning={true}
           {...props}
         />
         {error && (
