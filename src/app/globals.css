@@ -32,6 +32,15 @@
   
   /* Color Palette - Only used variables */
   --color-gray-400: #9CA3AF;
+  
+  /* Gradient Variables for Consistency */
+  --gradient-mystical: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #1a1a2e 100%);
+  --gradient-loading: linear-gradient(180deg, #1f2937 0%, #6b46c1 50%, #1f2937 100%);
+  --gradient-admin: linear-gradient(135deg, #581c87 0%, #1e3a8a 50%, #312e81 100%);
+  --gradient-button-primary: linear-gradient(to right, #9333ea, #3b82f6);
+  --gradient-button-secondary: linear-gradient(to right, #7c3aed, #1d4ed8);
+  --gradient-progress: linear-gradient(to right, #8b5cf6, #9333ea);
+  --gradient-dark-card: linear-gradient(to bottom, #000000, #1f2937);
 }
 
 /* Typography Classes */
@@ -221,13 +230,33 @@
 
 /* Main Layout Classes */
 .mystical-background {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 70%, #1a1a2e 100%);
+  background: var(--gradient-mystical);
   min-height: 100vh;
   position: relative;
   overflow: hidden;
   /* Performance optimizations */
   transform: translateZ(0); /* Force hardware acceleration */
   backface-visibility: hidden; /* Prevent flickering */
+}
+
+/* Loading Background - Used for loading states */
+.loading-background {
+  background: var(--gradient-loading);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Admin Background - Used for admin pages */
+.admin-background {
+  background: var(--gradient-admin);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .content-section {
@@ -304,6 +333,33 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
   }
+}
+
+/* Unified Button Styles */
+.btn-mystical-primary {
+  background: var(--gradient-button-primary);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
+}
+
+.btn-mystical-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+}
+
+.btn-mystical-secondary {
+  background: var(--gradient-button-secondary);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
+}
+
+.btn-mystical-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
 }
 
 /* Mobile Floating Buttons - Fixed to Screen Viewport */

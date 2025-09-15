@@ -44,7 +44,7 @@ export const StarBorder = React.forwardRef<HTMLButtonElement, StarBorderProps>(
             animationDuration: speed,
           }}
         />
-        <div className="relative z-1 bg-gradient-to-b from-black to-gray-900 border border-gray-800 text-white text-center text-[16px] py-[16px] px-[26px] rounded-[20px]">
+        <div className="relative z-1 border border-gray-800 text-white text-center text-[16px] py-[16px] px-[26px] rounded-[20px]" style={{ background: 'var(--gradient-dark-card)' }}>
           {children}
         </div>
       </Component>

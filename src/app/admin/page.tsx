@@ -217,7 +217,7 @@ export default function AdminPage() {
   // Show loading state during initialization to prevent hydration mismatch
   if (initializing) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="min-h-screen admin-background flex items-center justify-center p-4">
         <EnvironmentBadge />
         <div className="card-mystical max-w-md w-full p-8">
           <h1 className="text-2xl font-bold text-white text-center mb-8">
@@ -232,7 +232,7 @@ export default function AdminPage() {
   // Login form
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 flex items-center justify-center p-4">
+      <div className="min-h-screen admin-background flex items-center justify-center p-4">
         <EnvironmentBadge />
         <div className="card-mystical max-w-md w-full p-8">
           <h1 className="text-2xl font-bold text-white text-center mb-8">
@@ -270,7 +270,7 @@ export default function AdminPage() {
 
   // Admin dashboard
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 p-4">
+    <div className="min-h-screen admin-background p-4">
       <EnvironmentBadge />
       <div className="max-w-6xl mx-auto">
         <div className="card-mystical p-6 mb-6">

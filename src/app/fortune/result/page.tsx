@@ -135,7 +135,7 @@ function FortuneResultPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen loading-background text-white flex items-center justify-center">
         <div className="text-center">
           <LoadingAnimation size="medium" className="mx-auto mb-4" />
           <p className="text-gray-300">กำลังโหลด...</p>
@@ -146,7 +146,7 @@ function FortuneResultPageContent() {
 
   if (!fortune || !userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 text-white flex items-center justify-center">
+      <div className="min-h-screen loading-background text-white flex items-center justify-center">
         <div className="text-center">
           <LoadingAnimation size="medium" className="mx-auto mb-4" />
           <p className="text-red-400">เกิดข้อผิดพลาด</p>
@@ -308,7 +308,7 @@ function FortuneResultPageContent() {
 export default function FortuneResultPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center text-white">
+      <div className="min-h-screen loading-background flex items-center justify-center text-white">
         <div className="text-center">
           <LoadingAnimation size="medium" className="mx-auto mb-4" />
           <p className="text-gray-300">กำลังโหลด...</p>

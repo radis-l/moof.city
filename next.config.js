@@ -97,9 +97,34 @@ const nextConfig = {
 
     // Add performance hints
     config.performance = {
-      maxAssetSize: 400000, // 400KB (reasonable for current state)
-      maxEntrypointSize: 400000, // 400KB
+      maxAssetSize: 350000, // 350KB (target size)
+      maxEntrypointSize: 350000, // 350KB
       hints: process.env.NODE_ENV === 'production' ? 'warning' : false,
+    }
+
+    // Optimize chunks
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          cacheGroups: {
+            ...config.optimization.splitChunks.cacheGroups,
+            lottie: {
+              name: 'lottie',
+              chunks: 'all',
+              test: /[\\/]node_modules[\\/](lottie-react)[\\/]/,
+              priority: 30,
+            },
+            analytics: {
+              name: 'analytics',
+              chunks: 'all',
+              test: /[\\/]src[\\/]lib[\\/](analytics)[\\/]/,
+              priority: 25,
+            }
+          }
+        }
+      }
     }
 
     return config

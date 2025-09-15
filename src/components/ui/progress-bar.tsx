@@ -25,8 +25,9 @@ export const ProgressBar = ({ currentStep, totalSteps, className = '' }: Progres
       </div>
       <div className="w-full bg-gray-700/50 rounded-full h-3 backdrop-blur-sm">
         <div 
-          className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
+          className="h-3 rounded-full transition-all duration-500 ease-out shadow-lg"
           style={{ 
+            background: 'var(--gradient-progress)',
             width: `${progress}%`,
             boxShadow: '0 0 12px rgba(139, 92, 246, 0.4)'
           }}

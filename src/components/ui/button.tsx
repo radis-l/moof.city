@@ -18,16 +18,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const variants = {
       primary: `
-        bg-gradient-to-r from-purple-600 to-purple-700 
-        hover:from-purple-500 hover:to-purple-600
-        text-white shadow-lg hover:shadow-xl
+        btn-mystical-primary
         border border-purple-500/30 hover:border-purple-400/50
       `,
       secondary: `
-        bg-gray-700/50 hover:bg-gray-600/60 
-        backdrop-blur-sm text-white 
-        border border-gray-600/30 hover:border-gray-500/50
-        shadow-md hover:shadow-lg
+        btn-mystical-secondary
+        border border-purple-600/30 hover:border-purple-500/50
       `,
       outline: `
         border-2 border-gray-300 hover:border-gray-400
