@@ -44,37 +44,26 @@ export const LoadingAnimation = ({
     loadAnimation()
   }, [])
 
-  // Fallback loading spinner if Lottie isn't loaded yet
-  if (!LottieComponent || !animationData) {
-    return (
-      <div className={`${sizeClasses[size]} ${className} relative flex items-center justify-center`}>
-        <div className="animate-spin rounded-full h-full w-full border-2 border-purple-400 border-t-transparent opacity-75"></div>
-        
-        {/* Mystical glow effect */}
-        <div 
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%)',
-            filter: 'blur(8px)',
-            zIndex: -1
-          }}
-        />
-      </div>
-    )
-  }
-
   return (
     <div className={`${sizeClasses[size]} ${className} relative flex items-center justify-center`}>
-      <LottieComponent
-        animationData={animationData}
-        autoplay={true}
-        loop={true}
-        style={{
-          width: '100%',
-          height: '100%',
-          filter: 'drop-shadow(0 0 12px rgba(139, 92, 246, 0.4)) drop-shadow(0 0 24px rgba(139, 92, 246, 0.2))',
-        }}
-      />
+      {/* Show fallback spinner only while loading */}
+      {(!LottieComponent || !animationData) && (
+        <div className="animate-spin rounded-full h-full w-full border-2 border-purple-400 border-t-transparent opacity-75"></div>
+      )}
+      
+      {/* Show Lottie animation once loaded */}
+      {LottieComponent && animationData && (
+        <LottieComponent
+          animationData={animationData}
+          autoplay={true}
+          loop={true}
+          style={{
+            width: '100%',
+            height: '100%',
+            filter: 'drop-shadow(0 0 12px rgba(139, 92, 246, 0.4)) drop-shadow(0 0 24px rgba(139, 92, 246, 0.2))',
+          }}
+        />
+      )}
       
       {/* Mystical glow effect */}
       <div 
