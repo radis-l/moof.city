@@ -103,10 +103,7 @@ function FortuneResultPageContent() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          userData,
-          fortuneResult
-        })
+        body: JSON.stringify(userData)
       })
 
       const result = await response.json()
@@ -115,6 +112,11 @@ function FortuneResultPageContent() {
         console.warn('Failed to save fortune:', result.error)
         trackError('fortune_save_failed', result.error, 'result_page')
         // Don't show error to user, just log it
+      } else {
+        // Update fortune with the one returned from API (in case of any differences)
+        if (result.fortune) {
+          setFortune(result.fortune)
+        }
       }
     } catch (error) {
       console.error('Error saving fortune:', error)
