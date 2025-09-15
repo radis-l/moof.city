@@ -3,11 +3,11 @@ import { createClient } from '@supabase/supabase-js'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
 // Initialize Supabase (production) or use in-memory Map (development)
-const supabaseUrl = process.env.SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY
+const supabaseUrl = process.env.SUPABASE_URL || 'https://kqkjbavhplvbdvefachg.supabase.co'
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtxa2piYXZocGx2YmR2ZWZhY2hnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwNDgzNTQsImV4cCI6MjA3MTYyNDM1NH0.5ylvBeRBWMchdLB1EUuIXvllsG9rM5koFHtEAaWqXP4'
 const isProduction = process.env.NODE_ENV === 'production'
 
-const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Simple in-memory storage for development
 const devStorage = new Map<string, FortuneDataEntry>()
@@ -25,7 +25,7 @@ export const saveFortune = async (userData: UserData, fortuneResult: FortuneResu
 }> => {
   const timestamp = new Date().toISOString()
   
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const { data, error } = await supabase
         .from(FORTUNES_TABLE)
@@ -77,7 +77,7 @@ export const checkEmail = async (email: string): Promise<{
   fortune?: FortuneDataEntry
   message: string
 }> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const { data, error } = await supabase
         .from(FORTUNES_TABLE)
@@ -130,7 +130,7 @@ export const getAllFortunes = async (): Promise<{
   data: FortuneDataEntry[]
   message: string
 }> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const { data, error } = await supabase
         .from(FORTUNES_TABLE)
@@ -172,7 +172,7 @@ export const getAllFortunes = async (): Promise<{
 }
 
 export const deleteFortune = async (id: string): Promise<{ success: boolean; message: string }> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const { error } = await supabase.from(FORTUNES_TABLE).delete().eq('id', id)
       if (error) throw error
@@ -194,7 +194,7 @@ export const deleteFortune = async (id: string): Promise<{ success: boolean; mes
 }
 
 export const clearAllFortunes = async (): Promise<{ success: boolean; message: string }> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const { error } = await supabase.from(FORTUNES_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000')
       if (error) throw error
@@ -210,7 +210,7 @@ export const clearAllFortunes = async (): Promise<{ success: boolean; message: s
 }
 
 export const verifyAdminPassword = async (password: string): Promise<boolean> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       // Dynamic import bcrypt only when needed
       const bcrypt = await import('bcryptjs')
@@ -255,7 +255,7 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
 let devAdminPasswordHash: string | null = null
 
 export const changeAdminPassword = async (newPassword: string): Promise<boolean> => {
-  if (supabase && isProduction) {
+  if (isProduction) {
     try {
       const bcrypt = await import('bcryptjs')
       const passwordHash = await bcrypt.hash(newPassword, 12)
