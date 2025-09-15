@@ -78,7 +78,7 @@ export default function Home() {
   return (
     <MobileLayout>
       {/* Unified Hero Section */}
-      <main className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10">
+      <main className="flex flex-col items-center justify-center min-h-[80vh] px-6 relative z-10" suppressHydrationWarning={true}>
         <div className="w-full max-w-md text-center space-y-4">
           
           {/* Powered by MOOF - Top of page */}
