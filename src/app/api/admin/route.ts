@@ -10,31 +10,11 @@ import { getStorageMode, getEnvironmentInfo } from '@/lib/environment'
 // --- TYPES ---
 
 interface AdminActionBody {
-  action: 'login' | 'delete' | 'clear-all' | 'change-password' | 'test-db'
+  action: 'login' | 'delete' | 'clear-all' | 'change-password'
   password?: string
   id?: string
   currentPassword?: string
   newPassword?: string
-}
-
-// ... handlers
-async function handleTestDB() {
-  const env = getEnvironmentInfo()
-  try {
-    const result = await getAllFortunes()
-    return NextResponse.json({ 
-      success: true, 
-      storageMode: getStorageMode(),
-      hasKeys: env.hasSupabaseKeys,
-      recordCount: result.data?.length || 0,
-      message: result.message || 'Database connection successful'
-    })
-  } catch (error: unknown) {
-    return NextResponse.json({ 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Database test failed' 
-    })
-  }
 }
 
 // --- ACTION HANDLERS ---
@@ -131,7 +111,6 @@ export async function POST(request: NextRequest) {
       case 'delete': return await handleDelete(body)
       case 'clear-all': return await handleClearAll()
       case 'change-password': return await handleChangePassword(body)
-      case 'test-db': return await handleTestDB()
       default: return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 })
     }
   } catch (error: unknown) {

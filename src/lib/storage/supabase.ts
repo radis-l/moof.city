@@ -61,14 +61,13 @@ export const supabaseStorage = {
         .single()
 
       if (error) {
-        console.error(`Supabase error inserting into ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        console.error(`Supabase error inserting into ${FORTUNES_TABLE}:`, error.message)
         if (error.code === '23505') return { success: false, message: 'Email already exists' }
         throw error
       }
       return { success: true, message: 'Saved successfully', id: data.id }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Save failed'
-      console.error('Supabase save exception details:', error)
       return { success: false, message: msg }
     }
   },
@@ -108,13 +107,12 @@ export const supabaseStorage = {
         .order('generated_at', { ascending: false })
 
       if (error) {
-        console.error(`Supabase error fetching from ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        console.error(`Supabase error fetching from ${FORTUNES_TABLE}:`, error.message)
         throw error
       }
       return { success: true, data: data.map(mapRowToFortune), message: 'Retrieved successfully' }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Retrieval failed'
-      console.error('Supabase retrieval exception details:', error)
       return { success: false, data: [], message: msg }
     }
   },
@@ -129,7 +127,7 @@ export const supabaseStorage = {
         .select()
 
       if (error) {
-        console.error(`Supabase error deleting from ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        console.error(`Supabase error deleting from ${FORTUNES_TABLE}:`, error.message)
         throw error
       }
 
@@ -140,7 +138,6 @@ export const supabaseStorage = {
       return { success: true, message: 'Deleted successfully' }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Delete failed'
-      console.error('Supabase delete exception details:', error)
       return { success: false, message: msg }
     }
   },
@@ -154,13 +151,12 @@ export const supabaseStorage = {
         .select()
 
       if (error) {
-        console.error(`Supabase error clearing ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        console.error(`Supabase error clearing ${FORTUNES_TABLE}:`, error.message)
         throw error
       }
       return { success: true, message: `All data cleared (${data?.length || 0} records deleted)` }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Clear failed'
-      console.error('Supabase clear exception details:', error)
       return { success: false, message: msg }
     }
   },
