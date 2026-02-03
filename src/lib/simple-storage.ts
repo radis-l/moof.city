@@ -312,11 +312,15 @@ export const clearAllFortunes = async (): Promise<{ success: boolean; message: s
 }
 
 export const verifyAdminPassword = async (password: string): Promise<boolean> => {
+  // 1. Primary Check: Environment Variable (Unified across environments)
+  if (password === devAdminPassword) {
+    return true
+  }
+
+  // 2. Secondary Check: Database Hash (For dashboard-initiated changes)
   if (isProduction) {
     try {
-      // Dynamic import bcrypt only when needed
       const bcrypt = await import('bcryptjs')
-
       const { data, error } = await supabase
         .from(ADMIN_TABLE)
         .select('password_hash')
@@ -331,7 +335,7 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
     }
   }
 
-  // Development: SQLite admin check with bcrypt
+  // Development: SQLite admin check
   try {
     const bcrypt = await import('bcryptjs')
     const row = db!.prepare('SELECT password_hash FROM dev_admin_config WHERE id = ?').get('main') as { password_hash: string } | undefined
@@ -339,11 +343,9 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
     if (row) {
       return await bcrypt.compare(password, row.password_hash)
     }
-
-    // Fallback if no password set in DB yet
-    return password === devAdminPassword
+    return false
   } catch {
-    return password === devAdminPassword
+    return false
   }
 }
 
