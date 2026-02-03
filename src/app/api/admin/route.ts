@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/storage/hybrid-storage'
 import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded } from '@/lib/auth'
-import { getStorageMode } from '@/lib/environment'
+import { getStorageMode, getEnvironmentInfo } from '@/lib/environment'
 
 // --- TYPES ---
 
