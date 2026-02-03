@@ -17,8 +17,8 @@ interface DBFortuneRow {
 }
 
 // Initialize Supabase (production)
-const supabaseUrl = process.env.SUPABASE_URL || 'https://kqkjbavhplvbdvefachg.supabase.co'
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtxa2piYXZocGx2YmR2ZWZhY2hnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwNDgzNTQsImV4cCI6MjA3MTYyNDM1NH0.5ylvBeRBWMchdLB1EUuIXvllsG9rM5koFHtEAaWqXP4'
+const supabaseUrl = process.env.SUPABASE_URL || 'https://wbyjptteluydlesmqeva.supabase.co'
+const supabaseKey = process.env.SUPABASE_ANON_KEY || 'sb_publishable_BTfOlPHWFRMrht8_vLK_SQ_A4IwNVPc'
 const isProduction = process.env.NODE_ENV === 'production'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
