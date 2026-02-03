@@ -122,20 +122,30 @@ export const supabaseStorage = {
   async deleteFortune(id: string): Promise<{ success: boolean; message: string }> {
     try {
       const { error } = await supabase.from(FORTUNES_TABLE).delete().eq('id', id)
-      if (error) throw error
+      if (error) {
+        console.error(`Supabase error deleting from ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        throw error
+      }
       return { success: true, message: 'Deleted successfully' }
     } catch (error: unknown) {
-      return { success: false, message: error instanceof Error ? error.message : 'Delete failed' }
+      const msg = error instanceof Error ? error.message : 'Delete failed'
+      console.error('Supabase delete exception details:', error)
+      return { success: false, message: msg }
     }
   },
 
   async clearAllFortunes(): Promise<{ success: boolean; message: string }> {
     try {
       const { error } = await supabase.from(FORTUNES_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000')
-      if (error) throw error
+      if (error) {
+        console.error(`Supabase error clearing ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
+        throw error
+      }
       return { success: true, message: 'All data cleared' }
     } catch (error: unknown) {
-      return { success: false, message: error instanceof Error ? error.message : 'Clear failed' }
+      const msg = error instanceof Error ? error.message : 'Clear failed'
+      console.error('Supabase clear exception details:', error)
+      return { success: false, message: msg }
     }
   },
 

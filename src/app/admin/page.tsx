@@ -137,10 +137,10 @@ export default function AdminPage() {
         setData(prev => prev.filter(item => item.id !== id))
         setMessage('ลบข้อมูลสำเร็จ')
       } else {
-        setMessage('ลบข้อมูลไม่สำเร็จ')
+        setMessage(`ลบข้อมูลไม่สำเร็จ: ${result.error || result.message || 'ไม่ทราบสาเหตุ'}`)
       }
     } catch {
-      setMessage('เกิดข้อผิดพลาดในการลบข้อมูล')
+      setMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเพื่อลบข้อมูล')
     }
     setLoading(false)
   }
@@ -168,10 +168,10 @@ export default function AdminPage() {
         setData([])
         setMessage('ล้างข้อมูลทั้งหมดสำเร็จ')
       } else {
-        setMessage('ล้างข้อมูลไม่สำเร็จ')
+        setMessage(`ล้างข้อมูลไม่สำเร็จ: ${result.error || result.message || 'ไม่ทราบสาเหตุ'}`)
       }
     } catch {
-      setMessage('เกิดข้อผิดพลาดในการล้างข้อมูล')
+      setMessage('เกิดข้อผิดพลาดในการเชื่อมต่อเพื่อล้างข้อมูล')
     }
     setLoading(false)
   }
