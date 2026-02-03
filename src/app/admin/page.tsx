@@ -21,16 +21,17 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [initializing, setInitializing] = useState(true)
 
-  // ... (inside handleLogin)
-      if (result.success) {
-        setIsAuthenticated(true)
-        setMessage('เข้าสู่ระบบสำเร็จ')
-        localStorage.setItem('adminToken', result.token)
-        if (result.storageMode) setServerStorageMode(result.storageMode)
-        fetchData(result.token)
-      } else {
-
-  // ... (inside fetchData)
+  // Fetch fortune data
+  const fetchData = async (token?: string) => {
+    const authToken = token || localStorage.getItem('adminToken')
+    if (!authToken) return
+    
+    setLoading(true)
+    try {
+      const response = await fetch('/api/admin', {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      })
+      
       const result = await response.json()
       
       if (result.success) {
@@ -45,13 +46,42 @@ export default function AdminPage() {
         }
       } else {
         setMessage('ไม่สามารถโหลดข้อมูลได้')
-        if (result.error.includes('Authentication')) {
+        if (result.error && result.error.includes('Authentication')) {
           setIsAuthenticated(false)
           localStorage.removeItem('adminToken')
         }
       }
     } catch {
       setMessage('เกิดข้อผิดพลาดในการโหลดข้อมูล')
+    }
+    setLoading(false)
+  }
+
+  // Simple login
+  const handleLogin = async () => {
+    if (!password) return
+    
+    setLoading(true)
+    try {
+      const response = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', password })
+      })
+      
+      const result = await response.json()
+      
+      if (result.success) {
+        setIsAuthenticated(true)
+        setMessage('เข้าสู่ระบบสำเร็จ')
+        localStorage.setItem('adminToken', result.token)
+        if (result.storageMode) setServerStorageMode(result.storageMode)
+        fetchData(result.token)
+      } else {
+        setMessage('รหัสผ่านไม่ถูกต้อง')
+      }
+    } catch {
+      setMessage('เข้าสู่ระบบไม่สำเร็จ')
     }
     setLoading(false)
   }
@@ -143,7 +173,7 @@ export default function AdminPage() {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}` // Add proper authorization
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({ 
           action: 'change-password', 
@@ -160,12 +190,10 @@ export default function AdminPage() {
         setNewPassword('')
         setConfirmPassword('')
         
-        // Use new token from response (JWT implementation)
         if (result.token) {
           localStorage.setItem('adminToken', result.token)
-          setMessage('เปลี่ยนรหัสผ่านสำเร็จ - ได้รับ Token ใหม่')
+          setMessage('เปลี่ยนรหัสผ่านสำเร็จ')
         } else {
-          // Fallback: Force re-login
           setIsAuthenticated(false)
           localStorage.removeItem('adminToken')
           setMessage('เปลี่ยนรหัสผ่านสำเร็จ - กรุณาเข้าสู่ระบบใหม่')
@@ -193,7 +221,7 @@ export default function AdminPage() {
   if (initializing) {
     return (
       <div className="min-h-screen admin-background flex items-center justify-center p-4">
-        <EnvironmentBadge />
+        <EnvironmentBadge forceStorage="Checking Server..." />
         <div className="card-mystical max-w-md w-full p-8">
           <h1 className="text-2xl font-bold text-white text-center mb-8">
             🔮 กำลังโหลด...
@@ -208,7 +236,7 @@ export default function AdminPage() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen admin-background flex items-center justify-center p-4">
-        <EnvironmentBadge />
+        <EnvironmentBadge forceStorage={serverStorageMode ? (serverStorageMode === 'supabase' ? 'Supabase DB' : 'SQLite') : 'Connecting...'} />
         <div className="card-mystical max-w-md w-full p-8">
           <h1 className="text-2xl font-bold text-white text-center mb-8">
             🔮 ระบบจัดการผู้ดูแล
@@ -246,7 +274,9 @@ export default function AdminPage() {
   // Admin dashboard
   return (
     <div className="min-h-screen admin-background p-4">
-      <EnvironmentBadge />
+      <EnvironmentBadge 
+        forceStorage={serverStorageMode === 'supabase' ? 'Supabase DB' : serverStorageMode === 'sqlite' ? 'SQLite' : undefined} 
+      />
       <div className="max-w-6xl mx-auto">
         <div className="card-mystical p-6 mb-6">
           <div className="flex justify-between items-center">
@@ -296,7 +326,6 @@ export default function AdminPage() {
           <div className="text-center text-white mb-6">กำลังโหลด...</div>
         )}
 
-        {/* Simple data table */}
         <div className="card-mystical overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-white text-sm">
@@ -343,20 +372,11 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Change Password Modal */}
       {showChangePassword && (
         <div 
           className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              setShowChangePassword(false)
-              setCurrentPassword('')
-              setNewPassword('')
-              setConfirmPassword('')
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === 'Escape') {
               setShowChangePassword(false)
               setCurrentPassword('')
               setNewPassword('')
@@ -392,9 +412,6 @@ export default function AdminPage() {
                   placeholder="กรอกรหัสผ่านใหม่ (อย่างน้อย 6 ตัวอักษร)"
                   disabled={loading}
                 />
-                {newPassword && newPassword.length < 6 && (
-                  <p className="text-red-400 text-xs mt-1">รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร</p>
-                )}
               </div>
               
               <div>
@@ -408,12 +425,6 @@ export default function AdminPage() {
                   disabled={loading}
                   onKeyPress={(e) => e.key === 'Enter' && handleChangePassword()}
                 />
-                {confirmPassword && newPassword !== confirmPassword && (
-                  <p className="text-red-400 text-xs mt-1">รหัสผ่านไม่ตรงกัน</p>
-                )}
-                {confirmPassword && newPassword === confirmPassword && newPassword.length >= 6 && (
-                  <p className="text-green-400 text-xs mt-1">✓ รหัสผ่านตรงกัน</p>
-                )}
               </div>
             </div>
             

@@ -22,7 +22,12 @@ async function handleLogin(body: AdminActionBody) {
 
   const isValid = await verifyAdminPassword(password)
   if (isValid) {
-    return NextResponse.json({ success: true, message: 'Login successful', token: generateAdminToken() })
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Login successful', 
+      token: generateAdminToken(),
+      storageMode: getStorageMode()
+    })
   }
   return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 })
 }

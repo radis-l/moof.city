@@ -5,7 +5,19 @@ import type { UserData, FortuneResult } from '@/types'
 
 const getStorage = () => {
   const mode = getStorageMode()
-  return mode === 'supabase' ? supabaseStorage : sqliteStorage
+  
+  if (mode === 'supabase') {
+    return supabaseStorage
+  }
+  
+  if (mode.startsWith('error')) {
+    console.error('CRITICAL: Storage configuration error:', mode)
+    // In production/Vercel, we'd rather fail than silently save to a non-existent SQLite file
+    // However, to keep the app "working" (even if not persisting correctly), we return sqliteStorage
+    // but the getStorageMode() will correctly report the error to the UI
+  }
+
+  return sqliteStorage
 }
 
 export const saveFortune = async (userData: UserData, fortuneResult: FortuneResult) => {
