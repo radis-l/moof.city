@@ -27,20 +27,20 @@ export function EnvironmentBadge({ forceStorage, forceEnvironment }: Environment
   const displayEnvironment = forceEnvironment || envInfo.environment
   const displayStorage = forceStorage || envInfo.storage
   
-  // Update color based on storage
-  let badgeColor = envInfo.color
-  if (displayStorage.toLowerCase().includes('sqlite')) badgeColor = 'bg-blue-600'
-  if (displayStorage.toLowerCase().includes('supabase')) badgeColor = 'bg-green-600'
-  if (displayStorage.toLowerCase().includes('error')) badgeColor = 'bg-red-600'
+  // Update color based on storage - using subtle accents
+  let dotColor = 'bg-white/50'
+  if (displayStorage.toLowerCase().includes('sqlite')) dotColor = 'bg-blue-400'
+  if (displayStorage.toLowerCase().includes('supabase')) dotColor = 'bg-purple-400'
+  if (displayStorage.toLowerCase().includes('error')) dotColor = 'bg-rose-500'
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <div className={`${badgeColor} text-white px-3 py-2 rounded-lg text-xs font-medium shadow-lg transition-all duration-300 border border-white/20`}>
+    <div className="fixed bottom-4 right-4 z-50">
+      <div className="bg-white/5 backdrop-blur-md text-white/70 px-3 py-2 rounded-full text-[10px] font-medium border border-white/10 shadow-2xl transition-all duration-300">
         <div className="flex items-center space-x-2">
-          <div className={`w-2 h-2 bg-white rounded-full ${displayStorage.includes('...') ? 'animate-pulse' : ''}`}></div>
-          <div>
-            <div className="font-bold">{displayEnvironment}</div>
-            <div className="text-xs opacity-90">{displayStorage}</div>
+          <div className={`w-1.5 h-1.5 ${dotColor} rounded-full ${displayStorage.includes('...') ? 'animate-pulse' : ''} shadow-[0_0_8px_rgba(255,255,255,0.5)]`}></div>
+          <div className="flex space-x-1.5 divide-x divide-white/10">
+            <span className="uppercase tracking-widest opacity-60">{displayEnvironment}</span>
+            <span className="pl-1.5 opacity-80">{displayStorage}</span>
           </div>
         </div>
       </div>

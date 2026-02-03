@@ -249,12 +249,12 @@ export default function AdminPage() {
   if (initializing) {
     return (
       <div className="min-h-screen admin-background flex items-center justify-center p-4">
-        <EnvironmentBadge forceStorage="Checking Server..." />
-        <div className="card-mystical max-w-md w-full p-8">
-          <h1 className="text-2xl font-bold text-white text-center mb-8">
+        <div className="card-mystical max-w-md w-full p-8 text-center">
+          <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-6"></div>
+          <h1 className="text-xl font-bold text-white mb-2">
             🔮 กำลังโหลด...
           </h1>
-          <div className="text-center text-white/60">กำลังตรวจสอบสถานะการเข้าสู่ระบบ</div>
+          <div className="text-sm text-white/40 tracking-wider">SECURE CONNECTION</div>
         </div>
       </div>
     )
@@ -277,20 +277,20 @@ export default function AdminPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-              className="w-full"
+              className="w-full bg-white/5 border-white/10 text-center"
             />
             
             <Button 
               onClick={handleLogin}
               disabled={loading || !password}
-              className="w-full"
+              className="w-full btn-mystical-primary border-0"
             >
               {loading ? 'กำลังตรวจสอบ...' : 'เข้าสู่ระบบ'}
             </Button>
           </div>
           
           {message && (
-            <div className="mt-4 p-3 rounded-lg bg-black/20 text-white text-center text-sm">
+            <div className="mt-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-200 text-center text-xs">
               {message}
             </div>
           )}
@@ -307,60 +307,62 @@ export default function AdminPage() {
       />
       <div className="max-w-6xl mx-auto">
         <div className="card-mystical p-6 mb-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-2xl font-bold text-white">
-              🔮 ข้อมูลการทำนาย ({data.length} รายการ)
-              {serverStorageMode && (
-                <span className="ml-3 text-xs font-normal bg-white/10 px-2 py-1 rounded">
-                  Server Storage: {serverStorageMode}
-                </span>
-              )}
+              🔮 ข้อมูลการทำนาย ({data.length})
             </h1>
             
-            <div className="space-x-2">
-              <Button onClick={testDatabase} disabled={loading} className="bg-purple-600 hover:bg-purple-700">
-                ทดสอบ DB
+            <div className="flex flex-wrap gap-2">
+              <Button onClick={testDatabase} disabled={loading} size="sm" className="bg-purple-600/30 hover:bg-purple-600/50 text-xs border border-purple-500/30">
+                🛠 ทดสอบ DB
               </Button>
-              <Button onClick={() => fetchData()} disabled={loading} className="bg-blue-600 hover:bg-blue-700">
-                รีเฟรช
+              <Button onClick={() => fetchData()} disabled={loading} size="sm" className="bg-blue-600/30 hover:bg-blue-600/50 text-xs border border-blue-500/30">
+                🔄 รีเฟรช
               </Button>
-              <Button onClick={handleClearAll} disabled={loading} className="bg-red-600 hover:bg-red-700">
-                ล้างทั้งหมด
+              <Button onClick={handleClearAll} disabled={loading} size="sm" className="bg-red-600/30 hover:bg-red-600/50 text-xs border border-red-500/30">
+                🗑 ล้างทั้งหมด
               </Button>
-              <Button 
-                onClick={() => !isDevelopment && setShowChangePassword(true)} 
-                disabled={loading || isDevelopment} 
-                className={isDevelopment ? "bg-gray-500 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}
-              >
-                {isDevelopment ? '🔒 ล็อก (Dev)' : 'เปลี่ยนรหัสผ่าน'}
-              </Button>
+              {!isDevelopment && (
+                <Button 
+                  onClick={() => setShowChangePassword(true)} 
+                  disabled={loading} 
+                  size="sm"
+                  className="bg-yellow-600/30 hover:bg-yellow-600/50 text-xs border border-yellow-500/30 text-yellow-200"
+                >
+                  🔑 รหัสผ่าน
+                </Button>
+              )}
               <Button 
                 onClick={() => {
                   setIsAuthenticated(false)
                   localStorage.removeItem('adminToken')
                 }}
-                className="bg-gray-600 hover:bg-gray-700"
+                size="sm"
+                className="bg-white/5 hover:bg-white/10 text-xs border border-white/10"
               >
-                ออกจากระบบ
+                🚪 ออก
               </Button>
             </div>
           </div>
           
           {dbStatus && (
-            <div className={`mt-4 p-3 rounded-lg text-sm ${dbStatus.success ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
-              <div className="flex justify-between">
-                <span><strong>DB Test:</strong> {dbStatus.message}</span>
-                {hasKeys !== null && (
-                  <span className={hasKeys ? "text-green-400" : "text-red-400"}>
-                    Keys: {hasKeys ? "✅ Found" : "❌ Missing"}
-                  </span>
-                )}
+            <div className={`mt-4 p-3 rounded-lg text-xs backdrop-blur-sm border ${dbStatus.success ? 'bg-green-500/10 border-green-500/20 text-green-300' : 'bg-red-500/10 border-red-500/20 text-red-300'}`}>
+              <div className="flex justify-between items-center">
+                <span><strong>สถานะระบบ:</strong> {dbStatus.message}</span>
+                <div className="flex gap-3">
+                  {serverStorageMode && <span className="opacity-60">Storage: {serverStorageMode}</span>}
+                  {hasKeys !== null && (
+                    <span className={hasKeys ? "text-green-400" : "text-red-400"}>
+                      Keys: {hasKeys ? "Found" : "Missing"}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           )}
           
           {message && (
-            <div className="mt-4 p-3 rounded-lg bg-black/20 text-white text-sm">
+            <div className="mt-4 p-2 rounded bg-white/5 text-white/60 text-xs text-center border border-white/5">
               {message}
             </div>
           )}
@@ -386,20 +388,21 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {data.map((item, index) => (
-                  <tr key={item.id} className={index % 2 === 0 ? 'bg-black/10' : 'bg-black/20'}>
-                    <td className="p-3">{item.userData.email}</td>
-                    <td className="p-3">{item.userData.ageRange}</td>
-                    <td className="p-3">{item.userData.birthDay}</td>
-                    <td className="p-3">{item.userData.bloodGroup}</td>
-                    <td className="p-3 text-2xl font-bold text-yellow-400">
+                  <tr key={item.id} className={`${index % 2 === 0 ? 'bg-white/5' : 'bg-transparent'} border-b border-white/5 last:border-0 hover:bg-white/[0.08] transition-colors`}>
+                    <td className="p-4 font-medium">{item.userData.email}</td>
+                    <td className="p-4 opacity-70">{item.userData.ageRange}</td>
+                    <td className="p-4 opacity-70">{item.userData.birthDay}</td>
+                    <td className="p-4 opacity-70">{item.userData.bloodGroup}</td>
+                    <td className="p-4 text-xl font-bold text-purple-400">
                       {item.fortuneResult.luckyNumber}
                     </td>
-                    <td className="p-3">{new Date(item.timestamp).toLocaleDateString('th-TH')}</td>
-                    <td className="p-3 text-center">
+                    <td className="p-4 opacity-60 text-xs">{new Date(item.timestamp).toLocaleDateString('th-TH')}</td>
+                    <td className="p-4 text-center">
                       <Button
                         onClick={() => handleDelete(item.id)}
                         disabled={loading}
-                        className="bg-red-600 hover:bg-red-700 text-xs px-2 py-1"
+                        size="sm"
+                        className="bg-red-500/10 hover:bg-red-500/30 text-red-400 text-[10px] px-3 py-1 border border-red-500/20"
                       >
                         ลบ
                       </Button>
