@@ -4,9 +4,11 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { EnvironmentBadge } from '@/components/ui/environment-badge'
+import { getEnvironmentInfo } from '@/lib/environment'
 import type { FortuneDataEntry } from '@/types'
 
 export default function AdminPage() {
+  const { isDevelopment } = getEnvironmentInfo()
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [data, setData] = useState<FortuneDataEntry[]>([])
@@ -287,11 +289,11 @@ export default function AdminPage() {
                 ล้างทั้งหมด
               </Button>
               <Button 
-                onClick={() => setShowChangePassword(true)} 
-                disabled={loading} 
-                className="bg-yellow-600 hover:bg-yellow-700"
+                onClick={() => !isDevelopment && setShowChangePassword(true)} 
+                disabled={loading || isDevelopment} 
+                className={isDevelopment ? "bg-gray-500 cursor-not-allowed" : "bg-yellow-600 hover:bg-yellow-700"}
               >
-                เปลี่ยนรหัสผ่าน
+                {isDevelopment ? '🔒 ล็อก (Dev)' : 'เปลี่ยนรหัสผ่าน'}
               </Button>
               <Button 
                 onClick={() => {

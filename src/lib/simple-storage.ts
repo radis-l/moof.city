@@ -19,7 +19,6 @@ interface DBFortuneRow {
 
 // CONFIGURATION
 const isProduction = process.env.NODE_ENV === 'production'
-const devAdminPassword = process.env.ADMIN_PASSWORD || 'temp_dev_password_change_me'
 
 const FORTUNES_TABLE = isProduction ? 'prod_fortunes' : 'dev_fortunes'
 const ADMIN_TABLE = 'prod_admin_config'
@@ -41,11 +40,6 @@ if (!isProduction) {
         work TEXT,
         health TEXT,
         generated_at TEXT
-      );
-      CREATE TABLE IF NOT EXISTS dev_admin_config (
-        id TEXT PRIMARY KEY DEFAULT 'main',
-        password_hash TEXT,
-        updated_at TEXT
       );
     `)
   } catch (error) {
@@ -244,12 +238,12 @@ export const clearAllFortunes = async (): Promise<{ success: boolean; message: s
 
 // AUTH OPERATIONS
 export const verifyAdminPassword = async (password: string): Promise<boolean> => {
-  // 1. Root Fallback: Environment Variable (Emergency Access)
-  if (password === devAdminPassword) {
-    return true
+  // 1. Local Environment: Fixed password 'admin'
+  if (!isProduction) {
+    return password === 'admin'
   }
 
-  // 2. Global Master: Supabase Cloud (Primary Auth for all environments)
+  // 2. Production Environment: Dynamic Supabase Auth
   try {
     const bcrypt = await import('bcryptjs')
     const { data, error } = await supabase
@@ -264,32 +258,30 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
       if (match) return true
     }
   } catch (error) {
-    console.warn('Global auth check bypassed (offline?):', error)
+    console.warn('Production auth check failed:', error)
   }
 
-  // 3. Local Redundancy: SQLite (Backup for offline development)
-  if (!isProduction && db) {
-    try {
-      const bcrypt = await import('bcryptjs')
-      const row = db.prepare('SELECT password_hash FROM dev_admin_config WHERE id = ?').get('main') as { password_hash: string } | undefined
-      if (row && row.password_hash) {
-        return await bcrypt.compare(password, row.password_hash)
-      }
-    } catch {
-      return false
-    }
+  // 3. Root Fallback: Environment Variable (Emergency Access)
+  if (process.env.ADMIN_PASSWORD && password === process.env.ADMIN_PASSWORD) {
+    return true
   }
 
   return false
 }
 
 export const changeAdminPassword = async (newPassword: string): Promise<boolean> => {
+  // 1. Disable in Development
+  if (!isProduction) {
+    console.warn('Password change disabled in development mode')
+    return false
+  }
+
   try {
     const bcrypt = await import('bcryptjs')
     const passwordHash = await bcrypt.hash(newPassword, 12)
     const timestamp = new Date().toISOString()
 
-    // 1. Always update Supabase (The Global Source of Truth)
+    // 2. Update Supabase (The Global Source of Truth)
     const { error: supabaseError } = await supabase
       .from(ADMIN_TABLE)
       .upsert({
@@ -300,19 +292,6 @@ export const changeAdminPassword = async (newPassword: string): Promise<boolean>
 
     if (supabaseError) {
       console.error('Failed to sync password to Supabase:', supabaseError)
-    }
-
-    // 2. Also update local SQLite as a backup (Only in Dev)
-    if (!isProduction && db) {
-      try {
-        db.prepare(`
-          INSERT INTO dev_admin_config (id, password_hash, updated_at)
-          VALUES (?, ?, ?)
-          ON CONFLICT(id) DO UPDATE SET password_hash=excluded.password_hash, updated_at=excluded.updated_at
-        `).run('main', passwordHash, timestamp)
-      } catch (localError) {
-        console.error('Failed to update local password backup:', localError)
-      }
     }
 
     return !supabaseError
