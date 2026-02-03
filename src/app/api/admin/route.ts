@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/storage/hybrid-storage'
 import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded } from '@/lib/auth'
+import { getStorageMode } from '@/lib/environment'
 
 // --- TYPES ---
 
@@ -68,7 +69,10 @@ export async function GET(request: NextRequest) {
     if (!tokenPayload) return NextResponse.json({ success: false, error: 'Authentication required' }, { status: 401 })
 
     const result = await getAllFortunes()
-    const response = NextResponse.json(result)
+    const response = NextResponse.json({
+      ...result,
+      storageMode: getStorageMode()
+    })
 
     const newToken = refreshTokenIfNeeded(tokenPayload)
     if (newToken) response.headers.set('X-New-Token', newToken)

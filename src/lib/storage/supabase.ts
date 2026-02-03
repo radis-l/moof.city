@@ -61,12 +61,15 @@ export const supabaseStorage = {
         .single()
 
       if (error) {
+        console.error(`Supabase error inserting into ${FORTUNES_TABLE}:`, error)
         if (error.code === '23505') return { success: false, message: 'Email already exists' }
         throw error
       }
       return { success: true, message: 'Saved successfully', id: data.id }
     } catch (error: unknown) {
-      return { success: false, message: error instanceof Error ? error.message : 'Save failed' }
+      const msg = error instanceof Error ? error.message : 'Save failed'
+      console.error('Supabase save exception:', msg)
+      return { success: false, message: msg }
     }
   },
 
@@ -104,10 +107,15 @@ export const supabaseStorage = {
         .select('*')
         .order('generated_at', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        console.error(`Supabase error fetching from ${FORTUNES_TABLE}:`, error)
+        throw error
+      }
       return { success: true, data: data.map(mapRowToFortune), message: 'Retrieved successfully' }
     } catch (error: unknown) {
-      return { success: false, data: [], message: error instanceof Error ? error.message : 'Retrieval failed' }
+      const msg = error instanceof Error ? error.message : 'Retrieval failed'
+      console.error('Supabase retrieval exception:', msg)
+      return { success: false, data: [], message: msg }
     }
   },
 

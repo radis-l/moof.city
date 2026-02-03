@@ -49,10 +49,11 @@ export const validateEnvironment = () => {
 
 export const getStorageMode = () => {
   const env = getEnvironmentInfo()
+  const forceSupabase = process.env.USE_SUPABASE_PRIMARY === 'true'
 
-  if (env.isProduction && env.hasSupabaseKeys) {
+  if ((env.isProduction || forceSupabase) && env.hasSupabaseKeys) {
     return 'supabase'
-  } else if (env.isDevelopment) {
+  } else if (env.isDevelopment && !forceSupabase) {
     return 'sqlite'
   } else {
     return 'fallback'

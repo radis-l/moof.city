@@ -12,6 +12,7 @@ export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [data, setData] = useState<FortuneDataEntry[]>([])
+  const [serverStorageMode, setServerStorageMode] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -20,49 +21,21 @@ export default function AdminPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [initializing, setInitializing] = useState(true)
 
-  // Simple login
-  const handleLogin = async () => {
-    if (!password) return
-    
-    setLoading(true)
-    try {
-      const response = await fetch('/api/admin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'login', password })
-      })
-      
-      const result = await response.json()
-      
+  // ... (inside handleLogin)
       if (result.success) {
         setIsAuthenticated(true)
         setMessage('เข้าสู่ระบบสำเร็จ')
         localStorage.setItem('adminToken', result.token)
+        if (result.storageMode) setServerStorageMode(result.storageMode)
         fetchData(result.token)
       } else {
-        setMessage('รหัสผ่านไม่ถูกต้อง')
-      }
-    } catch {
-      setMessage('เข้าสู่ระบบไม่สำเร็จ')
-    }
-    setLoading(false)
-  }
 
-  // Fetch fortune data
-  const fetchData = async (token?: string) => {
-    const authToken = token || localStorage.getItem('adminToken')
-    if (!authToken) return
-    
-    setLoading(true)
-    try {
-      const response = await fetch('/api/admin', {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      })
-      
+  // ... (inside fetchData)
       const result = await response.json()
       
       if (result.success) {
         setData(result.data)
+        if (result.storageMode) setServerStorageMode(result.storageMode)
         setMessage(`พบข้อมูล ${result.data.length} รายการ`)
         
         // Handle token refresh
@@ -279,6 +252,11 @@ export default function AdminPage() {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold text-white">
               🔮 ข้อมูลการทำนาย ({data.length} รายการ)
+              {serverStorageMode && (
+                <span className="ml-3 text-xs font-normal bg-white/10 px-2 py-1 rounded">
+                  Server Storage: {serverStorageMode}
+                </span>
+              )}
             </h1>
             
             <div className="space-x-2">
