@@ -62,13 +62,13 @@ function FortunePageContent() {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1)
       trackFormProgress('questionnaire', currentStep + 1, totalSteps)
-      
+
       // Track specific page views for each step
       const stepPageNames = {
         2: '03_question_birthday_selection',
         3: '04_question_bloodgroup_selection'
       }
-      
+
       const pageName = stepPageNames[currentStep + 1 as keyof typeof stepPageNames]
       if (pageName) {
         trackPageView(pageName, 'new_user')
@@ -94,10 +94,10 @@ function FortunePageContent() {
       birthDay,
       bloodGroup
     }
-    
+
     const completionTime = Math.round((Date.now() - startTime) / 1000);
     trackQuestionnaireComplete(completionTime)
-    
+
     // Store in URL params for now (later we'll use Google Sheets)
     const params = new URLSearchParams(formData as Record<string, string>)
     router.push(`/fortune/result?${params.toString()}`)
@@ -109,9 +109,9 @@ function FortunePageContent() {
         return (
           <div className="text-center space-y-3">
             <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
-              <h2 
+              <h2
                 className="font-heading text-white font-bold"
-                style={{ 
+                style={{
                   fontSize: 'var(--text-2xl)',
                   marginBottom: 'var(--space-1)',
                   textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
@@ -119,7 +119,7 @@ function FortunePageContent() {
               >
                 คุณอายุเท่าไหร่?
               </h2>
-              <p 
+              <p
                 className="font-body text-gray-400"
                 style={{ fontSize: 'var(--text-sm)' }}
               >
@@ -139,9 +139,9 @@ function FortunePageContent() {
         return (
           <div className="text-center space-y-3">
             <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
-              <h2 
+              <h2
                 className="font-heading text-white font-bold"
-                style={{ 
+                style={{
                   fontSize: 'var(--text-2xl)',
                   marginBottom: 'var(--space-1)',
                   textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
@@ -149,7 +149,7 @@ function FortunePageContent() {
               >
                 คุณเกิดวันไหน?
               </h2>
-              <p 
+              <p
                 className="font-body text-gray-400"
                 style={{ fontSize: 'var(--text-sm)' }}
               >
@@ -169,9 +169,9 @@ function FortunePageContent() {
         return (
           <div className="text-center space-y-3">
             <div style={{ marginBottom: 'var(--space-2)', paddingTop: '16px' }}>
-              <h2 
+              <h2
                 className="font-heading text-white font-bold"
-                style={{ 
+                style={{
                   fontSize: 'var(--text-2xl)',
                   marginBottom: 'var(--space-1)',
                   textShadow: '0 2px 12px rgba(139, 92, 246, 0.2)'
@@ -179,7 +179,7 @@ function FortunePageContent() {
               >
                 กรุ๊ปเลือดคุณคืออะไร?
               </h2>
-              <p 
+              <p
                 className="font-body text-gray-400"
                 style={{ fontSize: 'var(--text-sm)' }}
               >
@@ -208,15 +208,15 @@ function FortunePageContent() {
       }
 
       try {
-        const response = await fetch(`/api/storage/check-email?email=${encodeURIComponent(email)}`)
+        const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
         const result = await response.json()
-        
+
         if (result.success && result.exists) {
           // Email already exists, redirect to results
           router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
           return
         }
-        
+
         // Email doesn't exist, allow questionnaire
         trackPageView('02_question_age_selection', 'new_user')
         trackQuestionnaireStart()
@@ -283,7 +283,7 @@ function FortunePageContent() {
             >
               {currentStep === 1 ? 'กลับ' : 'ย้อนกลับ'}
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={handleNext}
