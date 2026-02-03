@@ -72,7 +72,7 @@ Built with modern web technologies for optimal performance:
 - **React 19.1.1** - Latest React with improved performance
 - **TypeScript 5.x** - Type-safe development with latest features
 - **Tailwind CSS 4.0** - Modern styling framework
-- **Vercel KV** - Redis database for production storage
+- **Supabase** - PostgreSQL database for production storage
 - **bcrypt** - Secure password hashing for admin system
 - **Mobile-Exclusive Design** - Optimized specifically for smartphones
 - **Multi-Font System** - MuseoModerno logo, Kanit body, Maitree headings
@@ -115,7 +115,7 @@ MOOF is optimized for production deployment with recent performance improvements
 - **Mobile Performance** - Lighthouse score optimized for mobile devices
 - **Admin Dashboard** - Secure analytics and data management (`/admin`)
 - **Database-Based Auth** - Password storage persists across deployments
-- **Hybrid Storage** - JSON files (dev) + Vercel KV (production)
+- **Hybrid Storage** - SQLite (dev) + Supabase (production)
 - **Auto-Scaling** - Handles traffic spikes with Vercel infrastructure
 - **Production-Ready Logging** - Console output optimized for production environments
 - **Utility Functions** - Reusable timestamp parsing and date utilities
