@@ -1,19 +1,60 @@
-// Simple Storage - Replace entire hybrid system with one clean file
+// Simple Storage - Upgrade to persistent SQLite for local development
 import { createClient } from '@supabase/supabase-js'
+import Database from 'better-sqlite3'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
-// Initialize Supabase (production) or use in-memory Map (development)
+interface DBFortuneRow {
+  id: string
+  email: string
+  age_range: string
+  birth_day: string
+  blood_group: string
+  lucky_number: number
+  relationship: string
+  work: string
+  health: string
+  generated_at: string
+}
+
+// Initialize Supabase (production)
 const supabaseUrl = process.env.SUPABASE_URL || 'https://kqkjbavhplvbdvefachg.supabase.co'
 const supabaseKey = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtxa2piYXZocGx2YmR2ZWZhY2hnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYwNDgzNTQsImV4cCI6MjA3MTYyNDM1NH0.5ylvBeRBWMchdLB1EUuIXvllsG9rM5koFHtEAaWqXP4'
 const isProduction = process.env.NODE_ENV === 'production'
 
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Simple in-memory storage for development
-const devStorage = new Map<string, FortuneDataEntry>()
+// Persistent SQLite for local development
+let db: Database.Database | null = null
+if (!isProduction) {
+  try {
+    db = new Database('./data/local.db')
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS dev_fortunes (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE,
+        age_range TEXT,
+        birth_day TEXT,
+        blood_group TEXT,
+        lucky_number INTEGER,
+        relationship TEXT,
+        work TEXT,
+        health TEXT,
+        generated_at TEXT
+      );
+      CREATE TABLE IF NOT EXISTS dev_admin_config (
+        id TEXT PRIMARY KEY DEFAULT 'main',
+        password_hash TEXT,
+        updated_at TEXT
+      );
+    `)
+  } catch (error) {
+    console.error('Failed to initialize SQLite database:', error)
+  }
+}
+
 const devAdminPassword = process.env.ADMIN_PASSWORD || 'temp_dev_password_change_me'
 
-// Simple table name
+// Table names
 const FORTUNES_TABLE = isProduction ? 'prod_fortunes' : 'dev_fortunes'
 const ADMIN_TABLE = isProduction ? 'prod_admin_config' : 'dev_admin_config'
 
@@ -24,7 +65,7 @@ export const saveFortune = async (userData: UserData, fortuneResult: FortuneResu
   id?: string
 }> => {
   const timestamp = new Date().toISOString()
-  
+
   if (isProduction) {
     try {
       const { data, error } = await supabase
@@ -54,21 +95,35 @@ export const saveFortune = async (userData: UserData, fortuneResult: FortuneResu
     }
   }
 
-  // Development: in-memory storage
-  if (devStorage.has(userData.email)) {
-    return { success: false, message: 'Email already exists' }
-  }
+  // Development: persistent SQLite
+  try {
+    const id = `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const insert = db!.prepare(`
+      INSERT INTO dev_fortunes (id, email, age_range, birth_day, blood_group, lucky_number, relationship, work, health, generated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `)
 
-  const id = `dev_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-  const entry: FortuneDataEntry = {
-    id,
-    userData,
-    fortuneResult: { ...fortuneResult, generatedAt: timestamp },
-    timestamp
+    insert.run(
+      id,
+      userData.email,
+      userData.ageRange,
+      userData.birthDay,
+      userData.bloodGroup,
+      fortuneResult.luckyNumber,
+      fortuneResult.relationship,
+      fortuneResult.work,
+      fortuneResult.health,
+      timestamp
+    )
+
+    return { success: true, message: 'Saved successfully', id }
+  } catch (error: unknown) {
+    const err = error as { code?: string; message?: string }
+    if (err.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      return { success: false, message: 'Email already exists' }
+    }
+    return { success: false, message: err.message || 'SQLite Save failed' }
   }
-  
-  devStorage.set(userData.email, entry)
-  return { success: true, message: 'Saved successfully', id }
 }
 
 export const checkEmail = async (email: string): Promise<{
@@ -114,13 +169,36 @@ export const checkEmail = async (email: string): Promise<{
     }
   }
 
-  // Development: check in-memory storage
-  const fortune = devStorage.get(email)
-  return {
-    success: true,
-    exists: !!fortune,
-    fortune,
-    message: fortune ? 'Email found' : 'Email not found'
+  // Development: SQLite check
+  try {
+    const row = db!.prepare('SELECT * FROM dev_fortunes WHERE email = ?').get(email) as DBFortuneRow | undefined
+
+    if (!row) {
+      return { success: true, exists: false, message: 'Email not found' }
+    }
+
+    const fortune: FortuneDataEntry = {
+      id: row.id,
+      userData: {
+        email: row.email,
+        ageRange: row.age_range,
+        birthDay: row.birth_day,
+        bloodGroup: row.blood_group
+      },
+      fortuneResult: {
+        luckyNumber: row.lucky_number,
+        relationship: row.relationship,
+        work: row.work,
+        health: row.health,
+        generatedAt: row.generated_at
+      },
+      timestamp: row.generated_at
+    }
+
+    return { success: true, exists: true, fortune, message: 'Email found' }
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return { success: false, exists: false, message: err.message || 'SQLite check failed' }
   }
 }
 
@@ -163,11 +241,31 @@ export const getAllFortunes = async (): Promise<{
     }
   }
 
-  // Development: return in-memory data
-  return {
-    success: true,
-    data: Array.from(devStorage.values()),
-    message: 'Retrieved successfully'
+  // Development: SQLite retrieval
+  try {
+    const rows = db!.prepare('SELECT * FROM dev_fortunes ORDER BY generated_at DESC').all() as DBFortuneRow[]
+    const formattedData: FortuneDataEntry[] = rows.map((row) => ({
+      id: row.id,
+      userData: {
+        email: row.email,
+        ageRange: row.age_range,
+        birthDay: row.birth_day,
+        bloodGroup: row.blood_group
+      },
+      fortuneResult: {
+        luckyNumber: row.lucky_number,
+        relationship: row.relationship,
+        work: row.work,
+        health: row.health,
+        generatedAt: row.generated_at
+      },
+      timestamp: row.generated_at
+    }))
+
+    return { success: true, data: formattedData, message: 'Retrieved successfully' }
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return { success: false, data: [], message: err.message || 'SQLite retrieval failed' }
   }
 }
 
@@ -182,15 +280,14 @@ export const deleteFortune = async (id: string): Promise<{ success: boolean; mes
     }
   }
 
-  // Development: find and delete from in-memory storage
-  for (const [email, entry] of devStorage) {
-    if (entry.id === id) {
-      devStorage.delete(email)
-      return { success: true, message: 'Deleted successfully' }
-    }
+  // Development: SQLite delete
+  try {
+    db!.prepare('DELETE FROM dev_fortunes WHERE id = ?').run(id)
+    return { success: true, message: 'Deleted successfully' }
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return { success: false, message: err.message || 'SQLite delete failed' }
   }
-  
-  return { success: false, message: 'Entry not found' }
 }
 
 export const clearAllFortunes = async (): Promise<{ success: boolean; message: string }> => {
@@ -204,9 +301,14 @@ export const clearAllFortunes = async (): Promise<{ success: boolean; message: s
     }
   }
 
-  // Development: clear in-memory storage
-  devStorage.clear()
-  return { success: true, message: 'All data cleared' }
+  // Development: SQLite clear
+  try {
+    db!.prepare('DELETE FROM dev_fortunes').run()
+    return { success: true, message: 'All data cleared' }
+  } catch (error: unknown) {
+    const err = error as { message?: string }
+    return { success: false, message: err.message || 'SQLite clear failed' }
+  }
 }
 
 export const verifyAdminPassword = async (password: string): Promise<boolean> => {
@@ -214,7 +316,7 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
     try {
       // Dynamic import bcrypt only when needed
       const bcrypt = await import('bcryptjs')
-      
+
       const { data, error } = await supabase
         .from(ADMIN_TABLE)
         .select('password_hash')
@@ -229,40 +331,31 @@ export const verifyAdminPassword = async (password: string): Promise<boolean> =>
     }
   }
 
-  // Development: use bcrypt hashing for security consistency
+  // Development: SQLite admin check with bcrypt
   try {
     const bcrypt = await import('bcryptjs')
-    
-    // First check if there's a hashed password stored in memory (from password changes)
-    if (devAdminPasswordHash) {
-      return await bcrypt.compare(password, devAdminPasswordHash)
+    const row = db!.prepare('SELECT password_hash FROM dev_admin_config WHERE id = ?').get('main') as { password_hash: string } | undefined
+
+    if (row) {
+      return await bcrypt.compare(password, row.password_hash)
     }
-    
-    // Check if devAdminPassword is already hashed (starts with $2)
-    if (devAdminPassword.startsWith('$2')) {
-      return await bcrypt.compare(password, devAdminPassword)
-    } else {
-      // Plain text comparison (for backward compatibility during transition)
-      return password === devAdminPassword
-    }
+
+    // Fallback if no password set in DB yet
+    return password === devAdminPassword
   } catch {
-    // Fallback to plain text if bcrypt fails
     return password === devAdminPassword
   }
 }
-
-// In-memory development password storage (hashed)
-let devAdminPasswordHash: string | null = null
 
 export const changeAdminPassword = async (newPassword: string): Promise<boolean> => {
   if (isProduction) {
     try {
       const bcrypt = await import('bcryptjs')
       const passwordHash = await bcrypt.hash(newPassword, 12)
-      
+
       // Clear existing and insert new
       await supabase.from(ADMIN_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000')
-      
+
       const { error } = await supabase.from(ADMIN_TABLE).insert([{
         password_hash: passwordHash,
         updated_at: new Date().toISOString()
@@ -274,12 +367,21 @@ export const changeAdminPassword = async (newPassword: string): Promise<boolean>
     }
   }
 
-  // Development: hash and store in memory
+  // Development: SQLite password update
   try {
     const bcrypt = await import('bcryptjs')
-    devAdminPasswordHash = await bcrypt.hash(newPassword, 12)
+    const passwordHash = await bcrypt.hash(newPassword, 12)
+    const timestamp = new Date().toISOString()
+
+    db!.prepare(`
+      INSERT INTO dev_admin_config (id, password_hash, updated_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(id) DO UPDATE SET password_hash=excluded.password_hash, updated_at=excluded.updated_at
+    `).run('main', passwordHash, timestamp)
+
     return true
-  } catch {
+  } catch (error) {
+    console.error('SQLite password change failed:', error)
     return false
   }
 }
