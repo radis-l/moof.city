@@ -1,5 +1,8 @@
 // Consolidated Fortune API - handles both email checking and fortune saving
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
 import { generateFortune } from '@/lib/fortune-generator'
 import { checkEmail, saveFortune } from '@/lib/storage/hybrid-storage'
 import type { UserData } from '@/types'

@@ -1,5 +1,8 @@
 // Consolidated Admin API - handles login, data retrieval, and basic admin operations
 import { NextRequest, NextResponse } from 'next/server'
+
+export const dynamic = 'force-dynamic'
+
 import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/storage/hybrid-storage'
 import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded } from '@/lib/auth'
 import { getStorageMode } from '@/lib/environment'
@@ -7,11 +10,31 @@ import { getStorageMode } from '@/lib/environment'
 // --- TYPES ---
 
 interface AdminActionBody {
-  action: 'login' | 'delete' | 'clear-all' | 'change-password'
+  action: 'login' | 'delete' | 'clear-all' | 'change-password' | 'test-db'
   password?: string
   id?: string
   currentPassword?: string
   newPassword?: string
+}
+
+// ... handlers
+async function handleTestDB() {
+  const env = getEnvironmentInfo()
+  try {
+    const result = await getAllFortunes()
+    return NextResponse.json({ 
+      success: true, 
+      storageMode: getStorageMode(),
+      hasKeys: env.hasSupabaseKeys,
+      recordCount: result.data?.length || 0,
+      message: result.message || 'Database connection successful'
+    })
+  } catch (error: unknown) {
+    return NextResponse.json({ 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Database test failed' 
+    })
+  }
 }
 
 // --- ACTION HANDLERS ---
@@ -108,6 +131,7 @@ export async function POST(request: NextRequest) {
       case 'delete': return await handleDelete(body)
       case 'clear-all': return await handleClearAll()
       case 'change-password': return await handleChangePassword(body)
+      case 'test-db': return await handleTestDB()
       default: return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 })
     }
   } catch (error: unknown) {

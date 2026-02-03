@@ -13,6 +13,8 @@ export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [data, setData] = useState<FortuneDataEntry[]>([])
   const [serverStorageMode, setServerStorageMode] = useState<string>('')
+  const [hasKeys, setHasKeys] = useState<boolean | null>(null)
+  const [dbStatus, setDbStatus] = useState<{success: boolean, message: string} | null>(null)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -82,6 +84,32 @@ export default function AdminPage() {
       }
     } catch {
       setMessage('เข้าสู่ระบบไม่สำเร็จ')
+    }
+    setLoading(false)
+  }
+
+  // Test Database Connection
+  const testDatabase = async () => {
+    const authToken = localStorage.getItem('adminToken')
+    setLoading(true)
+    setDbStatus(null)
+    
+    try {
+      const response = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
+        },
+        body: JSON.stringify({ action: 'test-db' })
+      })
+      
+      const result = await response.json()
+      setDbStatus({ success: result.success, message: result.message || result.error || 'Connection tested' })
+      if (result.success && result.storageMode) setServerStorageMode(result.storageMode)
+      if (result.hasKeys !== undefined) setHasKeys(result.hasKeys)
+    } catch {
+      setDbStatus({ success: false, message: 'Failed to reach diagnostic API' })
     }
     setLoading(false)
   }
@@ -290,6 +318,9 @@ export default function AdminPage() {
             </h1>
             
             <div className="space-x-2">
+              <Button onClick={testDatabase} disabled={loading} className="bg-purple-600 hover:bg-purple-700">
+                ทดสอบ DB
+              </Button>
               <Button onClick={() => fetchData()} disabled={loading} className="bg-blue-600 hover:bg-blue-700">
                 รีเฟรช
               </Button>
@@ -314,6 +345,19 @@ export default function AdminPage() {
               </Button>
             </div>
           </div>
+          
+          {dbStatus && (
+            <div className={`mt-4 p-3 rounded-lg text-sm ${dbStatus.success ? 'bg-green-500/20 text-green-300' : 'bg-red-500/20 text-red-300'}`}>
+              <div className="flex justify-between">
+                <span><strong>DB Test:</strong> {dbStatus.message}</span>
+                {hasKeys !== null && (
+                  <span className={hasKeys ? "text-green-400" : "text-red-400"}>
+                    Keys: {hasKeys ? "✅ Found" : "❌ Missing"}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
           
           {message && (
             <div className="mt-4 p-3 rounded-lg bg-black/20 text-white text-sm">
