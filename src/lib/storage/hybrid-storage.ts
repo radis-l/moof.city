@@ -10,11 +10,11 @@ const getStorage = () => {
     return supabaseStorage
   }
   
+  // Strict check: If we're on Vercel/Production but Supabase is not ready,
+  // do NOT fall back to SQLite (which is temporary and misleading).
+  // Instead, the getStorageMode() error will be visible in the Admin UI.
   if (mode.startsWith('error')) {
-    console.error('CRITICAL: Storage configuration error:', mode)
-    // In production/Vercel, we'd rather fail than silently save to a non-existent SQLite file
-    // However, to keep the app "working" (even if not persisting correctly), we return sqliteStorage
-    // but the getStorageMode() will correctly report the error to the UI
+    console.error('CRITICAL: Storage configuration error. Supabase keys missing in production.')
   }
 
   return sqliteStorage
