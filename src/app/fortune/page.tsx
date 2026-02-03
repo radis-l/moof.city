@@ -208,7 +208,9 @@ function FortunePageContent() {
       }
 
       try {
-        const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
+        const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`, {
+          cache: 'no-store'
+        })
         const result = await response.json()
 
         if (result.success && result.exists) {

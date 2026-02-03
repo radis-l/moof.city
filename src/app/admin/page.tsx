@@ -31,7 +31,8 @@ export default function AdminPage() {
     setLoading(true)
     try {
       const response = await fetch('/api/admin', {
-        headers: { 'Authorization': `Bearer ${authToken}` }
+        headers: { 'Authorization': `Bearer ${authToken}` },
+        cache: 'no-store'
       })
       
       const result = await response.json()

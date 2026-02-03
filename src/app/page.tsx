@@ -43,8 +43,10 @@ export default function Home() {
     }
     
     try {
-      // Check if email already exists
-      const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
+      // Check if email already exists - using no-store to ensure we get fresh data after deletions
+      const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`, {
+        cache: 'no-store'
+      })
       const result = await response.json()
       
       if (result.success) {
