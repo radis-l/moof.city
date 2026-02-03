@@ -121,11 +121,22 @@ export const supabaseStorage = {
 
   async deleteFortune(id: string): Promise<{ success: boolean; message: string }> {
     try {
-      const { error } = await supabase.from(FORTUNES_TABLE).delete().eq('id', id)
+      // Use .select() to confirm if a row was actually deleted
+      const { data, error } = await supabase
+        .from(FORTUNES_TABLE)
+        .delete()
+        .eq('id', id)
+        .select()
+
       if (error) {
         console.error(`Supabase error deleting from ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
         throw error
       }
+
+      if (!data || data.length === 0) {
+        return { success: false, message: 'ไม่พบข้อมูลที่ต้องการลบ (No record found to delete)' }
+      }
+
       return { success: true, message: 'Deleted successfully' }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Delete failed'
@@ -136,12 +147,17 @@ export const supabaseStorage = {
 
   async clearAllFortunes(): Promise<{ success: boolean; message: string }> {
     try {
-      const { error } = await supabase.from(FORTUNES_TABLE).delete().neq('id', '00000000-0000-0000-0000-000000000000')
+      const { data, error } = await supabase
+        .from(FORTUNES_TABLE)
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000')
+        .select()
+
       if (error) {
         console.error(`Supabase error clearing ${FORTUNES_TABLE}:`, JSON.stringify(error, null, 2))
         throw error
       }
-      return { success: true, message: 'All data cleared' }
+      return { success: true, message: `All data cleared (${data?.length || 0} records deleted)` }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Clear failed'
       console.error('Supabase clear exception details:', error)
