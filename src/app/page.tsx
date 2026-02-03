@@ -47,14 +47,22 @@ export default function Home() {
       const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
       const result = await response.json()
       
-      if (result.success && result.exists) {
-        // Email exists, show existing fortune result
-        trackEmailSubmission(false, email)
-        router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
+      if (result.success) {
+        if (result.exists) {
+          // Email exists, show existing fortune result
+          trackEmailSubmission(false, email)
+          router.push(`/fortune/result?existing=true&email=${encodeURIComponent(email)}`)
+          return // Stop here
+        } else {
+          // Email doesn't exist, start new questionnaire
+          trackEmailSubmission(true, email)
+          router.push(`/fortune?email=${encodeURIComponent(email)}`)
+          return // Stop here
+        }
       } else {
-        // Email doesn't exist, start new questionnaire
-        trackEmailSubmission(true, email)
-        router.push(`/fortune?email=${encodeURIComponent(email)}`)
+        // API reported an error (e.g., DB connection issue)
+        console.error('API Error:', result.error)
+        setEmailError(`เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล: ${result.error || 'กรุณาลองใหม่อีกครั้ง'}`)
       }
     } catch (error) {
       console.error('Error checking email:', error)
