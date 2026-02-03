@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getEnvironmentBadge } from '@/lib/environment'
 
 export function EnvironmentBadge() {
   const [mounted, setMounted] = useState(false)
@@ -26,13 +27,8 @@ export function EnvironmentBadge() {
     )
   }
 
-  // Client-side environment detection
-  const isDev = process.env.NODE_ENV !== 'production'
-  const envInfo = {
-    environment: isDev ? 'Development' : 'Production',
-    storage: isDev ? 'In-Memory' : 'Supabase DB',
-    color: isDev ? 'bg-blue-600' : 'bg-green-600'
-  }
+  // Use centralized environment detection
+  const envInfo = getEnvironmentBadge()
 
   return (
     <div className="fixed top-4 right-4 z-50">

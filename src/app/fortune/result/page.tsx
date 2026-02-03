@@ -88,14 +88,14 @@ function FortuneResultPageContent() {
       // Save to storage only once
       if (!saveAttempted.current) {
         saveAttempted.current = true
-        saveFortune(user, generatedFortune)
+        saveFortune(user)
       } else {
         setLoading(false)
       }
     }
   }, [searchParams, router, loadExistingFortune])
 
-  const saveFortune = async (userData: UserData, _fortuneResult: FortuneResult) => {
+  const saveFortune = async (userData: UserData) => {
     setSaving(true)
     try {
       const response = await fetch('/api/fortune', {
