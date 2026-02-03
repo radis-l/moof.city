@@ -1,6 +1,6 @@
 // Consolidated Admin API - handles login, data retrieval, and basic admin operations
 import { NextRequest, NextResponse } from 'next/server'
-import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/simple-storage'
+import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/storage/hybrid-storage'
 import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded } from '@/lib/auth'
 
 // --- TYPES ---

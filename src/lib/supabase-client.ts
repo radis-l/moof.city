@@ -1,6 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = process.env.SUPABASE_URL || 'https://wbyjptteluydlesmqeva.supabase.co'
-const supabaseKey = process.env.SUPABASE_ANON_KEY || 'sb_publishable_BTfOlPHWFRMrht8_vLK_SQ_A4IwNVPc'
+const supabaseUrl = process.env.SUPABASE_URL || ''
+const supabaseKey = process.env.SUPABASE_ANON_KEY || ''
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Export a dummy client if keys are missing to prevent build-time crashes
+// The app logic ensures Supabase is only used when keys are present
+export const supabase = (supabaseUrl && supabaseKey)
+  ? createClient(supabaseUrl, supabaseKey)
+  : createClient('https://placeholder.supabase.co', 'placeholder')

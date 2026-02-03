@@ -1,7 +1,7 @@
 // Consolidated Fortune API - handles both email checking and fortune saving
 import { NextRequest, NextResponse } from 'next/server'
 import { generateFortune } from '@/lib/fortune-generator'
-import { checkEmail, saveFortune } from '@/lib/simple-storage'
+import { checkEmail, saveFortune } from '@/lib/storage/hybrid-storage'
 import type { UserData } from '@/types'
 
 // GET: Check if email exists and return existing fortune

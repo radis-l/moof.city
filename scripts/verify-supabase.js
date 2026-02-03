@@ -5,7 +5,7 @@ async function verifyTables() {
     console.log('🔍 Checking Supabase connection...\n')
 
     // Check prod_fortunes table
-    const { data: fortunes, error: fortunesError } = await supabase
+    const { error: fortunesError } = await supabase
         .from('prod_fortunes')
         .select('*')
         .limit(1)
@@ -17,7 +17,7 @@ async function verifyTables() {
     }
 
     // Check prod_admin_config table
-    const { data: admin, error: adminError } = await supabase
+    const { error: adminError } = await supabase
         .from('prod_admin_config')
         .select('*')
         .limit(1)
@@ -29,7 +29,7 @@ async function verifyTables() {
     }
 
     console.log('\n📊 Summary:')
-    console.log('- Supabase URL:', process.env.SUPABASE_URL || 'https://wbyjptteluydlesmqeva.supabase.co')
+    console.log('- Supabase URL:', process.env.SUPABASE_URL || 'Not set')
     console.log('- Connection:', fortunesError && adminError ? '❌ Failed' : '✅ Success')
 }
 

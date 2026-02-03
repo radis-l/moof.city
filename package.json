@@ -10,8 +10,7 @@
     "type-check": "tsc --noEmit",
     "test:utils": "vitest tests/utils-only.spec.ts",
     "test:essential": "npm run build && npm run lint && npm run type-check",
-    "analyze": "ANALYZE=true npm run build",
-    "push-auto": "node scripts/push-automation.js"
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.1",
