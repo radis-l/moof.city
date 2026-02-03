@@ -54,16 +54,21 @@ export const getStorageMode = () => {
   const env = getEnvironmentInfo()
   const forceSupabase = process.env.USE_SUPABASE_PRIMARY === 'true'
 
-  // On Vercel, we MUST use Supabase or everything will fail/not persist
-  if (env.isVercel || env.isProduction || forceSupabase) {
+  // 1. Explicitly forced via Env Var
+  if (forceSupabase && env.hasSupabaseKeys) {
+    return 'supabase'
+  }
+
+  // 2. Production/Vercel - MUST use Supabase
+  if (env.isProduction || env.isVercel) {
     if (env.hasSupabaseKeys) {
       return 'supabase'
     }
-    // If on Vercel but keys are missing, we're in a broken state
+    // If we're on the server and keys are missing, it's an error
     return env.isClient ? 'checking...' : 'error-missing-keys'
   }
   
-  // Local development
+  // 3. Local Development - Default to SQLite
   return 'sqlite'
 }
 
