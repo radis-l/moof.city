@@ -1,6 +1,6 @@
-# CLAUDE.md - AI Operating Manual
+# PROJECT_RULES.md - AI Operating Manual
 
-> **Optimized for Claude Code AI Context Usage** - Quick reference for maximum efficiency
+> **Optimized for AI Agent Context Usage** - Quick reference for maximum efficiency
 
 ## 🎯 Quick Reference
 

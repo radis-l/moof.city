@@ -23,7 +23,7 @@ function FortuneResultPageContent() {
     try {
       const response = await fetch(`/api/fortune?email=${encodeURIComponent(email)}`)
       const result = await response.json()
-      
+
       if (result.success && result.exists && result.fortune) {
         setUserData(result.fortune.userData)
         setFortune(result.fortune.fortuneResult)
@@ -75,16 +75,16 @@ function FortuneResultPageContent() {
       }
 
       setUserData(user)
-      
+
       // Generate fortune
       const generatedFortune = generateFortune(user)
       setFortune(generatedFortune)
-      
+
       trackPageView('05_result_fortune_new', 'new_user')
       trackResultView(true, 'new_fortune')
       trackFortuneGeneration({ age: user.ageRange, bloodGroup: user.bloodGroup, birthDay: user.birthDay })
       trackConversion('fortune_complete', 1)
-      
+
       // Save to storage only once
       if (!saveAttempted.current) {
         saveAttempted.current = true
@@ -95,7 +95,7 @@ function FortuneResultPageContent() {
     }
   }, [searchParams, router, loadExistingFortune])
 
-  const saveFortune = async (userData: UserData, fortuneResult: FortuneResult) => {
+  const saveFortune = async (userData: UserData, _fortuneResult: FortuneResult) => {
     setSaving(true)
     try {
       const response = await fetch('/api/fortune', {
@@ -107,7 +107,7 @@ function FortuneResultPageContent() {
       })
 
       const result = await response.json()
-      
+
       if (!result.success) {
         console.warn('Failed to save fortune:', result.error)
         trackError('fortune_save_failed', result.error, 'result_page')
@@ -167,9 +167,9 @@ function FortuneResultPageContent() {
 
             {/* Header - Title */}
             <div className="text-center mb-2">
-              <h1 
+              <h1
                 className="font-heading text-white font-bold"
-                style={{ 
+                style={{
                   fontSize: 'var(--text-3xl)',
                   textShadow: '0 4px 20px rgba(139, 92, 246, 0.3)'
                 }}
@@ -198,13 +198,13 @@ function FortuneResultPageContent() {
 
             {/* Lucky Number */}
             <div className="card-mystical text-center">
-              <h2 
+              <h2
                 className="font-heading text-white font-bold mb-4"
                 style={{ fontSize: 'var(--text-xl)' }}
               >
-  เลขนำโชค
+                เลขนำโชค
               </h2>
-              <div 
+              <div
                 className="text-white font-heading font-bold"
                 style={{ fontSize: '4rem', lineHeight: '1' }}
                 data-testid="fortune-numbers"
@@ -217,13 +217,13 @@ function FortuneResultPageContent() {
             <div className="card-mystical">
               {/* Relationship */}
               <div className="mb-6">
-                <h3 
+                <h3
                   className="font-heading font-bold mb-3 text-pink-300 flex items-center gap-2"
                   style={{ fontSize: 'var(--text-lg)' }}
                 >
                   💝 เรื่องรัก
                 </h3>
-                <p 
+                <p
                   className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
                   style={{ fontSize: 'var(--text-sm)' }}
                 >
@@ -236,13 +236,13 @@ function FortuneResultPageContent() {
 
               {/* Work */}
               <div className="mb-6">
-                <h3 
+                <h3
                   className="font-heading font-bold mb-3 text-blue-300 flex items-center gap-2"
                   style={{ fontSize: 'var(--text-lg)' }}
                 >
                   💼 การงาน
                 </h3>
-                <p 
+                <p
                   className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
                   style={{ fontSize: 'var(--text-sm)' }}
                 >
@@ -255,19 +255,19 @@ function FortuneResultPageContent() {
 
               {/* Health */}
               <div>
-                <h3 
+                <h3
                   className="font-heading font-bold mb-3 text-green-300 flex items-center gap-2"
                   style={{ fontSize: 'var(--text-lg)' }}
                 >
                   🏥 สุขภาพ
                 </h3>
-                <p 
+                <p
                   className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
                   style={{ fontSize: 'var(--text-sm)' }}
                 >
                   {fortune.health}
                 </p>
-                </div>
+              </div>
             </div>
 
             {/* Bottom padding for floating button */}
@@ -276,7 +276,7 @@ function FortuneResultPageContent() {
             {/* Saving Status */}
             {saving && (
               <div className="text-center">
-                <p 
+                <p
                   className="font-body text-gray-400"
                   style={{ fontSize: 'var(--text-xs)' }}
                 >
