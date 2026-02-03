@@ -17,6 +17,9 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
 
+  // Turbopack configuration
+  turbopack: {},
+
   // Server external packages (moved from experimental)
   serverExternalPackages: ['better-sqlite3'],
 
