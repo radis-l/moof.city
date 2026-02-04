@@ -151,9 +151,9 @@ export function useFortuneData(): UseFortuneDataReturn {
     fetchData(1, limit)
   }
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     await fetchData(currentPage, itemsPerPage)
-  }
+  }, [fetchData, currentPage, itemsPerPage])
 
   return {
     fortunes,

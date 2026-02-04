@@ -148,11 +148,6 @@ export default function AdminPage() {
         {/* Analytics */}
         {fortunes.length > 0 && <AnalyticsPanel stats={stats} />}
 
-        {/* Loading indicator */}
-        {dataLoading && (
-          <div className="text-center text-white mb-6">กำลังโหลด...</div>
-        )}
-
         {/* Data table */}
         <FortuneTable
           fortunes={fortunes}
