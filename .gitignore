@@ -46,7 +46,9 @@ Thumbs.db
 *~
 
 # Data directory (contains sensitive user data and admin credentials)
-data/
+# Note: src/data/ contains application data (fortune messages) and SHOULD be committed
+/data/
+!/src/data/
 
 # Logs
 logs
