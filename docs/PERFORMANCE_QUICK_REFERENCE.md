@@ -215,7 +215,6 @@ npm run analyze  # Visual bundle analysis
 ## 📚 Documentation
 
 - **Full Guide:** `/docs/PERFORMANCE_MONITORING.md`
-- **Sprint Summary:** `/docs/PERFORMANCE_SPRINT_SUMMARY.md`
 - **Quick Reference:** This file
 
 ---
