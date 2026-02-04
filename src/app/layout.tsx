@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/react';
 // Removed over-engineered performance monitor
 
 const kanit = Kanit({
@@ -66,6 +68,12 @@ export default function RootLayout({
             />
           </>
         )}
+        
+        {/* Vercel Speed Insights - Free tier, production only */}
+        {process.env.NODE_ENV === 'production' && <SpeedInsights />}
+        
+        {/* Vercel Analytics - Free tier, production only */}
+        {process.env.NODE_ENV === 'production' && <Analytics />}
         
       </body>
     </html>

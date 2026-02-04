@@ -20,21 +20,33 @@ export default function AdminPage() {
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [initializing, setInitializing] = useState(true)
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage, setItemsPerPage] = useState(50)
+  const [totalCount, setTotalCount] = useState(0)
+  const [jumpToPage, setJumpToPage] = useState('')
 
-  // Fetch fortune data
-  const fetchData = async () => {
+  // Calculate total pages
+  const totalPages = Math.ceil(totalCount / itemsPerPage)
+
+  // Fetch fortune data with pagination
+  const fetchData = async (page = currentPage, limit = itemsPerPage) => {
     setLoading(true)
     try {
-      const response = await fetch('/api/admin', {
-        cache: 'no-store'
-      })
+      const offset = (page - 1) * limit
+      const response = await fetch(
+        `/api/admin?limit=${limit}&offset=${offset}&orderBy=generated_at&order=desc`,
+        { cache: 'no-store' }
+      )
       
       const result = await response.json()
       
       if (result.success) {
         setData(result.data)
+        setTotalCount(result.count || 0)
         if (result.storageMode) setServerStorageMode(result.storageMode)
-        setMessage(`พบข้อมูล ${result.data.length} รายการ`)
+        setMessage(`แสดง ${result.data.length} รายการ จากทั้งหมด ${result.count || 0} รายการ`)
         setIsAuthenticated(true)
       } else {
         setMessage('ไม่สามารถโหลดข้อมูลได้')
@@ -198,6 +210,28 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  // Pagination handlers
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage)
+      fetchData(newPage, itemsPerPage)
+    }
+  }
+
+  const handleItemsPerPageChange = (newLimit: number) => {
+    setItemsPerPage(newLimit)
+    setCurrentPage(1) // Reset to first page
+    fetchData(1, newLimit)
+  }
+
+  const handleJumpToPage = () => {
+    const pageNum = parseInt(jumpToPage, 10)
+    if (pageNum && pageNum >= 1 && pageNum <= totalPages) {
+      handlePageChange(pageNum)
+      setJumpToPage('')
+    }
+  }
+
   // Check if already logged in on mount
   useEffect(() => {
     fetchData()
@@ -262,9 +296,31 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen admin-background p-4">
       <EnvironmentBadge 
-        forceStorage={serverStorageMode === 'supabase' ? 'Supabase DB' : serverStorageMode === 'sqlite' ? 'SQLite' : undefined} 
+        forceStorage={serverStorageMode === 'supabase' ? 'Supabase DB' : serverStorageMode === 'sqlite' ? 'SQLite' : undefined}
+        showPerformance={true}
       />
       <div className="max-w-6xl mx-auto">
+        {/* Performance Monitoring Info */}
+        <div className="card-mystical p-4 mb-4 border border-blue-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">📊</span>
+              <div>
+                <h3 className="text-sm font-semibold text-white">Performance Monitoring</h3>
+                <p className="text-xs text-white/60">View real-time performance metrics on Vercel</p>
+              </div>
+            </div>
+            <a 
+              href="https://vercel.com/analytics" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/30 rounded-lg text-xs text-white transition-all"
+            >
+              Open Analytics →
+            </a>
+          </div>
+        </div>
+        
         <div className="card-mystical p-6 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <h1 className="text-2xl font-bold text-white">
@@ -354,6 +410,83 @@ export default function AdminPage() {
             )}
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        {data.length > 0 && (
+          <div className="card-mystical p-4 mt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Page Navigation */}
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={loading || currentPage === 1}
+                  size="sm"
+                  className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/30 text-xs px-3"
+                >
+                  ← ก่อนหน้า
+                </Button>
+                
+                <div className="text-white text-sm px-3">
+                  หน้า <span className="font-bold text-purple-400">{currentPage}</span> / {totalPages}
+                </div>
+                
+                <Button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={loading || currentPage === totalPages}
+                  size="sm"
+                  className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500/30 text-xs px-3"
+                >
+                  ถัดไป →
+                </Button>
+              </div>
+
+              {/* Jump to Page */}
+              <div className="flex items-center gap-2">
+                <span className="text-white/60 text-xs">ไปที่หน้า:</span>
+                <Input
+                  type="number"
+                  min="1"
+                  max={totalPages}
+                  value={jumpToPage}
+                  onChange={(e) => setJumpToPage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleJumpToPage()}
+                  placeholder={`1-${totalPages}`}
+                  className="w-20 h-8 text-xs bg-white/5 border-white/10 text-center"
+                  disabled={loading}
+                />
+                <Button
+                  onClick={handleJumpToPage}
+                  disabled={loading || !jumpToPage}
+                  size="sm"
+                  className="bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500/30 text-xs px-3"
+                >
+                  ไป
+                </Button>
+              </div>
+
+              {/* Items per Page Selector */}
+              <div className="flex items-center gap-2">
+                <span className="text-white/60 text-xs">แสดง:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(parseInt(e.target.value, 10))}
+                  disabled={loading}
+                  className="h-8 px-2 text-xs bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors"
+                >
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span className="text-white/60 text-xs">รายการ/หน้า</span>
+              </div>
+            </div>
+
+            {/* Total Count Display */}
+            <div className="text-center text-white/40 text-xs mt-3 pt-3 border-t border-white/5">
+              ทั้งหมด {totalCount.toLocaleString()} รายการ
+            </div>
+          </div>
+        )}
       </div>
 
       {showChangePassword && (

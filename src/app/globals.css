@@ -123,7 +123,7 @@
   width: 450px;
   height: 450px;
   background: radial-gradient(circle, rgba(167, 139, 250, 0.6) 0%, rgba(139, 92, 246, 0.4) 40%, rgba(124, 58, 237, 0.25) 70%, transparent 100%);
-  filter: blur(60px);
+  filter: blur(45px); /* Reduced from 60px for better performance */
   top: 10%;
   left: -10%;
   animation-delay: 0s;
@@ -133,7 +133,7 @@
   width: 550px;
   height: 550px;
   background: radial-gradient(circle, rgba(139, 92, 246, 0.65) 0%, rgba(124, 58, 237, 0.45) 40%, rgba(109, 40, 217, 0.28) 70%, transparent 100%);
-  filter: blur(80px);
+  filter: blur(50px); /* Reduced from 80px for better performance */
   top: 40%;
   right: -15%;
   animation-delay: -10s;
@@ -143,7 +143,7 @@
   width: 400px;
   height: 400px;
   background: radial-gradient(circle, rgba(124, 58, 237, 0.5) 0%, rgba(109, 40, 217, 0.32) 50%, rgba(88, 28, 135, 0.18) 80%, transparent 100%);
-  filter: blur(70px);
+  filter: blur(45px); /* Reduced from 70px for better performance */
   bottom: 15%;
   left: 15%;
   animation-delay: -20s;
@@ -153,7 +153,7 @@
   width: 350px;
   height: 350px;
   background: radial-gradient(circle, rgba(167, 139, 250, 0.45) 0%, rgba(139, 92, 246, 0.28) 60%, rgba(124, 58, 237, 0.15) 90%, transparent 100%);
-  filter: blur(50px);
+  filter: blur(40px); /* Reduced from 50px for better performance */
   top: 70%;
   right: 20%;
   animation-delay: -25s;
@@ -379,4 +379,97 @@
 .floating-button-bg {
   padding: 20px !important;
   /* Remove all background and shadow effects for pure floating look */
+}
+
+/* ===================================================================
+   PERFORMANCE OPTIMIZATIONS - Added for Phase 1-2 Performance Sprint
+   =================================================================== */
+
+/* Reduced Motion Support - Accessibility & Performance */
+@media (prefers-reduced-motion: reduce) {
+  .gradient-sphere,
+  .particle,
+  .mystical-glow,
+  .mystical-glow::before,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  /* Completely disable mystical animations for reduced motion */
+  .gradient-sphere {
+    animation: none !important;
+  }
+  
+  .particle {
+    animation: none !important;
+    opacity: 0.5 !important;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: none; }
+  }
+  
+  @keyframes mysticalPulse {
+    0%, 100% { opacity: 0; }
+  }
+}
+
+/* Low-End Mobile Device Optimizations */
+@media (max-width: 640px) and (max-resolution: 1dppx) {
+  /* Reduce gradient sphere effects on low-DPI mobile devices */
+  .gradient-sphere {
+    opacity: 0.3 !important;
+    filter: blur(30px) !important;
+  }
+  
+  /* Simplify particles on low-end devices */
+  .particle {
+    opacity: 0.4 !important;
+  }
+  
+  /* Reduce blur on particle effects */
+  .particle-small {
+    filter: blur(0.1px) !important;
+    box-shadow: 0 0 4px rgba(139, 92, 246, 0.6) !important;
+  }
+  
+  .particle-medium {
+    filter: blur(0.3px) !important;
+    box-shadow: 0 0 8px rgba(167, 139, 250, 0.5) !important;
+  }
+  
+  .particle-large {
+    filter: blur(0.5px) !important;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.4) !important;
+  }
+}
+
+/* High Performance Mode - For devices with high refresh rate */
+@media (min-resolution: 2dppx) and (min-width: 1024px) {
+  /* Enable smoother animations on capable devices */
+  .gradient-sphere,
+  .particle,
+  .mystical-glow {
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Force GPU acceleration on all animated elements */
+.gradient-sphere,
+.particle,
+.mystical-glow,
+.card-mystical {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize backdrop-filter for better performance */
+.card-mystical,
+.admin-card-mobile {
+  will-change: transform, opacity;
+  /* Use CSS containment for performance */
+  contain: layout style paint;
 }

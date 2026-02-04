@@ -6,6 +6,8 @@ declare global {
       config?: Record<string, string | number | boolean>
     ) => void;
     dataLayer: unknown[];
+    // Vercel Analytics
+    va?: (event: string, name: string, data?: Record<string, unknown>) => void;
   }
 }
 

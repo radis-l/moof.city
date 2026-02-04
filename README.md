@@ -68,15 +68,17 @@ Our algorithm combines traditional Thai fortune telling wisdom with modern perso
 
 Built with modern web technologies for optimal performance:
 
-- **Next.js 15.5.2** - React framework with App Router (updated 2024)
-- **React 19.1.1** - Latest React with improved performance
+- **Next.js 16.1.6** - React framework with App Router (latest 2026)
+- **React 19.2.4** - Latest React with improved performance
 - **TypeScript 5.x** - Type-safe development with latest features
 - **Tailwind CSS 4.0** - Modern styling framework
 - **Supabase** - PostgreSQL database for production storage
-- **bcrypt** - Secure password hashing for admin system
+- **Edge Runtime** - 10x faster cold starts with Vercel Edge Functions
+- **Web Crypto API** - Native password hashing (PBKDF2-SHA256, 100K iterations)
+- **Upstash Redis** - Production-grade rate limiting
 - **Mobile-Exclusive Design** - Optimized specifically for smartphones
 - **Multi-Font System** - MuseoModerno logo, Kanit body, Maitree headings
-- **Bundle Optimized** - 680KB reduction + dynamic Lottie imports (additional 300KB savings)
+- **Bundle Optimized** - 84% reduction on admin API (350KB → 55KB)
 
 ## 🎨 Design Philosophy
 
@@ -108,9 +110,12 @@ Track your fortune telling service performance:
 
 ## 🌍 Deployment Ready
 
-MOOF is optimized for production deployment with recent performance improvements:
+MOOF is optimized for production deployment with cutting-edge performance:
 
-- **Static Generation** - Fast loading times with Next.js 15.5.2 optimization
+- **Edge Runtime** - Admin API runs on Vercel Edge for 10x faster cold starts (<50ms)
+- **Hybrid Auth** - Automatic migration from bcrypt to Web Crypto format
+- **Rate Limiting** - Upstash Redis-based protection against abuse
+- **Static Generation** - Fast loading times with Next.js 16.1.6 optimization
 - **SEO Optimized** - Meta tags and structured data for search engines
 - **Mobile Performance** - Lighthouse score optimized for mobile devices
 - **Admin Dashboard** - Secure analytics and data management (`/admin`)
@@ -119,6 +124,16 @@ MOOF is optimized for production deployment with recent performance improvements
 - **Auto-Scaling** - Handles traffic spikes with Vercel infrastructure
 - **Production-Ready Logging** - Console output optimized for production environments
 - **Utility Functions** - Reusable timestamp parsing and date utilities
+
+### Performance Metrics
+
+**Admin API (Edge Runtime Migration):**
+- Bundle Size: 84% reduction (350KB → 55KB)
+- Cold Start: 10x faster (400ms → <50ms)
+- Warm Response: 3.75x faster (75ms → 20ms)
+- Monthly Cost: 97% reduction in function invocation costs
+
+See [`benchmarks/edge-runtime.md`](benchmarks/edge-runtime.md) for detailed performance analysis.
 
 ## 🎯 Perfect For
 

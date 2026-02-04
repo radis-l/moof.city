@@ -15,6 +15,14 @@ interface DBFortuneRow {
   generated_at: string
 }
 
+// PAGINATION OPTIONS INTERFACE (matching Supabase)
+export interface PaginationOptions {
+  limit?: number                               // จำนวนรายการต่อหน้า (Default: 50)
+  offset?: number                              // เริ่มต้นจากตำแหน่งที่ (Default: 0)
+  orderBy?: 'generated_at' | 'email'          // เรียงตาม (Default: 'generated_at')
+  order?: 'asc' | 'desc'                      // ทิศทางการเรียง (Default: 'desc')
+}
+
 let db: Database.Database | null = null
 
 const initDB = () => {
@@ -119,20 +127,45 @@ export const sqliteStorage = {
     }
   },
 
-  async getAllFortunes(): Promise<{
+  async getAllFortunes(options?: PaginationOptions): Promise<{
     success: boolean
     data: FortuneDataEntry[]
+    count: number | null
     message: string
   }> {
     const db = initDB()
-    if (!db) return { success: false, data: [], message: 'Database not initialized' }
+    if (!db) return { success: false, data: [], count: 0, message: 'Database not initialized' }
+
+    // Set defaults for pagination (matching Supabase implementation)
+    const limit = options?.limit ?? 50
+    const offset = options?.offset ?? 0
+    const orderBy = options?.orderBy ?? 'generated_at'
+    const order = options?.order ?? 'desc'
 
     try {
-      const rows = db.prepare('SELECT * FROM dev_fortunes ORDER BY generated_at DESC').all() as DBFortuneRow[]
-      return { success: true, data: rows.map(mapRowToFortune), message: 'Retrieved successfully' }
+      // Get total count for pagination
+      const countRow = db.prepare('SELECT COUNT(*) as total FROM dev_fortunes').get() as { total: number }
+      const totalCount = countRow.total
+
+      // Build dynamic SQL query with pagination
+      const orderDirection = order.toUpperCase()
+      const query = `
+        SELECT * FROM dev_fortunes 
+        ORDER BY ${orderBy} ${orderDirection}
+        LIMIT ? OFFSET ?
+      `
+      
+      const rows = db.prepare(query).all(limit, offset) as DBFortuneRow[]
+      
+      return { 
+        success: true, 
+        data: rows.map(mapRowToFortune), 
+        count: totalCount,
+        message: 'Retrieved successfully' 
+      }
     } catch (error: unknown) {
       const err = error as { message?: string }
-      return { success: false, data: [], message: err.message || 'SQLite retrieval failed' }
+      return { success: false, data: [], count: 0, message: err.message || 'SQLite retrieval failed' }
     }
   },
 
