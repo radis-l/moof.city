@@ -2,18 +2,36 @@
 
 import { useEffect, useState } from 'react'
 import { getEnvironmentBadge } from '@/lib/environment'
+import { getCurrentWebVitals } from '@/lib/web-vitals'
+import { getPerformanceGrade } from '@/lib/performance'
 
 interface EnvironmentBadgeProps {
   forceStorage?: string;
   forceEnvironment?: string;
+  showPerformance?: boolean;
 }
 
-export function EnvironmentBadge({ forceStorage, forceEnvironment }: EnvironmentBadgeProps) {
+export function EnvironmentBadge({ forceStorage, forceEnvironment, showPerformance = false }: EnvironmentBadgeProps) {
   const [mounted, setMounted] = useState(false)
+  const [performanceGrade, setPerformanceGrade] = useState<string>('')
 
   useEffect(() => {
     setMounted(true)
-  }, [])
+    
+    // Get performance grade if requested
+    if (showPerformance) {
+      getCurrentWebVitals().then((vitals) => {
+        const grade = getPerformanceGrade({
+          lcp: vitals.LCP,
+          fid: vitals.FID,
+          cls: vitals.CLS,
+        })
+        setPerformanceGrade(grade)
+      }).catch(() => {
+        // Ignore errors
+      })
+    }
+  }, [showPerformance])
 
   // Prevent hydration mismatch by not rendering until mounted
   if (!mounted) {
@@ -41,6 +59,9 @@ export function EnvironmentBadge({ forceStorage, forceEnvironment }: Environment
           <div className="flex space-x-1.5 divide-x divide-white/10">
             <span className="uppercase tracking-widest opacity-60">{displayEnvironment}</span>
             <span className="pl-1.5 opacity-80">{displayStorage}</span>
+            {showPerformance && performanceGrade && (
+              <span className="pl-1.5 opacity-80">Perf: {performanceGrade}</span>
+            )}
           </div>
         </div>
       </div>

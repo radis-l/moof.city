@@ -12,11 +12,16 @@ export const getEnvironmentInfo = () => {
   const hasJwtSecret = !!process.env.JWT_SECRET
   const hasSupabaseKeys = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
 
+  // Detect Edge Runtime vs Node.js Runtime
+  // Edge Runtime doesn't have process.version or certain Node.js APIs
+  const isEdgeRuntime = typeof (globalThis as any).EdgeRuntime !== 'undefined'
+
   return {
     isProduction,
     isVercel,
     isDevelopment,
     isClient,
+    isEdgeRuntime,
     hasAdminPassword,
     hasJwtSecret,
     hasSupabaseKeys,

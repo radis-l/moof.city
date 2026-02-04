@@ -99,11 +99,11 @@ const nextConfig = {
       config.externals.push('better-sqlite3')
     }
 
-    // Add performance hints
+    // Add performance hints - Stricter budgets for Phase 1-2 Performance Sprint
     config.performance = {
-      maxAssetSize: 350000, // 350KB (target size)
-      maxEntrypointSize: 350000, // 350KB
-      hints: process.env.NODE_ENV === 'production' ? 'warning' : false,
+      maxAssetSize: 300000, // 300KB - Reduced from 350KB for better performance
+      maxEntrypointSize: 300000, // 300KB - Reduced from 350KB
+      hints: process.env.NODE_ENV === 'production' ? 'error' : false, // Make it error instead of warning
     }
 
     // Optimize chunks

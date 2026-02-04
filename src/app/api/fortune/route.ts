@@ -6,6 +6,12 @@ export const dynamic = 'force-dynamic'
 import { generateFortune } from '@/lib/fortune-generator'
 import { checkEmail, saveFortune } from '@/lib/storage/hybrid-storage'
 import type { UserData } from '@/types'
+import { 
+  fortuneRateLimit, 
+  createRateLimitIdentifier, 
+  getRetryAfterSeconds,
+  getRateLimitErrorMessage 
+} from '@/lib/rate-limit'
 
 // GET: Check if email exists and return existing fortune
 export async function GET(request: NextRequest) {
@@ -30,6 +36,28 @@ export async function GET(request: NextRequest) {
 // POST: Generate and save new fortune
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting check - prevent spam and abuse
+    const identifier = createRateLimitIdentifier(request, 'fortune')
+    const { success, reset } = await fortuneRateLimit.limit(identifier)
+    
+    if (!success) {
+      const retryAfter = getRetryAfterSeconds(reset)
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: getRateLimitErrorMessage(reset, 'fortune'),
+          retryAfter 
+        }, 
+        { 
+          status: 429,
+          headers: {
+            'Retry-After': retryAfter.toString(),
+            'X-RateLimit-Reset': new Date(reset).toISOString()
+          }
+        }
+      )
+    }
+
     const userData: UserData = await request.json()
     
     // Validate required fields

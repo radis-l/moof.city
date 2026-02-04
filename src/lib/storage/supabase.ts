@@ -36,6 +36,14 @@ const mapRowToFortune = (row: DBFortuneRow): FortuneDataEntry => ({
   timestamp: row.generated_at
 })
 
+// PAGINATION OPTIONS INTERFACE
+export interface PaginationOptions {
+  limit?: number                               // จำนวนรายการต่อหน้า (Default: 50)
+  offset?: number                              // เริ่มต้นจากตำแหน่งที่ (Default: 0)
+  orderBy?: 'generated_at' | 'email'          // เรียงตาม (Default: 'generated_at')
+  order?: 'asc' | 'desc'                      // ทิศทางการเรียง (Default: 'desc')
+}
+
 export const supabaseStorage = {
   async saveFortune(userData: UserData, fortuneResult: FortuneResult): Promise<{
     success: boolean
@@ -95,25 +103,41 @@ export const supabaseStorage = {
     }
   },
 
-  async getAllFortunes(): Promise<{
+  async getAllFortunes(options?: PaginationOptions): Promise<{
     success: boolean
     data: FortuneDataEntry[]
+    count: number | null
     message: string
   }> {
+    // Set defaults for pagination
+    const limit = options?.limit ?? 50
+    const offset = options?.offset ?? 0
+    const orderBy = options?.orderBy ?? 'generated_at'
+    const order = options?.order ?? 'desc'
+    const ascending = order === 'asc'
+
     try {
-      const { data, error } = await supabase
+      // Use count: 'exact' to get total count for pagination UI
+      const { data, error, count } = await supabase
         .from(FORTUNES_TABLE)
-        .select('*')
-        .order('generated_at', { ascending: false })
+        .select('*', { count: 'exact' })
+        .order(orderBy, { ascending })
+        .range(offset, offset + limit - 1)
 
       if (error) {
         console.error(`Supabase error fetching from ${FORTUNES_TABLE}:`, error.message)
         throw error
       }
-      return { success: true, data: data.map(mapRowToFortune), message: 'Retrieved successfully' }
+      
+      return { 
+        success: true, 
+        data: data.map(mapRowToFortune), 
+        count: count ?? 0,
+        message: 'Retrieved successfully' 
+      }
     } catch (error: unknown) {
       const msg = error instanceof Error ? error.message : 'Retrieval failed'
-      return { success: false, data: [], message: msg }
+      return { success: false, data: [], count: 0, message: msg }
     }
   },
 

@@ -9,8 +9,12 @@
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "test:utils": "vitest tests/utils-only.spec.ts",
+    "test:auth-edge": "vitest tests/auth-edge.spec.ts",
+    "test:all": "vitest",
     "test:essential": "npm run build && npm run lint && npm run type-check",
-    "analyze": "ANALYZE=true npm run build"
+    "analyze": "ANALYZE=true npm run build",
+    "migrate-passwords": "tsx scripts/migrate-passwords.ts",
+    "migrate-db": "tsx scripts/run-migration.ts"
   },
   "dependencies": {
     "@next/third-parties": "^15.5.1",
@@ -19,6 +23,8 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/uuid": "^10.0.0",
+    "@vercel/analytics": "^1.4.1",
+    "@vercel/speed-insights": "^1.1.0",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.2.0",
     "jsonwebtoken": "^9.0.2",
@@ -41,6 +47,7 @@
     "eslint-config-next": "^15.5.2",
     "husky": "^9.1.7",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^3.2.4"
   }
