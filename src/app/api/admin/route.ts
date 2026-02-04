@@ -4,13 +4,13 @@ import { NextRequest, NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 import { getAllFortunes, deleteFortune, clearAllFortunes, verifyAdminPassword, changeAdminPassword } from '@/lib/storage/hybrid-storage'
-import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded } from '@/lib/auth'
-import { getStorageMode, getEnvironmentInfo } from '@/lib/environment'
+import { generateAdminToken, authenticateAdmin, refreshTokenIfNeeded, COOKIE_NAME } from '@/lib/auth'
+import { getStorageMode } from '@/lib/environment'
 
 // --- TYPES ---
 
 interface AdminActionBody {
-  action: 'login' | 'delete' | 'clear-all' | 'change-password'
+  action: 'login' | 'logout' | 'delete' | 'clear-all' | 'change-password'
   password?: string
   id?: string
   currentPassword?: string
@@ -25,14 +25,31 @@ async function handleLogin(body: AdminActionBody) {
 
   const isValid = await verifyAdminPassword(password)
   if (isValid) {
-    return NextResponse.json({ 
+    const token = generateAdminToken()
+    const response = NextResponse.json({ 
       success: true, 
       message: 'Login successful', 
-      token: generateAdminToken(),
       storageMode: getStorageMode()
     })
+
+    // Set HttpOnly secure cookie
+    response.cookies.set(COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 60 * 60 * 24 // 24 hours
+    })
+
+    return response
   }
   return NextResponse.json({ success: false, error: 'Invalid password' }, { status: 401 })
+}
+
+async function handleLogout() {
+  const response = NextResponse.json({ success: true, message: 'Logged out' })
+  response.cookies.delete(COOKIE_NAME)
+  return response
 }
 
 async function handleDelete(body: AdminActionBody) {
@@ -83,7 +100,15 @@ export async function GET(request: NextRequest) {
     })
 
     const newToken = refreshTokenIfNeeded(tokenPayload)
-    if (newToken) response.headers.set('X-New-Token', newToken)
+    if (newToken) {
+      response.cookies.set(COOKIE_NAME, newToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24
+      })
+    }
 
     return response
   } catch (error: unknown) {
@@ -102,6 +127,7 @@ export async function POST(request: NextRequest) {
 
     // 1. Actions that DON'T require auth
     if (action === 'login') return await handleLogin(body)
+    if (action === 'logout') return await handleLogout()
 
     // 2. Actions that REQUIRE auth
     const tokenPayload = authenticateAdmin(request)

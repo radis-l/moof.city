@@ -144,10 +144,11 @@ export const supabaseStorage = {
 
   async clearAllFortunes(): Promise<{ success: boolean; message: string }> {
     try {
+      // Use a more standard filter for "delete all" in Supabase
       const { data, error } = await supabase
         .from(FORTUNES_TABLE)
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000')
+        .gt('id', '00000000-0000-0000-0000-000000000000')
         .select()
 
       if (error) {

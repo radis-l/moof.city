@@ -44,7 +44,7 @@ export const validateEnvironment = () => {
   }
 
   if (env.isProduction && !env.hasSupabaseKeys && !env.isClient) {
-    errors.push('Supabase keys missing in production - data will not persist')
+    errors.push('CRITICAL: Supabase keys missing in production environment. Data persistence will fail.')
   }
 
   return { warnings, errors, isValid: errors.length === 0 }
@@ -64,8 +64,12 @@ export const getStorageMode = () => {
     if (env.hasSupabaseKeys) {
       return 'supabase'
     }
-    // If we're on the server and keys are missing, it's an error
-    return env.isClient ? 'checking...' : 'error-missing-keys'
+    // If we're on the server and keys are missing, it's a critical error
+    if (!env.isClient) {
+      console.error('CRITICAL: Supabase configuration error in production.')
+      return 'error-missing-keys'
+    }
+    return 'checking...'
   }
   
   // 3. Local Development - Default to SQLite

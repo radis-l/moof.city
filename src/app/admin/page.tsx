@@ -22,14 +22,10 @@ export default function AdminPage() {
   const [initializing, setInitializing] = useState(true)
 
   // Fetch fortune data
-  const fetchData = async (token?: string) => {
-    const authToken = token || localStorage.getItem('adminToken')
-    if (!authToken) return
-    
+  const fetchData = async () => {
     setLoading(true)
     try {
       const response = await fetch('/api/admin', {
-        headers: { 'Authorization': `Bearer ${authToken}` },
         cache: 'no-store'
       })
       
@@ -39,17 +35,11 @@ export default function AdminPage() {
         setData(result.data)
         if (result.storageMode) setServerStorageMode(result.storageMode)
         setMessage(`พบข้อมูล ${result.data.length} รายการ`)
-        
-        // Handle token refresh
-        const newToken = response.headers.get('X-New-Token')
-        if (newToken) {
-          localStorage.setItem('adminToken', newToken)
-        }
+        setIsAuthenticated(true)
       } else {
         setMessage('ไม่สามารถโหลดข้อมูลได้')
         if (result.error && result.error.includes('Authentication')) {
           setIsAuthenticated(false)
-          localStorage.removeItem('adminToken')
         }
       }
     } catch {
@@ -75,9 +65,8 @@ export default function AdminPage() {
       if (result.success) {
         setIsAuthenticated(true)
         setMessage('เข้าสู่ระบบสำเร็จ')
-        localStorage.setItem('adminToken', result.token)
         if (result.storageMode) setServerStorageMode(result.storageMode)
-        fetchData(result.token)
+        fetchData()
       } else {
         setMessage('รหัสผ่านไม่ถูกต้อง')
       }
@@ -87,19 +76,32 @@ export default function AdminPage() {
     setLoading(false)
   }
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'logout' })
+      })
+      setIsAuthenticated(false)
+      setData([])
+      setMessage('ออกจากระบบแล้ว')
+    } catch {
+      setMessage('ออกจากระบบไม่สำเร็จ')
+    }
+  }
+
   // Delete single entry
   const handleDelete = async (id: string) => {
     if (!confirm('แน่ใจว่าต้องการลบ?')) return
     
-    const authToken = localStorage.getItem('adminToken')
     setLoading(true)
     
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ action: 'delete', id })
       })
@@ -122,15 +124,13 @@ export default function AdminPage() {
   const handleClearAll = async () => {
     if (!confirm('แน่ใจว่าต้องการลบข้อมูลทั้งหมด?')) return
     
-    const authToken = localStorage.getItem('adminToken')
     setLoading(true)
     
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ action: 'clear-all' })
       })
@@ -167,14 +167,12 @@ export default function AdminPage() {
     }
 
     setLoading(true)
-    const authToken = localStorage.getItem('adminToken')
     
     try {
       const response = await fetch('/api/admin', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
           action: 'change-password', 
@@ -190,15 +188,7 @@ export default function AdminPage() {
         setCurrentPassword('')
         setNewPassword('')
         setConfirmPassword('')
-        
-        if (result.token) {
-          localStorage.setItem('adminToken', result.token)
-          setMessage('เปลี่ยนรหัสผ่านสำเร็จ')
-        } else {
-          setIsAuthenticated(false)
-          localStorage.removeItem('adminToken')
-          setMessage('เปลี่ยนรหัสผ่านสำเร็จ - กรุณาเข้าสู่ระบบใหม่')
-        }
+        setMessage('เปลี่ยนรหัสผ่านสำเร็จ')
       } else {
         setMessage(result.error || 'เปลี่ยนรหัสผ่านไม่สำเร็จ')
       }
@@ -210,11 +200,7 @@ export default function AdminPage() {
 
   // Check if already logged in on mount
   useEffect(() => {
-    const token = localStorage.getItem('adminToken')
-    if (token) {
-      setIsAuthenticated(true)
-      fetchData(token)
-    }
+    fetchData()
     setInitializing(false)
   }, [])
 
@@ -303,10 +289,7 @@ export default function AdminPage() {
                 </Button>
               )}
               <Button 
-                onClick={() => {
-                  setIsAuthenticated(false)
-                  localStorage.removeItem('adminToken')
-                }}
+                onClick={handleLogout}
                 size="sm"
                 className="bg-white/5 hover:bg-white/10 text-xs border border-white/10"
               >

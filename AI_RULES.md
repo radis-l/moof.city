@@ -40,7 +40,7 @@ npm run test:utils  # Unit tests (vitest only)
 - **Framework**: Next.js 16.1.6 + React 19.2.4 + TypeScript 5.x
 - **Styling**: Tailwind CSS 4.0 + Custom glassmorphism system  
 - **Storage**: Hybrid System (SQLite local, Supabase prod)
-- **Auth**: bcrypt + HTTP-only cookies (24h expiry)
+- **Auth**: bcrypt + HttpOnly Cookies (24h expiry, admin_session)
 - **Animation**: Dynamic Lottie imports (bundle optimized)
 
 ### Directory Structure
