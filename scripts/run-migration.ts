@@ -87,7 +87,7 @@ async function runMigration() {
     console.log('')
     console.log('📝 MANUAL MIGRATION REQUIRED:')
     console.log('')
-    console.log('1. Go to your Supabase Dashboard: ' + supabaseUrl.replace('//', '//app.').replace('.co', '.co/project/_'))
+    console.log('1. Go to your Supabase Dashboard: ' + (supabaseUrl || '').replace('//', '//app.').replace('.co', '.co/project/_'))
     console.log('2. Navigate to: SQL Editor')
     console.log('3. Copy the SQL from migrations/001_add_performance_indexes.sql')
     console.log('4. Paste and execute it')
@@ -97,25 +97,6 @@ async function runMigration() {
   } else {
     console.log('✅ Migration completed successfully!')
     console.log('')
-    
-    // Try to verify indexes
-    try {
-      const { data: indexes, error: indexError } = await supabase
-        .from('information_schema.tables')
-        .select('*')
-        .limit(1)
-
-      if (!indexError) {
-        console.log('🔍 To verify indexes were created, run this SQL query:')
-        console.log('')
-        console.log("  SELECT indexname, indexdef")
-        console.log("  FROM pg_indexes")
-        console.log("  WHERE tablename = 'prod_fortunes';")
-        console.log('')
-      }
-    } catch (err) {
-      // Ignore verification errors
-    }
   }
 }
 
