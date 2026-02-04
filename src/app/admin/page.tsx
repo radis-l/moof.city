@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { EnvironmentBadge } from '@/components/ui/environment-badge'
 import { getEnvironmentInfo } from '@/lib/environment'
@@ -30,18 +29,9 @@ export default function AdminPage() {
   } = useFortuneData()
   const { stats } = useAnalytics(fortunes)
 
-  // Fetch data when authenticated
-  useEffect(() => {
-    if (isAuthenticated && !authLoading) {
-      refresh()
-    }
-  }, [isAuthenticated, authLoading, refresh])
-
   const handleLogin = async (password: string) => {
-    const result = await login(password)
-    if (result.success) {
-      refresh()
-    }
+    await login(password)
+    // Hook will auto-fetch data on mount
   }
 
   const handleLogout = async () => {

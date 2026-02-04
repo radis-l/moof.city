@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import type { FortuneDataEntry } from '@/types'
 
 interface PaginationState {
@@ -80,8 +80,8 @@ export function useFortuneData(): UseFortuneDataReturn {
       const result = await response.json()
       
       if (result.success) {
-        setFortunes(prev => prev.filter(item => item.id !== id))
-        setTotalCount(prev => prev - 1)
+        // Re-fetch from database to sync UI with server state
+        await fetchData(currentPage, itemsPerPage)
         setError('')
       } else {
         setError(`ลบข้อมูลไม่สำเร็จ: ${result.error || result.message || 'ไม่ทราบสาเหตุ'}`)
@@ -109,8 +109,9 @@ export function useFortuneData(): UseFortuneDataReturn {
       const result = await response.json()
       
       if (result.success) {
-        setFortunes([])
-        setTotalCount(0)
+        // Reset to page 1 and re-fetch to sync with database
+        setCurrentPage(1)
+        await fetchData(1, itemsPerPage)
         setError('')
       } else {
         setError(`ล้างข้อมูลไม่สำเร็จ: ${result.error || result.message || 'ไม่ทราบสาเหตุ'}`)
@@ -154,6 +155,12 @@ export function useFortuneData(): UseFortuneDataReturn {
   const refresh = useCallback(async () => {
     await fetchData(currentPage, itemsPerPage)
   }, [fetchData, currentPage, itemsPerPage])
+
+  // Fetch initial data on mount
+  useEffect(() => {
+    fetchData(1, 50)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return {
     fortunes,
