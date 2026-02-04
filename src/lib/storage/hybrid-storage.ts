@@ -14,7 +14,7 @@ export interface SQLitePaginationOptions {
 export type PaginationOptions = SQLitePaginationOptions & SupabasePaginationOptions
 
 // Lazy load SQLite storage only when needed (not in edge runtime)
-let sqliteStorageCache: any = null
+let sqliteStorageCache: typeof import('./sqlite').sqliteStorage | null = null
 async function getSQLiteStorage() {
   if (!sqliteStorageCache) {
     const { sqliteStorage } = await import('./sqlite')

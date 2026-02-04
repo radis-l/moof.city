@@ -17,7 +17,7 @@
     "migrate-db": "tsx scripts/run-migration.ts"
   },
   "dependencies": {
-    "@next/third-parties": "^15.5.1",
+    "@next/third-parties": "^16.1.6",
     "@supabase/supabase-js": "^2.57.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",

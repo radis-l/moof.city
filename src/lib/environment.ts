@@ -14,7 +14,7 @@ export const getEnvironmentInfo = () => {
 
   // Detect Edge Runtime vs Node.js Runtime
   // Edge Runtime doesn't have process.version or certain Node.js APIs
-  const isEdgeRuntime = typeof (globalThis as any).EdgeRuntime !== 'undefined'
+  const isEdgeRuntime = typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime !== 'undefined'
 
   return {
     isProduction,

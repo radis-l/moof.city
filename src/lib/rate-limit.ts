@@ -1,7 +1,9 @@
 /**
  * Rate Limiting Utilities for moof.city
  * 
- * Uses in-memory rate limiting - zero setup required, works everywhere.
+ * Hybrid rate limiting system:
+ * - Production: Supabase-backed (distributed, persistent)
+ * - Development: In-memory (fast, simple)
  * 
  * Rate Limit Configurations:
  * - Fortune Generation: 10 requests per 10 seconds (prevents spam)
@@ -10,76 +12,27 @@
  */
 
 import { NextRequest } from 'next/server'
+import { InMemoryRateLimiter } from './rate-limit-memory'
+import { SupabaseRateLimiter } from './rate-limit-supabase'
 
-// --- IN-MEMORY RATE LIMITER ---
+// --- RATE LIMITER SELECTION ---
 
-interface RateLimitEntry {
-  count: number
-  resetTime: number
+// Determine which limiter to use based on environment
+const isProduction = process.env.NODE_ENV === 'production'
+const hasSupabase = Boolean(
+  process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY
+)
+
+// Use Supabase in production when available, fallback to in-memory
+const shouldUseSupabase = isProduction && hasSupabase
+
+// Log rate limiter selection for debugging
+if (typeof window === 'undefined') {
+  console.log(`[Rate Limit] Using ${shouldUseSupabase ? 'Supabase' : 'In-Memory'} rate limiter`)
 }
 
-class InMemoryRateLimiter {
-  private store = new Map<string, RateLimitEntry>()
-  private maxRequests: number
-  private windowMs: number
-
-  constructor(maxRequests: number, windowMs: number) {
-    this.maxRequests = maxRequests
-    this.windowMs = windowMs
-    
-    // Clean up expired entries every minute
-    setInterval(() => this.cleanup(), 60000)
-  }
-
-  async limit(identifier: string): Promise<{
-    success: boolean
-    limit: number
-    remaining: number
-    reset: number
-    pending: Promise<unknown>
-  }> {
-    const now = Date.now()
-    const entry = this.store.get(identifier)
-
-    // If no entry or entry expired, create new one
-    if (!entry || now >= entry.resetTime) {
-      this.store.set(identifier, {
-        count: 1,
-        resetTime: now + this.windowMs
-      })
-      return {
-        success: true,
-        limit: this.maxRequests,
-        remaining: this.maxRequests - 1,
-        reset: now + this.windowMs,
-        pending: Promise.resolve()
-      }
-    }
-
-    // Increment count
-    entry.count++
-    const remaining = Math.max(0, this.maxRequests - entry.count)
-    const success = entry.count <= this.maxRequests
-
-    return {
-      success,
-      limit: this.maxRequests,
-      remaining,
-      reset: entry.resetTime,
-      pending: Promise.resolve()
-    }
-  }
-
-  private cleanup() {
-    const now = Date.now()
-    const entries = Array.from(this.store.entries())
-    for (const [key, entry] of entries) {
-      if (now >= entry.resetTime) {
-        this.store.delete(key)
-      }
-    }
-  }
-}
+// Select rate limiter implementation
+const RateLimiter = shouldUseSupabase ? SupabaseRateLimiter : InMemoryRateLimiter
 
 // --- RATE LIMITER INSTANCES ---
 
@@ -88,21 +41,21 @@ class InMemoryRateLimiter {
  * Limits: 10 requests per 10 seconds
  * Purpose: Prevent spam and abuse of fortune generation
  */
-export const fortuneRateLimit = new InMemoryRateLimiter(10, 10000)
+export const fortuneRateLimit = new RateLimiter(10, 10000)
 
 /**
  * Admin Login Rate Limiter
  * Limits: 5 attempts per 15 minutes
  * Purpose: Prevent brute force password attacks
  */
-export const adminLoginRateLimit = new InMemoryRateLimiter(5, 15 * 60 * 1000)
+export const adminLoginRateLimit = new RateLimiter(5, 15 * 60 * 1000)
 
 /**
  * Admin Operations Rate Limiter
  * Limits: 30 requests per minute
  * Purpose: Prevent abuse of admin functionality
  */
-export const adminOpsRateLimit = new InMemoryRateLimiter(30, 60000)
+export const adminOpsRateLimit = new RateLimiter(30, 60000)
 
 // --- IP ADDRESS HELPERS ---
 
