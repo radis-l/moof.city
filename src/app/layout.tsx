@@ -3,7 +3,7 @@ import { Kanit, MuseoModerno, Maitree } from "next/font/google";
 import "./globals.css";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Analytics } from '@vercel/analytics/react';
-// Removed over-engineered performance monitor
+import { Toaster } from '@/components/ui/sonner';
 
 const kanit = Kanit({
   variable: "--font-kanit",
@@ -45,7 +45,8 @@ export default function RootLayout({
         className={`${kanit.variable} ${museoModerno.variable} ${maitree.variable} font-kanit antialiased`}
       >
         {children}
-        
+        <Toaster />
+
         {/* Google Analytics 4 Integration */}
         {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && (
           <>
