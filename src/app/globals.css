@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
-@import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
 
 /* MOOF Fortune Telling - Foundation Styles */
@@ -589,7 +586,5 @@
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+  /* Note: body background is controlled by .mystical-background class, not shadcn defaults */
 }

@@ -7,26 +7,24 @@
 ### Essential Commands
 ```bash
 npm run dev         # Development server
-npm run build       # Production build  
+npm run build       # Production build
 npm run lint        # ESLint check
 npm run type-check  # TypeScript validation
-npm run test:utils  # Unit tests (vitest only)
 ```
 
 ### Key File Paths
 - **Components**: `src/components/ui/` (buttons, inputs, animations)
 - **Pages**: `src/app/` (Next.js App Router)
 - **APIs**: `src/app/api/` (storage & auth endpoints)
-- **Storage**: `src/lib/storage/` (Hybrid: SQLite local, Supabase prod)
+- **Storage**: `src/lib/storage/` (Supabase only - dev/prod table separation)
 - **Types**: `src/types/index.ts` (TypeScript definitions)
-- **Utils**: `src/lib/utils.ts` (parseThaiTimestamp, etc.)
+- **Utils**: `src/lib/utils.ts` (cn, parseThaiTimestamp)
 
 ### Environment Detection
 ```typescript
-// Storage method priority:
-// Production: Supabase (when SUPABASE_URL && SUPABASE_ANON_KEY exist)
-// Local Dev: SQLite (data/local.db) - fast, isolated
-// Fallback: Hybrid storage system with environment detection
+// Storage: Supabase only (no SQLite)
+// Dev/Prod tables are separated in Supabase
+// Requires: SUPABASE_URL && SUPABASE_ANON_KEY
 ```
 
 ---
@@ -38,28 +36,28 @@ npm run test:utils  # Unit tests (vitest only)
 
 ### Tech Stack
 - **Framework**: Next.js 16.1.6 + React 19.2.4 + TypeScript 5.x
-- **Styling**: Tailwind CSS 4.0 + Custom glassmorphism system  
-- **Storage**: Hybrid System (SQLite local, Supabase prod)
+- **Styling**: Tailwind CSS 4.0 + shadcn/ui components + Custom glassmorphism system
+- **Storage**: Supabase (dev/prod table separation)
 - **Auth**: bcrypt + HttpOnly Cookies (24h expiry, admin_session)
-- **Animation**: Dynamic Lottie imports (bundle optimized)
+- **Animation**: Dynamic Lottie imports + Framer Motion + tailwindcss-animate
 
 ### Directory Structure
 ```
 src/
 ├── app/                    # Next.js App Router pages
 │   ├── page.tsx           # Landing page (email input)
-│   ├── fortune/page.tsx   # 3-step questionnaire  
+│   ├── fortune/page.tsx   # 3-step questionnaire
 │   ├── fortune/result/    # Fortune display
 │   ├── admin/page.tsx     # Protected analytics dashboard
 │   └── api/               # API endpoints (storage + auth)
 ├── components/
-│   ├── ui/                # Reusable components
+│   ├── ui/                # Reusable components (shadcn + custom)
 │   └── layout/            # MobileLayout wrapper
 ├── lib/
-│   ├── storage/           # Hybrid storage system
+│   ├── storage/           # Supabase storage layer
 │   ├── fortune-generator.ts # Deterministic algorithm
 │   ├── analytics.ts       # GA4 event tracking
-│   └── utils.ts           # Thai timestamp parsing
+│   └── utils.ts           # cn (class merge), parseThaiTimestamp
 └── types/index.ts         # TypeScript definitions
 ```
 
@@ -69,13 +67,13 @@ src/
 
 ### 1. Storage Operations
 ```typescript
-// Always use hybrid storage (SQLite local, Supabase prod)
+// Supabase-only storage (no SQLite)
 import { saveFortune, checkEmail } from '@/lib/storage/hybrid-storage'
 
 // Save fortune
 await saveFortune(userData, fortuneResult)
 
-// Check email existence  
+// Check email existence
 const result = await checkEmail(email)
 ```
 
@@ -85,7 +83,7 @@ import { generateFortune } from '@/lib/fortune-generator'
 
 const fortune = generateFortune({
   age: '26-35' as AgeRange,
-  birthDay: 'Monday' as BirthDay,  
+  birthDay: 'Monday' as BirthDay,
   bloodGroup: 'A' as BloodGroup
 })
 // Always returns same result for same input
@@ -96,6 +94,7 @@ const fortune = generateFortune({
 'use client'
 
 import { useState, useEffect } from 'react'
+import { cn } from '@/lib/utils'
 
 interface ComponentProps {
   className?: string
@@ -105,7 +104,7 @@ interface ComponentProps {
 export const Component = ({ className = '' }: ComponentProps) => {
   // Component logic
   return (
-    <div className={`base-styles ${className}`}>
+    <div className={cn('base-styles', className)}>
       {/* Content */}
     </div>
   )
@@ -129,11 +128,10 @@ export const Component = ({ className = '' }: ComponentProps) => {
 ## 🚨 Critical Rules
 
 ### Security
-- **Never commit** `data/` directory (contains local DB)
 - **Always use** environment variables for Supabase keys (no hardcoded fallbacks)
-- **Strict storage**: Use the hybrid storage orchestration layer
+- **Required env vars**: SUPABASE_URL, SUPABASE_ANON_KEY, JWT_SECRET, ADMIN_PASSWORD
 
-### Code Quality  
+### Code Quality
 - **Mobile-first** design (768px breakpoint strictly enforced)
 - **Thai language** only in UI (no English fallbacks)
 - **Deterministic fortunes** (same input = same output always)
