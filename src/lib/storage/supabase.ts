@@ -1,4 +1,5 @@
 import { supabase } from '../supabase-client'
+import { getEnvironmentInfo } from '../environment'
 import type { UserData, FortuneResult, FortuneDataEntry } from '@/types'
 
 // DATABASE ROW TYPE
@@ -15,8 +16,14 @@ interface DBFortuneRow {
   generated_at: string
 }
 
-const FORTUNES_TABLE = 'prod_fortunes'
-const ADMIN_TABLE = 'prod_admin_config'
+// Dynamic table names based on environment
+const getTablePrefix = () => {
+  const { isDevelopment } = getEnvironmentInfo()
+  return isDevelopment ? 'dev' : 'prod'
+}
+
+const getFortunesTable = () => `${getTablePrefix()}_fortunes`
+const getAdminTable = () => `${getTablePrefix()}_admin_config`
 
 const mapRowToFortune = (row: DBFortuneRow): FortuneDataEntry => ({
   id: row.id,
@@ -53,7 +60,7 @@ export const supabaseStorage = {
     const timestamp = new Date().toISOString()
     try {
       const { data, error } = await supabase
-        .from(FORTUNES_TABLE)
+        .from(getFortunesTable())
         .insert([{
           email: userData.email,
           age_range: userData.ageRange,
@@ -69,7 +76,7 @@ export const supabaseStorage = {
         .single()
 
       if (error) {
-        console.error(`Supabase error inserting into ${FORTUNES_TABLE}:`, error.message)
+        console.error(`Supabase error inserting into ${getFortunesTable()}:`, error.message)
         if (error.code === '23505') return { success: false, message: 'Email already exists' }
         throw error
       }
@@ -88,7 +95,7 @@ export const supabaseStorage = {
   }> {
     try {
       const { data, error } = await supabase
-        .from(FORTUNES_TABLE)
+        .from(getFortunesTable())
         .select('*')
         .eq('email', email)
         .single()
@@ -119,13 +126,13 @@ export const supabaseStorage = {
     try {
       // Use count: 'exact' to get total count for pagination UI
       const { data, error, count } = await supabase
-        .from(FORTUNES_TABLE)
+        .from(getFortunesTable())
         .select('*', { count: 'exact' })
         .order(orderBy, { ascending })
         .range(offset, offset + limit - 1)
 
       if (error) {
-        console.error(`Supabase error fetching from ${FORTUNES_TABLE}:`, error.message)
+        console.error(`Supabase error fetching from ${getFortunesTable()}:`, error.message)
         throw error
       }
       
@@ -145,13 +152,13 @@ export const supabaseStorage = {
     try {
       // Use .select() to confirm if a row was actually deleted
       const { data, error } = await supabase
-        .from(FORTUNES_TABLE)
+        .from(getFortunesTable())
         .delete()
         .eq('id', id)
         .select()
 
       if (error) {
-        console.error(`Supabase error deleting from ${FORTUNES_TABLE}:`, error.message)
+        console.error(`Supabase error deleting from ${getFortunesTable()}:`, error.message)
         throw error
       }
 
@@ -170,13 +177,13 @@ export const supabaseStorage = {
     try {
       // Use a more standard filter for "delete all" in Supabase
       const { data, error } = await supabase
-        .from(FORTUNES_TABLE)
+        .from(getFortunesTable())
         .delete()
         .gt('id', '00000000-0000-0000-0000-000000000000')
         .select()
 
       if (error) {
-        console.error(`Supabase error clearing ${FORTUNES_TABLE}:`, error.message)
+        console.error(`Supabase error clearing ${getFortunesTable()}:`, error.message)
         throw error
       }
       return { success: true, message: `All data cleared (${data?.length || 0} records deleted)` }
@@ -189,7 +196,7 @@ export const supabaseStorage = {
   // Auth specific to Supabase
   async getAdminHash(): Promise<{ hash: string | null; error: unknown }> {
     const { data, error } = await supabase
-      .from(ADMIN_TABLE)
+      .from(getAdminTable())
       .select('password_hash')
       .order('updated_at', { ascending: false })
       .limit(1)
@@ -201,7 +208,7 @@ export const supabaseStorage = {
   async updateAdminPassword(passwordHash: string): Promise<{ error: unknown }> {
     const timestamp = new Date().toISOString()
     const { error } = await supabase
-      .from(ADMIN_TABLE)
+      .from(getAdminTable())
       .upsert({
         id: 'main',
         password_hash: passwordHash,

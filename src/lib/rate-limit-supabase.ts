@@ -1,6 +1,6 @@
 /**
  * Supabase-backed Rate Limiter for moof.city
- * 
+ *
  * Uses PostgreSQL table for distributed rate limiting across serverless instances.
  * Automatically handles cleanup and provides graceful degradation on errors.
  */
@@ -15,23 +15,31 @@ interface RateLimitResult {
   pending: Promise<unknown>
 }
 
+// Dynamic table name based on environment
+const getRateLimitsTable = () => {
+  const isDevelopment = process.env.NODE_ENV !== 'production' && process.env.VERCEL !== '1'
+  return isDevelopment ? 'dev_rate_limits' : 'prod_rate_limits'
+}
+
 export class SupabaseRateLimiter {
   private supabase
   private maxRequests: number
   private windowMs: number
+  private tableName: string
 
   constructor(maxRequests: number, windowMs: number) {
     this.maxRequests = maxRequests
     this.windowMs = windowMs
-    
+    this.tableName = getRateLimitsTable()
+
     // Initialize Supabase client
     const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    
+
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase credentials not configured for rate limiting')
     }
-    
+
     this.supabase = createClient(supabaseUrl, supabaseKey)
   }
 
@@ -45,7 +53,7 @@ export class SupabaseRateLimiter {
 
       // Get current entry
       const { data: existing, error: fetchError } = await this.supabase
-        .from('rate_limits')
+        .from(this.tableName)
         .select('*')
         .eq('identifier', identifier)
         .maybeSingle()
@@ -57,7 +65,7 @@ export class SupabaseRateLimiter {
       // If no entry or expired, create/reset
       if (!existing || new Date(existing.reset_time).getTime() <= now) {
         const { error: upsertError } = await this.supabase
-          .from('rate_limits')
+          .from(this.tableName)
           .upsert({
             identifier,
             count: 1,
@@ -81,7 +89,7 @@ export class SupabaseRateLimiter {
       // Increment count
       const newCount = existing.count + 1
       const { error: updateError } = await this.supabase
-        .from('rate_limits')
+        .from(this.tableName)
         .update({ 
           count: newCount,
           updated_at: new Date().toISOString()
@@ -125,7 +133,7 @@ export class SupabaseRateLimiter {
       if (Math.random() > 0.1) return
 
       await this.supabase
-        .from('rate_limits')
+        .from(this.tableName)
         .delete()
         .lt('reset_time', new Date().toISOString())
     } catch (error) {
