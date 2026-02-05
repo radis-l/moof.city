@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { EnvironmentBadge } from '@/components/ui/environment-badge'
-import { getEnvironmentInfo } from '@/lib/environment'
 import { useAdminAuth } from './hooks/useAdminAuth'
 import { useFortuneData } from './hooks/useFortuneData'
 import { useAnalytics } from './hooks/useAnalytics'

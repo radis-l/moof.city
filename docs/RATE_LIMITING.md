@@ -162,19 +162,3 @@ The 31st request should return `429 Too Many Requests`.
 
 3. **Rate Limit Evasion**: Attackers might try to clear cookies or use private browsing. IP-based limiting helps prevent this.
 
-## Future Improvements
-
-Potential enhancements for production scale:
-
-1. **Dynamic Rate Limits**: Adjust limits based on user behavior
-2. **Geo-blocking**: Block requests from suspicious regions
-3. **Analytics**: Track rate limit violations to identify attack patterns
-4. **Allowlist**: Whitelist trusted IPs (e.g., monitoring services)
-5. **Custom Error Pages**: Branded 429 error page in Thai
-6. **Email Alerts**: Notify admins of repeated violations
-
----
-
-**Last Updated**: February 4, 2026
-**Version**: 2.0.0
-**Maintainer**: moof.city development team

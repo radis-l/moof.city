@@ -7,13 +7,11 @@ export const getEnvironmentInfo = () => {
   const isDevelopment = !isProduction && !isVercel
 
   // Check if required environment variables are present
-  // Note: These are only available on the server
   const hasAdminPassword = !!process.env.ADMIN_PASSWORD
   const hasJwtSecret = !!process.env.JWT_SECRET
   const hasSupabaseKeys = !!(process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY)
 
   // Detect Edge Runtime vs Node.js Runtime
-  // Edge Runtime doesn't have process.version or certain Node.js APIs
   const isEdgeRuntime = typeof (globalThis as { EdgeRuntime?: string }).EdgeRuntime !== 'undefined'
 
   return {
@@ -39,56 +37,35 @@ export const validateEnvironment = () => {
     errors.push('JWT_SECRET environment variable is missing')
   }
 
+  if (!env.hasSupabaseKeys && !env.isClient) {
+    errors.push('Supabase keys missing - SUPABASE_URL and SUPABASE_ANON_KEY required')
+  }
+
   if (env.isDevelopment && !env.hasAdminPassword && !env.isClient) {
-    errors.push('ADMIN_PASSWORD environment variable is missing in development')
-  }
-
-  // Warning checks
-  if (env.isDevelopment && env.hasSupabaseKeys) {
-    warnings.push('Supabase keys detected in development - app will use SQLite unless forced')
-  }
-
-  if (env.isProduction && !env.hasSupabaseKeys && !env.isClient) {
-    errors.push('CRITICAL: Supabase keys missing in production environment. Data persistence will fail.')
+    warnings.push('ADMIN_PASSWORD not set - using default "admin" for local dev')
   }
 
   return { warnings, errors, isValid: errors.length === 0 }
 }
 
+// Always use Supabase (no more SQLite)
 export const getStorageMode = () => {
   const env = getEnvironmentInfo()
-  const forceSupabase = process.env.USE_SUPABASE_PRIMARY === 'true'
 
-  // 1. Explicitly forced via Env Var
-  if (forceSupabase && env.hasSupabaseKeys) {
-    return 'supabase'
+  if (!env.hasSupabaseKeys && !env.isClient) {
+    console.error('CRITICAL: Supabase keys missing')
+    return 'error-missing-keys'
   }
 
-  // 2. Production/Vercel - MUST use Supabase
-  if (env.isProduction || env.isVercel) {
-    if (env.hasSupabaseKeys) {
-      return 'supabase'
-    }
-    // If we're on the server and keys are missing, it's a critical error
-    if (!env.isClient) {
-      console.error('CRITICAL: Supabase configuration error in production.')
-      return 'error-missing-keys'
-    }
-    return 'checking...'
-  }
-  
-  // 3. Local Development - Default to SQLite
-  return 'sqlite'
+  return 'supabase'
 }
 
 export const getEnvironmentBadge = () => {
   const env = getEnvironmentInfo()
-  const storageMode = getStorageMode()
 
   return {
     environment: env.isDevelopment ? 'Development' : 'Production',
-    storage: storageMode === 'supabase' ? 'Supabase DB' :
-      storageMode === 'sqlite' ? 'SQLite' : 'Fallback',
+    storage: 'Supabase',
     color: env.isDevelopment ? 'bg-blue-600' : 'bg-green-600'
   }
 }
