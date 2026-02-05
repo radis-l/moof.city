@@ -265,7 +265,7 @@ export function getNavigationTiming() {
 export function getMemoryUsage() {
   if (typeof window === 'undefined') return null;
   
-  const perf = performance as any;
+  const perf = performance as Performance & { memory?: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } };
   if (perf.memory) {
     return {
       usedJSHeapSize: perf.memory.usedJSHeapSize,

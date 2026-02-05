@@ -116,8 +116,9 @@ export function reportWebVitals(metric: WebVitalsMetric) {
   logInDevelopment(metric);
 
   // Track to custom performance monitoring if needed
-  if (typeof window !== 'undefined' && (window as any).performanceMonitor) {
-    (window as any).performanceMonitor.trackWebVital(metric);
+  const windowWithMonitor = typeof window !== 'undefined' ? window as unknown as { performanceMonitor?: { trackWebVital: (m: unknown) => void } } : null;
+  if (windowWithMonitor?.performanceMonitor) {
+    windowWithMonitor.performanceMonitor.trackWebVital(metric);
   }
 }
 
@@ -177,21 +178,22 @@ export function getCurrentWebVitals(): Promise<Record<string, number>> {
       try {
         new PerformanceObserver((list) => {
           const entries = list.getEntries();
-          const lastEntry = entries[entries.length - 1] as any;
-          vitals.LCP = lastEntry.renderTime || lastEntry.loadTime;
+          const lastEntry = entries[entries.length - 1] as PerformanceEntry & { renderTime?: number; loadTime?: number };
+          vitals.LCP = lastEntry.renderTime || lastEntry.loadTime || 0;
         }).observe({ type: 'largest-contentful-paint', buffered: true });
-      } catch (e) {
+      } catch {
         // Ignore if not supported
       }
 
       // Get FID/INP
       try {
         new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry: any) => {
-            vitals.FID = entry.processingStart - entry.startTime;
+          list.getEntries().forEach((entry) => {
+            const fidEntry = entry as PerformanceEntry & { processingStart?: number };
+            vitals.FID = (fidEntry.processingStart || 0) - entry.startTime;
           });
         }).observe({ type: 'first-input', buffered: true });
-      } catch (e) {
+      } catch {
         // Ignore if not supported
       }
 
@@ -199,14 +201,15 @@ export function getCurrentWebVitals(): Promise<Record<string, number>> {
       try {
         let clsValue = 0;
         new PerformanceObserver((list) => {
-          list.getEntries().forEach((entry: any) => {
-            if (!entry.hadRecentInput) {
-              clsValue += entry.value;
+          list.getEntries().forEach((entry) => {
+            const clsEntry = entry as PerformanceEntry & { hadRecentInput?: boolean; value?: number };
+            if (!clsEntry.hadRecentInput) {
+              clsValue += clsEntry.value || 0;
             }
           });
           vitals.CLS = clsValue;
         }).observe({ type: 'layout-shift', buffered: true });
-      } catch (e) {
+      } catch {
         // Ignore if not supported
       }
 

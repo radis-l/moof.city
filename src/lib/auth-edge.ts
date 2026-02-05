@@ -65,12 +65,13 @@ function base64Decode(base64: string): Uint8Array {
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) {
     // Still do comparison to maintain constant time
-    // Compare against itself to keep timing consistent
-    let mismatch = 1
+    // Compare against itself to keep timing consistent (prevent timing attacks)
+    let result = 1
     for (let i = 0; i < a.length; i++) {
-      mismatch |= a.charCodeAt(i) ^ a.charCodeAt(i % b.length)
+      result |= a.charCodeAt(i) ^ a.charCodeAt(i % b.length)
     }
-    return false
+    // Use result to prevent optimization, but always return false for length mismatch
+    return result === 0
   }
   
   let mismatch = 0

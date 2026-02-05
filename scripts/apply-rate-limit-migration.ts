@@ -59,7 +59,7 @@ async function applyMigration() {
   
   // Verify table was created
   console.log('🔍 Verifying rate_limits table...')
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('rate_limits')
     .select('*')
     .limit(1)
