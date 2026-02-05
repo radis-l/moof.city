@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
 import { MobileLayout } from '@/components/layout'
 import { trackEmailSubmission, trackError, trackPageView, trackFormBegin, trackSessionStart } from '@/lib/analytics'
 
@@ -128,21 +131,20 @@ export default function Home() {
           </div>
 
           {/* Terms Checkbox */}
-          <div className="flex items-start text-left">
-            <input 
-              type="checkbox" 
-              id="terms" 
+          <div className="flex items-start gap-3 text-left">
+            <Checkbox
+              id="terms"
               checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 mr-3 w-4 h-4 accent-purple-500"
+              onCheckedChange={(checked) => setAgreed(checked === true)}
+              className="mt-0.5"
             />
-            <label 
-              htmlFor="terms" 
-              className="font-body text-gray-300 leading-relaxed"
+            <Label
+              htmlFor="terms"
+              className="font-body text-gray-300 leading-relaxed cursor-pointer font-normal"
               style={{ fontSize: 'var(--text-sm)' }}
             >
               ยินยอมให้ใช้อีเมลเพื่อวัดประสิทธิภาพโฆษณา
-            </label>
+            </Label>
           </div>
 
           {/* CTA Button */}
@@ -161,43 +163,45 @@ export default function Home() {
           </div>
 
           {/* Email Policy - Integrated */}
-          <div className="text-left">
-            <div 
-              className="font-body font-medium text-gray-400 mb-2"
-              style={{ fontSize: 'var(--text-sm)' }}
-            >
-              นโยบายการใช้อีเมล:
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-start">
-                <span className="text-purple-400 mr-2">•</span>
-                <span 
-                  className="font-body text-gray-300"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  ไม่มีการนำอีเมลไปใช้ในเชิงพาณิชย์
-                </span>
+          <Card className="bg-white/[0.05] border-purple-500/20 backdrop-blur-sm">
+            <CardContent className="p-4 text-left">
+              <div
+                className="font-body font-medium text-gray-400 mb-2"
+                style={{ fontSize: 'var(--text-sm)' }}
+              >
+                นโยบายการใช้อีเมล:
               </div>
-              <div className="flex items-start">
-                <span className="text-purple-400 mr-2">•</span>
-                <span 
-                  className="font-body text-gray-300"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  ไม่มีการแชร์อีเมลกับบุคคลที่สาม
-                </span>
+              <div className="space-y-1">
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    ไม่มีการนำอีเมลไปใช้ในเชิงพาณิชย์
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    ไม่มีการแชร์อีเมลกับบุคคลที่สาม
+                  </span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-purple-400 mr-2">•</span>
+                  <span
+                    className="font-body text-gray-300"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    อีเมลจะถูกลบออกภายใน <span className="text-white font-medium">30 วัน</span>
+                  </span>
+                </div>
               </div>
-              <div className="flex items-start">
-                <span className="text-purple-400 mr-2">•</span>
-                <span 
-                  className="font-body text-gray-300"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  อีเมลจะถูกลบออกภายใน <span className="text-white font-medium">30 วัน</span>
-                </span>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
         </div>
       </main>

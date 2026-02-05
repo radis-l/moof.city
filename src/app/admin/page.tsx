@@ -1,7 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { EnvironmentBadge } from '@/components/ui/environment-badge'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { useAdminAuth } from './hooks/useAdminAuth'
 import { useFortuneData } from './hooks/useFortuneData'
 import { useAnalytics } from './hooks/useAnalytics'
@@ -11,6 +20,7 @@ import { FortuneTable } from './components/FortuneTable'
 import { ExportButton } from './components/ExportButton'
 
 export default function AdminPage() {
+  const [isClearAllDialogOpen, setIsClearAllDialogOpen] = useState(false)
   const { isAuthenticated, isLoading: authLoading, error: authError, login, logout } = useAdminAuth()
   const {
     fortunes,
@@ -109,10 +119,10 @@ export default function AdminPage() {
                 🔄 รีเฟรช
               </Button>
               <ExportButton fortunes={fortunes} />
-              <Button 
-                onClick={clearAll} 
-                disabled={dataLoading} 
-                size="sm" 
+              <Button
+                onClick={() => setIsClearAllDialogOpen(true)}
+                disabled={dataLoading}
+                size="sm"
                 className="bg-red-600/30 hover:bg-red-600/50 text-xs border border-red-500/30"
               >
                 🗑 ล้างทั้งหมด
@@ -149,6 +159,41 @@ export default function AdminPage() {
           isLoading={dataLoading}
         />
       </div>
+
+      {/* Clear All Confirmation Dialog */}
+      <Dialog open={isClearAllDialogOpen} onOpenChange={setIsClearAllDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-white">⚠️ ยืนยันการลบทั้งหมด</DialogTitle>
+            <DialogDescription className="text-white/60">
+              ต้องการลบข้อมูลทั้งหมดหรือไม่? การดำเนินการนี้ไม่สามารถยกเลิกได้
+              <br />
+              <span className="text-red-400 font-medium">
+                ข้อมูลทั้งหมด {pagination.totalCount} รายการจะถูกลบ
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsClearAllDialogOpen(false)}
+              className="bg-white/5 hover:bg-white/10 border-white/10 text-white"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={() => {
+                clearAll()
+                setIsClearAllDialogOpen(false)
+              }}
+              disabled={dataLoading}
+              className="bg-red-600/80 hover:bg-red-600 text-white border-0"
+            >
+              ลบทั้งหมด
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

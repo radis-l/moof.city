@@ -3,6 +3,29 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import type { FortuneDataEntry } from '@/types'
 
 interface PaginationState {
@@ -34,6 +57,8 @@ export function FortuneTable({
   isLoading
 }: FortuneTableProps) {
   const [jumpToPage, setJumpToPage] = useState('')
+  const [deleteId, setDeleteId] = useState<string | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   const handleJumpToPage = () => {
     const pageNum = parseInt(jumpToPage, 10)
@@ -43,58 +68,99 @@ export function FortuneTable({
     }
   }
 
+  const handleDeleteClick = (id: string) => {
+    setDeleteId(id)
+    setIsDeleteDialogOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (deleteId) {
+      await onDelete(deleteId)
+      setDeleteId(null)
+      setIsDeleteDialogOpen(false)
+    }
+  }
+
   return (
     <div>
       <div className="card-mystical overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-white text-sm">
-            <thead className="bg-black/30">
-              <tr>
-                <th className="p-3 text-left">อีเมล</th>
-                <th className="p-3 text-left">อายุ</th>
-                <th className="p-3 text-left">วันเกิด</th>
-                <th className="p-3 text-left">กรุ๊ปเลือด</th>
-                <th className="p-3 text-left">เลขนำโชค</th>
-                <th className="p-3 text-left">วันที่</th>
-                <th className="p-3 text-center">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table className="text-white text-sm">
+            <TableHeader className="bg-black/30">
+              <TableRow className="border-white/10 hover:bg-transparent">
+                <TableHead className="text-white/80">อีเมล</TableHead>
+                <TableHead className="text-white/80">อายุ</TableHead>
+                <TableHead className="text-white/80">วันเกิด</TableHead>
+                <TableHead className="text-white/80">กรุ๊ปเลือด</TableHead>
+                <TableHead className="text-white/80">เลขนำโชค</TableHead>
+                <TableHead className="text-white/80">วันที่</TableHead>
+                <TableHead className="text-white/80 text-center">จัดการ</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {fortunes.map((item, index) => (
-                <tr 
-                  key={item.id} 
-                  className={`${index % 2 === 0 ? 'bg-white/5' : 'bg-transparent'} border-b border-white/5 last:border-0 hover:bg-white/[0.08] transition-colors`}
+                <TableRow
+                  key={item.id}
+                  className={`${index % 2 === 0 ? 'bg-white/5' : 'bg-transparent'} border-white/5 hover:bg-white/[0.08] transition-colors`}
                 >
-                  <td className="p-4 font-medium">{item.userData.email}</td>
-                  <td className="p-4 opacity-70">{item.userData.ageRange}</td>
-                  <td className="p-4 opacity-70">{item.userData.birthDay}</td>
-                  <td className="p-4 opacity-70">{item.userData.bloodGroup}</td>
-                  <td className="p-4 text-xl font-bold text-purple-400">
+                  <TableCell className="font-medium text-white">{item.userData.email}</TableCell>
+                  <TableCell className="text-white/70">{item.userData.ageRange}</TableCell>
+                  <TableCell className="text-white/70">{item.userData.birthDay}</TableCell>
+                  <TableCell className="text-white/70">{item.userData.bloodGroup}</TableCell>
+                  <TableCell className="text-xl font-bold text-purple-400">
                     {item.fortuneResult.luckyNumber}
-                  </td>
-                  <td className="p-4 opacity-60 text-xs">
+                  </TableCell>
+                  <TableCell className="text-white/60 text-xs">
                     {new Date(item.timestamp).toLocaleDateString('th-TH')}
-                  </td>
-                  <td className="p-4 text-center">
+                  </TableCell>
+                  <TableCell className="text-center">
                     <Button
-                      onClick={() => onDelete(item.id)}
+                      onClick={() => handleDeleteClick(item.id)}
                       disabled={isLoading}
                       size="sm"
                       className="bg-red-500/10 hover:bg-red-500/30 text-red-400 text-[10px] px-3 py-1 border border-red-500/20"
                     >
                       ลบ
                     </Button>
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
-          
+            </TableBody>
+          </Table>
+
           {fortunes.length === 0 && !isLoading && (
             <div className="text-center text-white/60 py-8">ไม่มีข้อมูล</div>
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-white">ยืนยันการลบ</DialogTitle>
+            <DialogDescription className="text-white/60">
+              ต้องการลบข้อมูลนี้หรือไม่? การดำเนินการนี้ไม่สามารถยกเลิกได้
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              className="bg-white/5 hover:bg-white/10 border-white/10 text-white"
+            >
+              ยกเลิก
+            </Button>
+            <Button
+              onClick={handleConfirmDelete}
+              disabled={isLoading}
+              className="bg-red-600/80 hover:bg-red-600 text-white border-0"
+            >
+              ลบ
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {fortunes.length > 0 && (
         <div className="card-mystical p-4 mt-4">
@@ -148,16 +214,20 @@ export function FortuneTable({
 
             <div className="flex items-center gap-2">
               <span className="text-white/60 text-xs">แสดง:</span>
-              <select
-                value={pagination.itemsPerPage}
-                onChange={(e) => onItemsPerPageChange(parseInt(e.target.value, 10))}
+              <Select
+                value={pagination.itemsPerPage.toString()}
+                onValueChange={(value) => onItemsPerPageChange(parseInt(value, 10))}
                 disabled={isLoading}
-                className="h-8 px-2 text-xs bg-white/5 border border-white/10 rounded text-white hover:bg-white/10 transition-colors"
               >
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
+                <SelectTrigger className="h-8 w-20 text-xs bg-white/5 border-white/10 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-900 border-white/10">
+                  <SelectItem value="25" className="text-white hover:bg-white/10">25</SelectItem>
+                  <SelectItem value="50" className="text-white hover:bg-white/10">50</SelectItem>
+                  <SelectItem value="100" className="text-white hover:bg-white/10">100</SelectItem>
+                </SelectContent>
+              </Select>
               <span className="text-white/60 text-xs">รายการ/หน้า</span>
             </div>
           </div>

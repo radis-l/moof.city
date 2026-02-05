@@ -4,6 +4,9 @@ import { Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LoadingAnimation } from '@/components/ui/loading-animation'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
 import { MobileLayout } from '@/components/layout'
 import { generateFortune } from '@/lib/fortune-generator'
 import type { UserData, FortuneResult } from '@/types'
@@ -180,97 +183,101 @@ function FortuneResultPageContent() {
               </h1>
             </div>
 
-            {/* Sub-header - User Info Only */}
+            {/* Sub-header - User Info with Badges */}
             <div className="text-center mb-6">
-              <div className="flex justify-center gap-8 text-center">
-                <div className="min-w-[60px]">
-                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>อายุ</div>
-                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.ageRange}</div>
-                </div>
-                <div className="min-w-[60px]">
-                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</div>
-                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.birthDay}</div>
-                </div>
-                <div className="min-w-[60px]">
-                  <div className="font-body text-gray-400 mb-1" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</div>
-                  <div className="font-body text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.bloodGroup}</div>
-                </div>
+              <div className="flex justify-center gap-3 flex-wrap">
+                <Badge variant="mystical" className="font-body px-3 py-1">
+                  <span className="text-gray-400 mr-1" style={{ fontSize: 'var(--text-xs)' }}>อายุ</span>
+                  <span className="text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.ageRange}</span>
+                </Badge>
+                <Badge variant="mystical" className="font-body px-3 py-1">
+                  <span className="text-gray-400 mr-1" style={{ fontSize: 'var(--text-xs)' }}>เกิดวัน</span>
+                  <span className="text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.birthDay}</span>
+                </Badge>
+                <Badge variant="mystical" className="font-body px-3 py-1">
+                  <span className="text-gray-400 mr-1" style={{ fontSize: 'var(--text-xs)' }}>กรุ๊ปเลือด</span>
+                  <span className="text-white font-medium" style={{ fontSize: 'var(--text-sm)' }}>{userData.bloodGroup}</span>
+                </Badge>
               </div>
             </div>
 
             {/* Lucky Number */}
-            <div className="card-mystical text-center">
-              <h2
-                className="font-heading text-white font-bold mb-4"
-                style={{ fontSize: 'var(--text-xl)' }}
-              >
-                เลขนำโชค
-              </h2>
-              <div
-                className="text-white font-heading font-bold"
-                style={{ fontSize: '4rem', lineHeight: '1' }}
-                data-testid="fortune-numbers"
-              >
-                {fortune.luckyNumber}
-              </div>
-            </div>
+            <Card className="bg-white/[0.08] backdrop-blur-xl border-purple-500/30">
+              <CardHeader className="pb-2">
+                <CardTitle
+                  className="font-heading text-white font-bold text-center"
+                  style={{ fontSize: 'var(--text-xl)' }}
+                >
+                  เลขนำโชค
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-center pb-6">
+                <div
+                  className="text-white font-heading font-bold"
+                  style={{ fontSize: '4rem', lineHeight: '1' }}
+                  data-testid="fortune-numbers"
+                >
+                  {fortune.luckyNumber}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Fortune Predictions - Combined Card */}
-            <div className="card-mystical">
-              {/* Relationship */}
-              <div className="mb-6">
-                <h3
-                  className="font-heading font-bold mb-3 text-pink-300 flex items-center gap-2"
-                  style={{ fontSize: 'var(--text-lg)' }}
-                >
-                  💝 เรื่องรัก
-                </h3>
-                <p
-                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  {fortune.relationship}
-                </p>
-              </div>
+            <Card className="bg-white/[0.08] backdrop-blur-xl border-purple-500/30">
+              <CardContent className="p-6">
+                {/* Relationship */}
+                <div className="mb-6">
+                  <h3
+                    className="font-heading font-bold mb-3 text-pink-300 flex items-center gap-2"
+                    style={{ fontSize: 'var(--text-lg)' }}
+                  >
+                    💝 เรื่องรัก
+                  </h3>
+                  <p
+                    className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    {fortune.relationship}
+                  </p>
+                </div>
 
-              {/* Divider */}
-              <div className="border-t border-gray-500/50 my-6"></div>
+                <Separator className="my-6 bg-gray-500/50" />
 
-              {/* Work */}
-              <div className="mb-6">
-                <h3
-                  className="font-heading font-bold mb-3 text-blue-300 flex items-center gap-2"
-                  style={{ fontSize: 'var(--text-lg)' }}
-                >
-                  💼 การงาน
-                </h3>
-                <p
-                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  {fortune.work}
-                </p>
-              </div>
+                {/* Work */}
+                <div className="mb-6">
+                  <h3
+                    className="font-heading font-bold mb-3 text-blue-300 flex items-center gap-2"
+                    style={{ fontSize: 'var(--text-lg)' }}
+                  >
+                    💼 การงาน
+                  </h3>
+                  <p
+                    className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    {fortune.work}
+                  </p>
+                </div>
 
-              {/* Divider */}
-              <div className="border-t border-gray-500/50 my-6"></div>
+                <Separator className="my-6 bg-gray-500/50" />
 
-              {/* Health */}
-              <div>
-                <h3
-                  className="font-heading font-bold mb-3 text-green-300 flex items-center gap-2"
-                  style={{ fontSize: 'var(--text-lg)' }}
-                >
-                  🏥 สุขภาพ
-                </h3>
-                <p
-                  className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
-                  style={{ fontSize: 'var(--text-sm)' }}
-                >
-                  {fortune.health}
-                </p>
-              </div>
-            </div>
+                {/* Health */}
+                <div>
+                  <h3
+                    className="font-heading font-bold mb-3 text-green-300 flex items-center gap-2"
+                    style={{ fontSize: 'var(--text-lg)' }}
+                  >
+                    🏥 สุขภาพ
+                  </h3>
+                  <p
+                    className="font-body text-gray-200 leading-relaxed whitespace-pre-line"
+                    style={{ fontSize: 'var(--text-sm)' }}
+                  >
+                    {fortune.health}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Bottom padding for floating button */}
             <div style={{ paddingBottom: '100px' }}></div>
