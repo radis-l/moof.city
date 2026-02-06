@@ -139,4 +139,23 @@ export const Component = ({ className = '' }: ComponentProps) => {
 
 ---
 
+## MCP Tools
+
+This project has a `.mcp.json` that provides **Supabase MCP** at the project level. This gives Claude Code direct access to the Supabase project (SQL queries, table management, migrations, edge functions) via OAuth.
+
+### Available MCP Servers (when running Claude Code in this project)
+- **Supabase** (project-level via `.mcp.json`) - Database operations, migrations, edge functions
+- **GitHub** (global) - Repository operations, PRs, issues
+- **Stripe** (global) - Payment integrations
+- **Vercel** (global) - Deployments, domains
+- **shadcn** (global) - UI component registry
+- **context7** (global) - Library documentation lookup
+
+### Supabase Notes
+- Dev/prod tables are separated within the same Supabase project
+- Project credentials in `.env.local` (SUPABASE_URL, SUPABASE_ANON_KEY)
+- MCP auth is handled via OAuth (no tokens in `.mcp.json`)
+
+---
+
 *This AI_RULES.md is optimized for AI context consumption. Each section provides immediate, actionable information for maximum development efficiency.*
